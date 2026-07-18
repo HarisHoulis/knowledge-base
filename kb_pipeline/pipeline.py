@@ -1,9 +1,9 @@
 import hashlib
 import logging
 import time
-from typing import Any, Optional
+from typing import Optional
 
-from .config import SOURCES
+from .config import SOURCES, Source
 from .state import load_state, save_state
 from .fetcher import fetch_rss, fetch_youtube, extract_text
 from .llm import classify_summarize
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 def run_pipeline(
     dry_run: bool = False,
     limit: Optional[int] = None,
-    sources: Optional[list[dict[str, Any]]] = None,
+    sources: Optional[list[Source]] = None,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
@@ -23,8 +23,8 @@ def run_pipeline(
     stats = {"sources": 0, "seen": 0, "written": 0, "skipped": 0}
 
     for src in sources:
-        logger.info("[%s]", src["id"])
-        entries = fetch_rss(src) if src["type"] == "rss" else fetch_youtube(src)
+        logger.info("[%s]", src.id)
+        entries = fetch_rss(src) if src.type == "rss" else fetch_youtube(src)
         logger.info("  %d in feed", len(entries))
         stats["sources"] += 1
 
