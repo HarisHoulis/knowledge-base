@@ -3,7 +3,7 @@
 
 Polls RSS feeds (trusted sources), extracts content,
 classifies + summarizes via DeepSeek V4 Flash API,
-and writes leaf-node entries as domain/subdomain/concept.md.
+and writes concepts as domain/subdomain/concept.md.
 
 Usage:
   python3 fetch.py                     # live run

@@ -6,7 +6,7 @@ A senior mobile tech lead needs to future-proof himself against the AI-driven re
 
 ## Solution
 
-An automated pipeline (`fetch.py`) that polls RSS feeds from 9 trusted individuals daily, extracts article text, classifies and summarizes each piece via DeepSeek V4 Flash API into a `domain/subdomain/concept.md` leaf-node entry, writes it to a local directory tree, and git-commits to a private GitHub repo. The user consumes the output as a reference library + weekly digest.
+An automated pipeline (`fetch.py`) that polls RSS feeds from 9 trusted individuals daily, extracts article text, classifies and summarizes each piece via DeepSeek V4 Flash API into a `domain/subdomain/concept.md` concept, writes it to a local directory tree, and git-commits to a private GitHub repo. The user consumes the output as a reference library + weekly digest.
 
 ## User Stories
 

@@ -1,55 +1,46 @@
-# Knowledge Base — Glossary
+# Knowledge Base
 
-## Domain Structure
+A curated repository of high-signal concepts synthesized from trusted sources, organized as a browsable directory tree.
 
-The KB organizes concepts in a three-level tree: `domain/subdomain/concept.md`.
+## Language
 
-### Domains and Subdomains
+**Concept**:
+A single, tightly-scoped idea captured in one markdown file at `domain/subdomain/concept.md`.
+_Avoid_: Entry, leaf-node entry, knowledge item
 
-| Domain | Subdomains | Scope |
+**Domain**:
+A top-level category of engineering knowledge. One of `android-kotlin`, `system-design`, `python-backend`, `ai-workflows`, `engineering-culture`.
+
+**Subdomain**:
+A sub-category within a domain. Examples: `architecture`, `coroutines`, `fastapi`, `coding-agents`.
+
+**Trusted Source**:
+An individual whose content is auto-ingested regardless of medium. All other sources must pass the audit gate.
+_Avoid_: Tier 1, auto-include source
+
+**Pipeline**:
+The automated process that fetches content from trusted sources, classifies it into a domain/subdomain/concept, writes a concept file, and commits it to the repository.
+
+**Weekly Digest**:
+A recurring 30-minute review of newly added concepts.
+
+**State**:
+Persistent tracking of which source URLs have already been processed, stored outside the KB tree.
+_Avoid_: Processed hashes
+
+**Cold Start**:
+The decision to begin ingesting from today only, without backfilling historical content from trusted sources.
+
+## Trusted Sources
+
+| Person | Domain | Primary Channel |
 |---|---|---|
-| `android-kotlin` | `architecture`, `coroutines`, `compose`, `build-tooling` | Android app development, Kotlin idioms, tooling |
-| `system-design` | `complexity`, `ddd`, `microservices` | Software architecture principles, trade-offs, patterns |
-| `python-backend` | `fastapi`, `async-python`, `service-patterns` | Python BE services (the team's expansion area) |
-| `ai-workflows` | `coding-agents`, `local-models`, `mcp`, `prompt-engineering` | AI-assisted development, agent configs, local/cloud LLM |
-| `engineering-culture` | `observability`, `team-dynamics`, `incident-management` | Engineering org practices, reducing headcount adaptation |
-
-### Leaf-Node Entry
-
-A `concept.md` file captures one tightly-scoped idea. Format: YAML frontmatter (domain, subdomain, concept, sources list) followed by a concise summary with inline citations.
-
-## Trusted Sources (Auto-Include)
-
-Tier 1 — auto-ingested regardless of medium. All others must pass the audit gate.
-
-| Person | Domain | Primary Channel | Feed |
-|---|---|---|---|
-| Jake Wharton | Android/Kotlin | Blog | `jakewharton.com/atom.xml` |
-| Manuel Vivo | Android/Compose | Blog, Medium | `medium.com/feed/@manuelvicnt` |
-| Martin Fowler | System Design | Blog | `martinfowler.com/feed.atom` |
-| John Ousterhout | Software Design | Stanford CS190 (YouTube) | YouTube channel RSS |
-| Simon Willison | AI Workflows | Blog | `simonwillison.net/atom/everything/` |
-| Kent Beck | AI + Software Design | Substack | `kentbeck.substack.com/feed` |
-| Charity Majors | Engineering Culture | Blog | `charity.wtf/feed/` |
-| Gergely Orosz | Engineering Culture | Substack | `newsletter.pragmaticengineer.com/feed` |
-| Matt Pocock | TypeScript | Newsletter, YouTube | YouTube RSS |
-
-## Pipeline
-
-- `fetch.py` — single Python script, runs daily via cron
-- RSS polling via `feedparser`, YouTube transcripts via `yt-dlp`
-- Text extraction via `trafilatura`
-- Classification + summarization via DeepSeek V4 Flash API (OpenAI-compatible)
-- Output: `domain/subdomain/concept.md` with YAML frontmatter
-- Dedup by source URL hash
-- State tracked in `~/.kb-pipeline/state.json`
-- Storage: private GitHub repo, auto-committed
-
-## Consumption Model
-
-- **Reference library** — search/browse by domain tree
-- **Weekly digest** — skim new entries during a recurring 30-min slot
-
-## Architecture Decisions
-
-See `docs/adr/` for decisions that are hard to reverse, surprising without context, or the result of a real trade-off.
+| Jake Wharton | Android / Kotlin | Blog |
+| Manuel Vivo | Android / Compose | Blog, Medium |
+| Martin Fowler | System Design | Blog |
+| John Ousterhout | Software Design | Stanford CS190 (YouTube) |
+| Simon Willison | AI Workflows | Blog |
+| Kent Beck | AI + Software Design | Substack |
+| Charity Majors | Engineering Culture | Blog |
+| Gergely Orosz | Engineering Culture | Substack |
+| Matt Pocock | TypeScript | Newsletter, YouTube |
