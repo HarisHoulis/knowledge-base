@@ -50,7 +50,7 @@ The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 
 | Jake Wharton | Android / Kotlin | Blog |
 | Manuel Vivo | Android / Compose | Blog, Medium |
 | Martin Fowler | System Design | Blog |
-| John Ousterhout / MIT | Distributed Systems | MIT 6.824 (YouTube) |
+| MIT | Distributed Systems | MIT 6.824 (YouTube) |
 | Simon Willison | AI Workflows | Blog |
 | Kent Beck | AI + Software Design | Substack |
 | Charity Majors | Engineering Culture | Blog |

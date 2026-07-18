@@ -38,7 +38,9 @@ SOURCES: list[Source] = [
     Source(id="charity-majors",   type="rss",  url="https://charity.wtf/feed/"),
     Source(id="gergely-orosz",    type="rss",  url="https://newsletter.pragmaticengineer.com/feed"),
     Source(id="matt-pocock",      type="youtube", channel="UCswG6FSbgZjbWtdf_hMLaow"),
-    Source(id="mit-6.824",        type="youtube", playlist="PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB"),
+    Source(id="john-ousterhout",  type="youtube", playlist="PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB"),
+    Source(id="gilded-rose",      type="youtube", playlist="PL1ssMPpyqociJNwykAOB9_KEZVW7BW7m2"),
+    Source(id="ai-engineer",      type="youtube", channel="UCLKPca3kwwd-B59HNr-_lvA"),
 ]
 
 SYSTEM_PROMPT = """You are a knowledge-base curator. Given an article or transcript, output a JSON object with:
