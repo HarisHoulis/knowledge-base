@@ -22,7 +22,11 @@ def validate_llm_output(data: dict[str, Any]) -> list[str]:
     return errors
 
 
-def classify_summarize(text: str, meta: dict[str, Any]) -> Optional[dict[str, Any]]:
+def classify_summarize(
+    text: str,
+    meta: dict[str, Any],
+    audit_feedback: Optional[str] = None,
+) -> Optional[dict[str, Any]]:
     if not DEEPSEEK_API_KEY:
         logger.warning("  [!] DEEPSEEK_API_KEY not set, skipping LLM")
         return None
@@ -34,6 +38,8 @@ def classify_summarize(text: str, meta: dict[str, Any]) -> Optional[dict[str, An
         f"Date: {meta.get('published', '')}\n\n"
         f"---\n\n{text[:15000]}"
     )
+    if audit_feedback:
+        prompt += f"\n\n---\nPrevious audit feedback — please address these issues:\n{audit_feedback}"
     try:
         r = requests.post(
             f"{DEEPSEEK_API_URL}/chat/completions",
