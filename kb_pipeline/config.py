@@ -9,6 +9,8 @@ DEEPSEEK_MODEL   = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 KB_PATH    = Path(os.environ.get("KB_PATH", str(Path.home() / "knowledge-base")))
 STATE_PATH = Path(os.environ.get("KB_STATE", str(Path.home() / ".kb-pipeline" / "state.json")))
 
+CONCEPTS_DIR = "concepts"
+
 VALID_DOMAINS = {
     "android-kotlin", "system-design", "python-backend",
     "ai-workflows", "engineering-culture",
