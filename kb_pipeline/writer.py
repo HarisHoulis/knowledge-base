@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from .config import KB_PATH
+from .config import CONCEPTS_DIR, KB_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def write_entry(data: dict[str, Any], source_url: str) -> None:
     for pt in points:
         md += f"\n- {pt}"
 
-    fp = KB_PATH / domain / sub / f"{name}.md"
+    fp = KB_PATH / CONCEPTS_DIR / domain / sub / f"{name}.md"
     fp.parent.mkdir(parents=True, exist_ok=True)
     fp.write_text(md)
     logger.info("  -> %s", fp.relative_to(KB_PATH))

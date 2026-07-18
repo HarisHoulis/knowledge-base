@@ -9,7 +9,7 @@ A single, tightly-scoped idea captured in one markdown file at `domain/subdomain
 _Avoid_: Entry, leaf-node entry, knowledge item
 
 **Domain**:
-A top-level category of engineering knowledge. One of `android-kotlin`, `system-design`, `python-backend`, `ai-workflows`, `engineering-culture`.
+A category of engineering knowledge, stored under `concepts/`. One of `android-kotlin`, `system-design`, `python-backend`, `ai-workflows`, `engineering-culture`.
 
 **Subdomain**:
 A sub-category within a domain. Examples: `architecture`, `coroutines`, `fastapi`, `coding-agents`.

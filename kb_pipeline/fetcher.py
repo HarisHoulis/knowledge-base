@@ -6,37 +6,33 @@ import feedparser
 import requests
 import trafilatura
 
-from .config import SOURCES
+from .config import Source
 
 logger = logging.getLogger(__name__)
 
 
-def fetch_rss(source: dict[str, Any]) -> list[Any]:
-    url = source["url"]
-    headers = source.get("headers", {})
-    if headers:
+def fetch_rss(source: Source) -> list[Any]:
+    if source.headers:
         try:
-            r = requests.get(url, headers=headers, timeout=30)
+            r = requests.get(source.url, headers=source.headers, timeout=30)
             r.raise_for_status()
             feed = feedparser.parse(r.text)
         except requests.RequestException as e:
-            logger.warning("  [!] RSS fetch error (%s): %s", source["id"], e)
+            logger.warning("  [!] RSS fetch error (%s): %s", source.id, e)
             return []
     else:
-        feed = feedparser.parse(url)
+        feed = feedparser.parse(source.url)
     if feed.bozo and not feed.entries:
-        logger.warning("  [!] RSS parse error (%s): %s", source["id"], feed.bozo_exception)
+        logger.warning("  [!] RSS parse error (%s): %s", source.id, feed.bozo_exception)
         return []
     return feed.entries
 
 
-def fetch_youtube(source: dict[str, Any]) -> list[Any]:
-    pid = source.get("playlist", "")
-    cid = source.get("channel", "")
-    if pid:
-        url = f"https://www.youtube.com/feeds/videos.xml?playlist_id={pid}"
-    elif cid:
-        url = f"https://www.youtube.com/feeds/videos.xml?channel_id={cid}"
+def fetch_youtube(source: Source) -> list[Any]:
+    if source.playlist:
+        url = f"https://www.youtube.com/feeds/videos.xml?playlist_id={source.playlist}"
+    elif source.channel:
+        url = f"https://www.youtube.com/feeds/videos.xml?channel_id={source.channel}"
     else:
         return []
     feed = feedparser.parse(url)

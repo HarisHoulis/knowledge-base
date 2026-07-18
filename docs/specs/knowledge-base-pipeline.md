@@ -6,7 +6,7 @@ A senior mobile tech lead needs to future-proof himself against the AI-driven re
 
 ## Solution
 
-An automated pipeline (`fetch.py`) that polls RSS feeds from 9 trusted individuals daily, extracts article text, classifies and summarizes each piece via DeepSeek V4 Flash API into a `domain/subdomain/concept.md` concept, writes it to a local directory tree, and git-commits to a private GitHub repo. The user consumes the output as a reference library + weekly digest.
+An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted individuals daily, extracts article text, classifies and summarizes each piece via DeepSeek V4 Flash API into a `domain/subdomain/concept.md` concept, writes it to a local directory tree, and git-commits to a private GitHub repo. The user consumes the output as a reference library + weekly digest.
 
 ## User Stories
 
@@ -22,7 +22,7 @@ An automated pipeline (`fetch.py`) that polls RSS feeds from 9 trusted individua
 
 ## Implementation Decisions
 
-- **Pipeline architecture**: Single Python script `fetch.py` (~150 lines). No external orchestrator (n8n/Make.com). No database — filesystem tree is the store.
+- **Pipeline architecture**: Multi-module Python package `kb_pipeline`. No external orchestrator (n8n/Make.com). No database — filesystem tree is the store.
 - **Content retrieval**: RSS polling via `feedparser` for all blog/Substack sources. YouTube RSS for video channels (Ousterhout, Matt Pocock). Transcripts via `yt-dlp --write-auto-subs`.
 - **Text extraction**: `trafilatura` with markdown output. Falls back to raw summary text if no HTML content available.
 - **LLM classification + summarization**: DeepSeek V4 Flash via OpenAI-compatible API. Single prompt requesting JSON output with `response_format: {"type": "json_object"}`. Temperature 0.3 for consistent classification. Max 2000 output tokens.
@@ -30,13 +30,13 @@ An automated pipeline (`fetch.py`) that polls RSS feeds from 9 trusted individua
 - **Deduplication**: By source URL hash. No embedding-based fuzzy matching (overkill for this volume).
 - **Entry format**: YAML frontmatter (domain, subdomain, concept, title, sources[]) + summary body + key points list.
 - **File naming**: `{concept}.md` where `concept` is a kebab-case identifier from the LLM.
-- **Git workflow**: No auto-commit in `fetch.py`. User's cron wraps: `python3 fetch.py && cd kb_path && git add -A && git commit -m "feat(kb): daily ingest"`.
+- **Git workflow**: No auto-commit in the pipeline. User's cron wraps: `python -m kb_pipeline && cd kb_path && git add -A && git commit -m "feat(kb): daily ingest"`.
 - **Entry limit**: `--limit=N` flag caps per-source processing. First run will backfill all existing RSS entries (capped if limit set).
 - **No RAG / vector DB**: Filesystem tree is the canonical store. Search is via `grep` or file browser.
 
 ## Testing Decisions
 
-- **Seam**: Integration test with `--dry-run` mode. One test feeds a known RSS fixture to `fetch.py` and asserts correct JSON output without writing files.
+- **Seam**: Integration test with `--dry-run` mode. One test feeds a known RSS fixture to `kb_pipeline` and asserts correct JSON output without writing files.
 - **Good test**: Feeds a real RSS XML file as input, verifies the LLM returns valid JSON with expected fields, verifies no files are written under `--dry-run`. Does not mock the LLM (the API integration is the core value).
 - **Prior art**: None in repo (greenfield). Test lives at `tests/test_pipeline.py`.
 - **What NOT to test**: Pure helper functions (`extract_text`, `entry_path` — too simple to break). LLM prompt quality (tested implicitly by dry-run output). Cron/git setup (system config, not code).
