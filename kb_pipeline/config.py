@@ -11,6 +11,7 @@ KB_PATH    = Path(os.environ.get("KB_PATH", str(Path.home() / "knowledge-base"))
 STATE_PATH = Path(os.environ.get("KB_STATE", str(Path.home() / ".kb-pipeline" / "state.json")))
 
 CONCEPTS_DIR = "concepts"
+DRAFTS_DIR = "drafts"
 
 VALID_DOMAINS = {
     "android-kotlin", "system-design", "python-backend",
