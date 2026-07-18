@@ -31,6 +31,18 @@ _Avoid_: Processed hashes
 **Cold Start**:
 The decision to begin ingesting from today only, without backfilling historical content from trusted sources.
 
+**Audit**:
+A post-ingestion review of a concept entry, split into two independent passes:
+- **Classification Audit** — verifies the assigned domain/subdomain/concept is correct.
+- **Content Audit** — verifies the summary body accurately reflects the source text.
+_Avoid_: Review, verification pass
+
+**Draft**:
+A concept file that has passed LLM generation but not yet cleared audit. Stored under `drafts/` in the KB tree. Moved into `domain/subdomain/concept.md` only after both audits pass.
+
+**Audit Loop**:
+The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 2 iterations). If still failing after max retries, the pipeline halts and notifies the user.
+
 ## Trusted Sources
 
 | Person | Domain | Primary Channel |
