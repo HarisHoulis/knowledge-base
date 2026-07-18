@@ -18,7 +18,10 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 6. As a consumer, I want a `--limit=N` flag, so that I can cap per-source processing during testing.
 7. As a consumer, I want the pipeline to skip low-content entries (extracted text <200 chars), so that trivial posts don't clutter the KB.
 8. As a consumer, I want the pipeline to run via cron automatically, so that the KB stays current without manual triggers.
-9. As a reviewer, I want an audit subagent (future) to verify factual accuracy and correct placement of generated entries before I trust the pipeline fully.
+9. As a reviewer, I want the Classification Audit to verify that each entry's domain/subdomain/concept assignment is correct, so that the KB tree stays navigable and entries land where I'd look for them.
+10. As a reviewer, I want the Content Audit to verify that the summary accurately reflects the source text (no hallucinations, no critical omissions), so that I can trust the summary at a glance without reading the original.
+11. As a reviewer, I want failed audits to give the LLM a second chance (up to 2 retries) with surgical, structured feedback about what went wrong, so that transient or minor errors self-correct without human intervention.
+12. As a consumer, I want entries that exhaust the retry limit to create a GitHub issue with the entry path and audit feedback, so that I can manually review and fix the edge case.
 
 ## Implementation Decisions
 
@@ -33,6 +36,10 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 - **Git workflow**: No auto-commit in the pipeline. User's cron wraps: `python -m kb_pipeline && cd kb_path && git add -A && git commit -m "feat(kb): daily ingest"`.
 - **Entry limit**: `--limit=N` flag caps per-source processing. First run will backfill all existing RSS entries (capped if limit set).
 - **No RAG / vector DB**: Filesystem tree is the canonical store. Search is via `grep` or file browser.
+- **Audit flow**: LLM output is written to `drafts/domain/subdomain/concept.md`. Classification Audit + Content Audit run concurrently on the draft. On pass, the file is moved to `domain/subdomain/concept.md` and `drafts/` is cleaned up. On fail, structured JSON feedback is fed into the LLM retry.
+- **Audit feedback format**: `{"pass": false, "issues": [{"field": "domain", "description": "should be android-kotlin, not system-design"}]}`. Minimum tokens, directly feedable into the retry prompt.
+- **Retry strategy**: Up to 2 iterations total. Only the failing audit re-runs per cycle (e.g., if Classification passes but Content fails, only Content re-runs on retry).
+- **Escalation**: After 2 failed retries, the pipeline halts and creates a GitHub issue via `gh issue create` with the entry path and combined audit feedback.
 
 ## Testing Decisions
 
@@ -40,10 +47,11 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 - **Good test**: Feeds a real RSS XML file as input, verifies the LLM returns valid JSON with expected fields, verifies no files are written under `--dry-run`. Does not mock the LLM (the API integration is the core value).
 - **Prior art**: None in repo (greenfield). Test lives at `tests/test_pipeline.py`.
 - **What NOT to test**: Pure helper functions (`extract_text`, `entry_path` — too simple to break). LLM prompt quality (tested implicitly by dry-run output). Cron/git setup (system config, not code).
+- **Audit seam**: Run the audit subagent against hand-crafted fixture concept files. Two fixtures: a known-correct entry (expects `{"pass": true}` from both audits) and a known-incorrect entry (expects `{"pass": false, "issues": [...]}`). Tests at `tests/test_audit.py`.
+- **Audit good test**: Feeds a fixture where the classification is deliberately wrong (e.g., a Jetpack Compose article classified as `system-design`) and verifies the Classification Audit returns accurate issues. Does not mock the LLM. Retry loop tested by feeding an entry that fails exactly once, then passes on retry.
 
 ## Out of Scope
 
-- Audit subagent (separate session)
 - Backfill of existing material (cold start)
 - Perplexity Spaces / Claude Projects integration
 - Vector DB / semantic search
