@@ -13,12 +13,14 @@ Usage:
 
 import hashlib
 import json
+import logging
 import os
 import subprocess
 import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Optional, Tuple
 
 import feedparser
 import requests
@@ -34,7 +36,12 @@ DEEPSEEK_MODEL   = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
 KB_PATH    = Path(os.environ.get("KB_PATH", str(Path.home() / "knowledge-base")))
 STATE_PATH = Path(os.environ.get("KB_STATE", str(Path.home() / ".kb-pipeline" / "state.json")))
 
-SOURCES = [
+VALID_DOMAINS = {
+    "android-kotlin", "system-design", "python-backend",
+    "ai-workflows", "engineering-culture",
+}
+
+SOURCES: list[dict[str, Any]] = [
     {"id": "jake-wharton",     "type": "rss",  "url": "https://jakewharton.com/atom.xml"},
     {"id": "manuel-vivo",      "type": "rss",  "url": "https://medium.com/feed/@manuelvicnt"},
     {"id": "martin-fowler",    "type": "rss",  "url": "https://martinfowler.com/feed.atom"},
@@ -42,13 +49,8 @@ SOURCES = [
     {"id": "kent-beck",        "type": "rss",  "url": "https://kentbeck.substack.com/feed"},
     {"id": "charity-majors",   "type": "rss",  "url": "https://charity.wtf/feed/"},
     {"id": "gergely-orosz",    "type": "rss",  "url": "https://newsletter.pragmaticengineer.com/feed"},
-    {"id": "john-ousterhout",  "type": "youtube", "channel": "UC_Stanford_CS190"},
-    {"id": "matt-pocock",      "type": "youtube", "channel": "UC_mattpocockuk"},
-]
-
-DOMAINS = [
-    "android-kotlin", "system-design", "python-backend",
-    "ai-workflows", "engineering-culture",
+    {"id": "matt-pocock",      "type": "youtube", "channel": "UCswG6FSbgZjbWtdf_hMLaow"},
+    {"id": "mit-6.824",        "type": "youtube", "playlist": "PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB"},
 ]
 
 SYSTEM_PROMPT = """You are a knowledge-base curator. Given an article or transcript, output a JSON object with:
@@ -63,39 +65,64 @@ SYSTEM_PROMPT = """You are a knowledge-base curator. Given an article or transcr
 Be concise. Strip fluff. Only include claims directly supported by the source text."""
 
 
+# ── Logging ────────────────────────────────────────────────────────
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S",
+)
+logger = logging.getLogger(__name__)
+
+
 # ── State ─────────────────────────────────────────────────────────
 
-def load_state():
+def load_state() -> dict[str, Any]:
     if STATE_PATH.exists():
         return json.loads(STATE_PATH.read_text())
     return {"processed_hashes": []}
 
 
-def save_state(state):
+def save_state(state: dict[str, Any]) -> None:
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
     STATE_PATH.write_text(json.dumps(state, indent=2, default=str))
 
 
 # ── Fetch ─────────────────────────────────────────────────────────
 
-def fetch_rss(source):
-    feed = feedparser.parse(source["url"])
+def fetch_rss(source: dict[str, Any]) -> list[Any]:
+    url = source["url"]
+    headers = source.get("headers", {})
+    if headers:
+        try:
+            r = requests.get(url, headers=headers, timeout=30)
+            r.raise_for_status()
+            feed = feedparser.parse(r.text)
+        except requests.RequestException as e:
+            logger.warning("  [!] RSS fetch error (%s): %s", source["id"], e)
+            return []
+    else:
+        feed = feedparser.parse(url)
     if feed.bozo and not feed.entries:
-        print(f"  [!] RSS error ({source['id']}): {feed.bozo_exception}")
+        logger.warning("  [!] RSS parse error (%s): %s", source["id"], feed.bozo_exception)
         return []
     return feed.entries
 
 
-def fetch_youtube(source):
-    channel = source.get("channel", "")
-    if not channel:
+def fetch_youtube(source: dict[str, Any]) -> list[Any]:
+    pid = source.get("playlist", "")
+    cid = source.get("channel", "")
+    if pid:
+        url = f"https://www.youtube.com/feeds/videos.xml?playlist_id={pid}"
+    elif cid:
+        url = f"https://www.youtube.com/feeds/videos.xml?channel_id={cid}"
+    else:
         return []
-    url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel}"
     feed = feedparser.parse(url)
     return feed.entries if not feed.bozo else []
 
 
-def transcript_youtube(video_id):
+def transcript_youtube(video_id: str) -> str:
     try:
         r = subprocess.run(
             ["yt-dlp", "--write-auto-subs", "--sub-lang", "en",
@@ -103,23 +130,37 @@ def transcript_youtube(video_id):
              f"https://www.youtube.com/watch?v={video_id}"],
             capture_output=True, text=True, timeout=120,
         )
+        r.check_returncode()
         return r.stdout.strip()
-    except (FileNotFoundError, subprocess.TimeoutExpired) as e:
-        print(f"  [!] yt-dlp failed for {video_id}: {e}")
+    except (FileNotFoundError, subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
+        logger.warning("  [!] yt-dlp failed for %s: %s", video_id, e)
         return ""
 
 
 # ── Extract ───────────────────────────────────────────────────────
 
-def extract_text(html):
+def extract_text(html: str) -> str:
     return trafilatura.extract(html, output_format="markdown", include_links=True) or ""
 
 
 # ── LLM ───────────────────────────────────────────────────────────
 
-def classify_summarize(text, meta):
+def validate_llm_output(data: dict[str, Any]) -> list[str]:
+    required = ["domain", "subdomain", "concept", "title", "summary", "key_points"]
+    errors: list[str] = []
+    for field in required:
+        if field not in data:
+            errors.append(f"missing '{field}'")
+    if "domain" in data and data["domain"] not in VALID_DOMAINS:
+        errors.append(f"invalid domain '{data['domain']}'")
+    if "key_points" in data and not isinstance(data["key_points"], list):
+        errors.append("'key_points' must be a list")
+    return errors
+
+
+def classify_summarize(text: str, meta: dict[str, Any]) -> Optional[dict[str, Any]]:
     if not DEEPSEEK_API_KEY:
-        print("  [!] DEEPSEEK_API_KEY not set, skipping LLM")
+        logger.warning("  [!] DEEPSEEK_API_KEY not set, skipping LLM")
         return None
 
     prompt = (
@@ -146,15 +187,24 @@ def classify_summarize(text, meta):
             timeout=60,
         )
         r.raise_for_status()
-        return json.loads(r.json()["choices"][0]["message"]["content"])
-    except Exception as e:
-        print(f"  [!] LLM error: {e}")
-        return None
+        body = r.json()
+        content = body["choices"][0]["message"]["content"]
+        data = json.loads(content)
+        errors = validate_llm_output(data)
+        if errors:
+            logger.warning("  [!] LLM output validation failed: %s", "; ".join(errors))
+            return None
+        return data
+    except requests.RequestException as e:
+        logger.warning("  [!] LLM request failed: %s", e)
+    except (json.JSONDecodeError, KeyError, IndexError, TypeError) as e:
+        logger.warning("  [!] LLM response parse failed: %s", e)
+    return None
 
 
 # ── Write ─────────────────────────────────────────────────────────
 
-def write_entry(data, source_url):
+def write_entry(data: dict[str, Any], source_url: str) -> None:
     domain = data.get("domain", "uncategorized")
     sub    = data.get("subdomain", "misc")
     name   = data.get("concept", "untitled")
@@ -183,26 +233,33 @@ def write_entry(data, source_url):
     fp = KB_PATH / domain / sub / f"{name}.md"
     fp.parent.mkdir(parents=True, exist_ok=True)
     fp.write_text(md)
-    print(f"  → {fp.relative_to(KB_PATH)}")
+    logger.info("  -> %s", fp.relative_to(KB_PATH))
+
+
+# ── CLI ──────────────────────────────────────────────────────────
+
+def parse_args() -> Tuple[bool, Optional[int]]:
+    dry_run = "--dry-run" in sys.argv
+    limit: Optional[int] = None
+    for a in sys.argv:
+        if a.startswith("--limit="):
+            limit = int(a.split("=", 1)[1])
+    return dry_run, limit
 
 
 # ── Main ──────────────────────────────────────────────────────────
 
-def main():
-    dry_run = "--dry-run" in sys.argv
-    limit = None
-    for a in sys.argv:
-        if a.startswith("--limit="):
-            limit = int(a.split("=", 1)[1])
+def main() -> None:
+    dry_run, limit = parse_args()
 
-    print(f"[pipeline] {'dry-run' if dry_run else 'live'} — {datetime.now(timezone.utc).isoformat()}")
+    logger.info("[pipeline] %s — %s", "dry-run" if dry_run else "live", datetime.now(timezone.utc).isoformat())
     state = load_state()
-    processed = set(state["processed_hashes"])
+    processed: set[str] = set(state["processed_hashes"])
 
     for src in SOURCES:
-        print(f"\n[{src['id']}]")
+        logger.info("[%s]", src["id"])
         entries = fetch_rss(src) if src["type"] == "rss" else fetch_youtube(src)
-        print(f"  {len(entries)} in feed")
+        logger.info("  %d in feed", len(entries))
 
         count = 0
         for entry in entries:
@@ -220,12 +277,12 @@ def main():
             if not content:
                 content = entry.get("summary", "")
             if not content:
-                print(f"  ⏭ no content: {entry.get('title', '')[:60]}")
+                logger.info("  skipping (no content): %s", entry.get("title", "")[:60])
                 continue
 
             text = extract_text(content)
             if not text or len(text) < 200:
-                print(f"  ⏭ too short: {entry.get('title', '')[:60]}")
+                logger.info("  skipping (too short): %s", entry.get("title", "")[:60])
                 continue
 
             result = classify_summarize(text, entry)
@@ -233,17 +290,17 @@ def main():
                 continue
 
             if dry_run:
-                print(f"  ✓ would write: {result.get('domain')}/{result.get('subdomain')}/{result.get('concept')}.md")
+                logger.info("  would write: %s/%s/%s.md", result.get("domain"), result.get("subdomain"), result.get("concept"))
             else:
                 write_entry(result, url)
                 processed.add(h)
-                state["processed_hashes"] = list(processed)
-                save_state(state)
 
             count += 1
             time.sleep(0.5)
 
-    print(f"\n{'[dry-run] no files written' if dry_run else '✓ done'}")
+    state["processed_hashes"] = list(processed)
+    save_state(state)
+    logger.info("%s", "[dry-run] no files written" if dry_run else "done")
 
 
 if __name__ == "__main__":
