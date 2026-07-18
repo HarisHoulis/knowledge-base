@@ -7,3 +7,7 @@ Issues live in this repo's GitHub Issues, managed via the `gh` CLI. See `docs/ag
 ### Domain docs
 
 Single-context layout — root `CONTEXT.md` + ADRs in `docs/adr/`. See `docs/agents/domain.md`.
+
+### Testing
+
+Injectable callables for deterministic unit tests; integration tests gated by marker and excluded from default runs. See `docs/agents/testing.md`.
