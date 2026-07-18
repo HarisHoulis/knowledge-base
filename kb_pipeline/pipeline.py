@@ -7,7 +7,8 @@ from .config import SOURCES, Source
 from .state import load_state, save_state
 from .fetcher import fetch_rss, fetch_youtube, extract_text
 from .llm import classify_summarize
-from .writer import write_entry
+from .writer import write_draft, write_entry, promote_draft
+from .audit import classification_audit, content_audit
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 def run_pipeline(
     dry_run: bool = False,
     limit: Optional[int] = None,
+    audit: bool = False,
     sources: Optional[list[Source]] = None,
 ) -> dict[str, int]:
     sources = sources or SOURCES
@@ -63,8 +65,20 @@ def run_pipeline(
 
             if dry_run:
                 logger.info("  would write: %s/%s/%s.md", result.get("domain"), result.get("subdomain"), result.get("concept"))
+                if audit:
+                    logger.info("  would audit and promote to concepts/%s/%s/%s.md", result.get("domain"), result.get("subdomain"), result.get("concept"))
+            elif audit:
+                draft_path = write_draft(result, url)
+                ca_result = classification_audit(result, text)
+                co_result = content_audit(result, text)
+                if ca_result.get("pass") and co_result.get("pass"):
+                    promote_draft(draft_path)
+                else:
+                    logger.warning("  audit failed: classification=%s content=%s", ca_result.get("pass"), co_result.get("pass"))
             else:
                 write_entry(result, url)
+
+            if not dry_run:
                 processed.add(h)
 
             stats["written"] += 1

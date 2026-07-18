@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Test Feed</title>
+    <link>https://example.com/</link>
+    <description>A test feed</description>
+    <item>
+      <title>Structured Concurrency in Kotlin</title>
+      <link>https://example.com/structured-concurrency</link>
+      <description>Exploring structured concurrency patterns in Kotlin coroutines for better async code organization.</description>
+      <content:encoded xmlns:content="http://purl.org/rss/1.0/modules/content/">
+        <![CDATA[<p>Structured concurrency is a paradigm that ensures coroutines are launched in a structured way, preventing leaks and making code more predictable. In Kotlin, this is enforced through coroutine scopes. When a scope is cancelled, all its children are cancelled. This creates a hierarchical relationship that makes error handling and lifecycle management straightforward. Key benefits include automatic cancellation propagation, structured error handling, and clear coroutine lifecycle.</p>]]>
+      </content:encoded>
+      <author>Test Author</author>
+      <pubDate>Mon, 01 Jan 2024 00:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>
