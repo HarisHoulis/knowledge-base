@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from kb_pipeline.audit import content_audit
+from kb_pipeline.audit import classification_audit, content_audit
 from kb_pipeline.config import Source
 from kb_pipeline.pipeline import run_pipeline
 
@@ -87,6 +87,66 @@ def test_content_audit_known_incorrect():
     assert result["pass"] is False
     assert len(result["issues"]) >= 1
     assert all(i["field"] == "summary" for i in result["issues"])
+
+
+COMPOSE_SOURCE = (
+    "Jetpack Compose is Android's modern UI toolkit for building native "
+    "interfaces. It uses a declarative approach where you describe how your "
+    "UI should look and Compose handles the rendering. Composables are "
+    "functions that emit UI elements, and the framework automatically "
+    "recomposes them when state changes. Key concepts include @Composable "
+    "annotations, remember and mutableStateOf for state management, and "
+    "Modifier chains for styling and layout. Compose integrates seamlessly "
+    "with existing Android Views and the Activity/Fragment lifecycle."
+)
+
+CORRECT_CLASSIFICATION_DATA = {
+    "domain": "android-kotlin",
+    "subdomain": "ui",
+    "concept": "compose-layout",
+    "title": "Jetpack Compose UI Toolkit",
+    "summary": "A declarative UI framework for Android using Kotlin.",
+    "key_points": [],
+    "sources": [],
+}
+
+INCORRECT_CLASSIFICATION_DATA = {
+    "domain": "system-design",
+    "subdomain": "distributed-systems",
+    "concept": "eventual-consistency",
+    "title": "Jetpack Compose UI Toolkit",
+    "summary": "A declarative UI framework for Android using Kotlin.",
+    "key_points": [],
+    "sources": [],
+}
+
+VALID_CLASSIFICATION_FIELDS = {"domain", "subdomain", "concept"}
+
+
+@pytest.mark.integration
+def test_classification_audit_known_correct():
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        pytest.skip("DEEPSEEK_API_KEY not set")
+    result = classification_audit(CORRECT_CLASSIFICATION_DATA, COMPOSE_SOURCE)
+    assert result == {"pass": True}
+
+
+@pytest.mark.integration
+def test_classification_audit_known_incorrect():
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        pytest.skip("DEEPSEEK_API_KEY not set")
+    result = classification_audit(INCORRECT_CLASSIFICATION_DATA, COMPOSE_SOURCE)
+    assert result["pass"] is False
+    assert len(result["issues"]) >= 1
+    fields_flagged = {i["field"] for i in result["issues"]}
+    assert "domain" in fields_flagged, (
+        f"expected 'domain' to be flagged, got fields: {fields_flagged}"
+    )
+    for issue in result["issues"]:
+        assert issue["field"] in VALID_CLASSIFICATION_FIELDS
+        assert isinstance(issue["description"], str) and len(issue["description"]) > 0
 
 
 @pytest.mark.integration
