@@ -298,8 +298,9 @@ def main() -> None:
             count += 1
             time.sleep(0.5)
 
-    state["processed_hashes"] = list(processed)
-    save_state(state)
+    if not dry_run:
+        state["processed_hashes"] = list(processed)
+        save_state(state)
     logger.info("%s", "[dry-run] no files written" if dry_run else "done")
 
 
