@@ -15,7 +15,7 @@ A category of engineering knowledge, stored under `concepts/`. One of `android-k
 A sub-category within a domain. Examples: `architecture`, `coroutines`, `fastapi`, `coding-agents`.
 
 **Trusted Source**:
-An individual whose content is auto-ingested regardless of medium. All other sources must pass the audit gate.
+An individual or publication whose content is auto-ingested regardless of medium. All other sources must pass the audit gate.
 _Avoid_: Tier 1, auto-include source
 
 **Pipeline**:
@@ -47,6 +47,9 @@ A concept file that has passed LLM generation but not yet cleared audit. Stored 
 **Audit Loop**:
 The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 2 iterations). If still failing after max retries, the pipeline halts and notifies the user.
 
+**Auth Cookie**:
+A browser session cookie required to access paywalled or authenticated content (e.g., Substack paid posts). Stored as an environment variable and referenced by `Source.cookie_env_var`. Validated at pipeline startup; if missing or expired, the pipeline files a GitHub issue and aborts.
+
 ## Trusted Sources
 
 | Person | Domain | Primary Channel |
@@ -59,4 +62,5 @@ The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 
 | Kent Beck | AI + Software Design | Substack |
 | Charity Majors | Engineering Culture | Blog |
 | Gergely Orosz | Engineering Culture | Substack |
+| ByteByteGo | System Design | Substack |
 | Matt Pocock | TypeScript | Newsletter, YouTube |
