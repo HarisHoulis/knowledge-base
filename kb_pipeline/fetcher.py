@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import feedparser
 import requests
@@ -71,18 +71,30 @@ def transcript_youtube(video_id: str) -> str:
         return ""
 
     with tempfile.TemporaryDirectory() as tmpdir:
-        try:
-            subprocess.run(
-                [*cmd,
-                 "--write-auto-subs", "--sub-lang", "en",
-                 "--skip-download",
-                 "--extractor-args", "youtube:player_client=android",
-                 "-o", f"{tmpdir}/%(id)s.%(ext)s",
-                 f"https://www.youtube.com/watch?v={video_id}"],
-                capture_output=True, text=True, timeout=120, check=True,
-            )
-        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
-            logger.warning("  [!] yt-dlp failed for %s: %s", video_id, e)
+        base_args = [
+            *cmd,
+            "--write-auto-subs", "--sub-lang", "en",
+            "--skip-download",
+            "-o", f"{tmpdir}/%(id)s.%(ext)s",
+            f"https://www.youtube.com/watch?v={video_id}",
+        ]
+        attempts = [
+            [*base_args, "--extractor-args", "youtube:player_client=android"],
+            base_args,
+        ]
+        last_error: Optional[Exception] = None
+        for attempt_cmd in attempts:
+            try:
+                subprocess.run(
+                    attempt_cmd,
+                    capture_output=True, text=True, timeout=120, check=True,
+                )
+                break
+            except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
+                last_error = e
+
+        if last_error is not None:
+            logger.warning("  [!] yt-dlp failed for %s: %s", video_id, last_error)
             return ""
 
         sub_files = sorted(Path(tmpdir).iterdir())
