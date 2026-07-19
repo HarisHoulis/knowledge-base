@@ -95,4 +95,8 @@ def transcript_youtube(video_id: str) -> str:
 
 
 def extract_text(html: str) -> str:
+    if not html.strip():
+        return ""
+    if not html.strip().startswith("<"):
+        return html.strip()
     return trafilatura.extract(html, output_format="markdown", include_links=True) or ""
