@@ -1,6 +1,10 @@
+import os
 import subprocess
+from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import MagicMock
+
+import pytest
 
 from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text, transcript_youtube
 
@@ -135,3 +139,61 @@ class TestTranscriptYoutube:
 
         assert result == ""
         assert "no longer available" in caplog.text
+
+
+def _fake_run_collector(calls: list) -> Callable:
+    def fake_run(cmd, **kwargs):
+        calls.append(cmd)
+        return MagicMock(stdout="", stderr="")
+    return fake_run
+
+
+class TestTranscriptYoutubeArgs:
+    def test_js_runtime_flag_in_all_attempts(self):
+        calls = []
+        transcript_youtube("test_id", run_cmd=_fake_run_collector(calls))
+
+        assert len(calls) >= 1
+        for cmd in calls:
+            assert "--js-runtimes" in cmd
+            js_idx = cmd.index("--js-runtimes")
+            assert js_idx + 1 < len(cmd)
+            assert cmd[js_idx + 1] == "node"
+
+    def test_cookies_arg_present_when_path_given(self):
+        calls = []
+        transcript_youtube("test_id", cookies_path="/tmp/yt-cookies.txt", run_cmd=_fake_run_collector(calls))
+
+        assert len(calls) >= 1
+        for cmd in calls:
+            assert "--cookies" in cmd
+            ck_idx = cmd.index("--cookies")
+            assert ck_idx + 1 < len(cmd)
+            assert cmd[ck_idx + 1] == "/tmp/yt-cookies.txt"
+
+    def test_no_cookies_arg_when_path_not_given(self):
+        calls = []
+        transcript_youtube("test_id", run_cmd=_fake_run_collector(calls))
+
+        for cmd in calls:
+            assert "--cookies" not in cmd
+
+    def test_cookies_path_from_env_var(self, monkeypatch):
+        monkeypatch.setenv("YT_COOKIES_PATH", "/env/cookies.txt")
+        calls = []
+        transcript_youtube("test_id", run_cmd=_fake_run_collector(calls))
+
+        for cmd in calls:
+            assert "--cookies" in cmd
+            ck_idx = cmd.index("--cookies")
+            assert cmd[ck_idx + 1] == "/env/cookies.txt"
+
+    def test_explicit_cookies_path_overrides_env_var(self, monkeypatch):
+        monkeypatch.setenv("YT_COOKIES_PATH", "/env/cookies.txt")
+        calls = []
+        transcript_youtube("test_id", cookies_path="/explicit/cookies.txt", run_cmd=_fake_run_collector(calls))
+
+        for cmd in calls:
+            assert "--cookies" in cmd
+            ck_idx = cmd.index("--cookies")
+            assert cmd[ck_idx + 1] == "/explicit/cookies.txt"

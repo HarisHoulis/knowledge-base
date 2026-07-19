@@ -15,6 +15,7 @@ dependencies = [
     "requests",
     "trafilatura",
     "yt-dlp",
+    "yt-dlp-ejs",
 ]
 
 [project.optional-dependencies]
