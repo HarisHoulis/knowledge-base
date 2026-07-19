@@ -5,7 +5,7 @@ from typing import Literal
 
 DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 DEEPSEEK_API_URL = os.environ.get("DEEPSEEK_API_URL", "https://api.deepseek.com/v1")
-DEEPSEEK_MODEL   = os.environ.get("DEEPSEEK_MODEL", "deepseek-chat")
+DEEPSEEK_MODEL   = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash")
 
 KB_PATH    = Path(os.environ.get("KB_PATH", str(Path.home() / "knowledge-base")))
 STATE_PATH = Path(os.environ.get("KB_STATE", str(Path.home() / ".kb-pipeline" / "state.json")))
