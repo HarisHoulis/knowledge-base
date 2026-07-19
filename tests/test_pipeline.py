@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from kb_pipeline.audit import AuditResult
+from kb_pipeline.config import Source
 
 SAMPLE_TEXT = "some source text"
 SAMPLE_URL = "https://example.com/article"
@@ -196,3 +197,53 @@ class TestAuditWithRetry:
         assert len(esc_calls) == 1
         # initial + 2 retries = 3 calls, but the stub passes after exhausting
         assert co_stub.call_count == 3  # initial + retry 1 + retry 2
+
+
+class TestExtractYoutubeVideoId:
+    def test_watch_url(self) -> None:
+        from kb_pipeline.pipeline import _extract_youtube_video_id
+
+        assert _extract_youtube_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+
+    def test_short_url(self) -> None:
+        from kb_pipeline.pipeline import _extract_youtube_video_id
+
+        assert _extract_youtube_video_id("https://youtu.be/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+
+    def test_with_query_params(self) -> None:
+        from kb_pipeline.pipeline import _extract_youtube_video_id
+
+        assert _extract_youtube_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=30s") == "dQw4w9WgXcQ"
+
+    def test_non_youtube_url(self) -> None:
+        from kb_pipeline.pipeline import _extract_youtube_video_id
+
+        assert _extract_youtube_video_id("https://example.com/article") is None
+
+    def test_empty_url(self) -> None:
+        from kb_pipeline.pipeline import _extract_youtube_video_id
+
+        assert _extract_youtube_video_id("") is None
+
+    def test_invalid_video_id_length(self) -> None:
+        from kb_pipeline.pipeline import _extract_youtube_video_id
+
+        assert _extract_youtube_video_id("https://www.youtube.com/watch?v=invalid") is None
+
+
+class TestRunPipelineWithTranscript:
+    def test_rss_source_does_not_call_transcript(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        calls: list[str] = []
+        def spy_transcript(video_id: str) -> str:
+            calls.append(video_id)
+            return ""
+
+        fixture = Path(__file__).parent / "fixtures" / "simple-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        stats = run_pipeline(dry_run=True, sources=[source], transcript_fn=spy_transcript)
+
+        assert calls == [], "transcript_fn should not be called for RSS sources"
+        assert stats["sources"] == 1

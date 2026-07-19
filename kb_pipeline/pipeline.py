@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -7,7 +8,7 @@ from typing import Any, Callable, Optional
 
 from .config import SOURCES, Source
 from .state import load_state, save_state
-from .fetcher import fetch_rss, fetch_youtube, extract_text
+from .fetcher import fetch_rss, fetch_youtube, extract_text, transcript_youtube
 from .llm import classify_summarize
 from .writer import write_draft, write_entry, promote_draft
 from .audit import classification_audit, content_audit, AuditResult
@@ -53,6 +54,11 @@ def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
         logger.info("  escalation issue created for %s", entry_path)
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
         logger.warning("  escalation failed: %s", e)
+
+
+def _extract_youtube_video_id(url: str) -> Optional[str]:
+    m = re.search(r"(?:v=|youtu\.be/)([a-zA-Z0-9_-]{11})", url)
+    return m.group(1) if m else None
 
 
 def _audit_with_retry(
@@ -113,6 +119,8 @@ def run_pipeline(
     limit: Optional[int] = None,
     audit: bool = False,
     sources: Optional[list[Source]] = None,
+    *,
+    transcript_fn: Callable[[str], str] = transcript_youtube,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
@@ -137,17 +145,24 @@ def run_pipeline(
                 stats["skipped"] += 1
                 continue
 
-            content = ""
-            if entry.get("content"):
-                content = entry["content"][0].get("value", "")
-            if not content:
-                content = entry.get("summary", "")
-            if not content:
-                logger.info("  skipping (no content): %s", entry.get("title", "")[:60])
-                stats["skipped"] += 1
-                continue
+            text = ""
+            if src.type == "youtube":
+                video_id = _extract_youtube_video_id(url)
+                if video_id:
+                    text = transcript_fn(video_id)
 
-            text = extract_text(content)
+            if not text:
+                content = ""
+                if entry.get("content"):
+                    content = entry["content"][0].get("value", "")
+                if not content:
+                    content = entry.get("summary", "")
+                if not content:
+                    logger.info("  skipping (no content): %s", entry.get("title", "")[:60])
+                    stats["skipped"] += 1
+                    continue
+                text = extract_text(content)
+
             if not text or len(text) < 200:
                 logger.info("  skipping (too short): %s", entry.get("title", "")[:60])
                 stats["skipped"] += 1
