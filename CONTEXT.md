@@ -50,6 +50,9 @@ The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 
 **Auth Cookie**:
 A browser session cookie required to access paywalled or authenticated content (e.g., Substack paid posts). Stored as an environment variable and referenced by `Source.cookie_env_var`. Validated at pipeline startup; if missing or expired, the pipeline files a GitHub issue and aborts.
 
+**YouTube Cookie**:
+A Netscape-format cookie file from a dedicated throwaway YouTube account, required by yt-dlp to bypass IP-based bot detection from GitHub Actions cloud IPs. Stored as a base64-encoded GitHub secret (`YOUTUBE_COOKIES`), decoded at runtime to `/tmp/yt-cookies.txt`. Distinct from **Auth Cookie** — this is for the ingest subprocess tooling, not for source-level content access.
+
 ## Trusted Sources
 
 | Person | Domain | Primary Channel |

@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 import shutil
 import subprocess
@@ -60,7 +61,7 @@ def _strip_subtitle_formatting(raw: str) -> str:
     return " ".join(lines)
 
 
-def transcript_youtube(video_id: str, *, run_cmd: Optional[Callable[..., Any]] = None) -> str:
+def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run_cmd: Optional[Callable[..., Any]] = None) -> str:
     if run_cmd is None:
         cmd = (["yt-dlp"] if shutil.which("yt-dlp") else
                [sys.executable, "-m", "yt_dlp"]
@@ -75,14 +76,20 @@ def transcript_youtube(video_id: str, *, run_cmd: Optional[Callable[..., Any]] =
         cmd = ["yt-dlp"]
         _run = run_cmd
 
+    if cookies_path is None:
+        cookies_path = os.environ.get("YT_COOKIES_PATH")
+
     with tempfile.TemporaryDirectory() as tmpdir:
         base_args = [
             *cmd,
             "--write-auto-subs", "--sub-lang", "en",
             "--skip-download",
+            "--js-runtimes", "node",
             "-o", f"{tmpdir}/%(id)s.%(ext)s",
             f"https://www.youtube.com/watch?v={video_id}",
         ]
+        if cookies_path:
+            base_args.extend(["--cookies", cookies_path])
         attempts = [
             [*base_args, "--extractor-args", "youtube:player_client=android"],
             base_args,
