@@ -103,7 +103,7 @@ COMPOSE_SOURCE = (
 CORRECT_CLASSIFICATION_DATA = {
     "domain": "android-kotlin",
     "subdomain": "ui",
-    "concept": "compose-layout",
+    "concept": "compose",
     "title": "Jetpack Compose UI Toolkit",
     "summary": "A declarative UI framework for Android using Kotlin.",
     "key_points": [],
