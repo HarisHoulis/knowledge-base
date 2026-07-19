@@ -24,6 +24,7 @@ def main() -> None:
         format="%(asctime)s [%(levelname)s] %(message)s",
         datefmt="%Y-%m-%dT%H:%M:%S",
     )
+    logging.getLogger("trafilatura").setLevel(logging.WARNING)
 
     dry_run, limit, audit = parse_args()
 

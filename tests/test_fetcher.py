@@ -1,4 +1,4 @@
-from kb_pipeline.fetcher import _strip_subtitle_formatting
+from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text
 
 
 SAMPLE_VTT = """WEBVTT
@@ -72,3 +72,26 @@ class TestStripSubtitleFormattingEdgeCases:
     def test_numeric_index_lines_skipped(self):
         result = _strip_subtitle_formatting(SAMPLE_VTT_NONTEXT)
         assert result == ""
+
+
+SAMPLE_PLAIN_TEXT = """Exploring /grill-me new batch-based question system.
+Learn how Matt is improving the skill by asking questions in rounds
+instead of one-by-one, reducing wait times and context switching."""
+
+
+class TestExtractText:
+    def test_empty_returns_empty_string(self):
+        assert extract_text("") == ""
+
+    def test_whitespace_only_returns_empty_string(self):
+        assert extract_text("   \n  \t  ") == ""
+
+    def test_plain_text_returns_unchanged(self):
+        result = extract_text(SAMPLE_PLAIN_TEXT)
+        assert result == SAMPLE_PLAIN_TEXT
+
+    def test_html_delegates_to_trafilatura(self):
+        html = "<html><body><p>Hello world</p></body></html>"
+        result = extract_text(html)
+        assert isinstance(result, str)
+        assert len(result) > 0
