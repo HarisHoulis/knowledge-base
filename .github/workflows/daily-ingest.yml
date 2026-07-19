@@ -41,9 +41,11 @@ jobs:
           key: kb-state-v1
 
       - name: Write YouTube cookies
-        if: ${{ secrets.YOUTUBE_COOKIES != '' }}
+        env:
+          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+        if: env.YOUTUBE_COOKIES != ''
         run: |
-          echo "${{ secrets.YOUTUBE_COOKIES }}" | base64 -d > /tmp/yt-cookies.txt
+          echo "$YOUTUBE_COOKIES" | base64 -d > /tmp/yt-cookies.txt
 
       - name: Run daily ingest
         env:
