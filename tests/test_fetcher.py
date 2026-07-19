@@ -1,4 +1,8 @@
-from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text
+import subprocess
+from pathlib import Path
+from unittest.mock import MagicMock
+
+from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text, transcript_youtube
 
 
 SAMPLE_VTT = """WEBVTT
@@ -95,3 +99,39 @@ class TestExtractText:
         result = extract_text(html)
         assert isinstance(result, str)
         assert len(result) > 0
+
+
+class TestTranscriptYoutube:
+    def test_retry_succeeds_on_second_attempt(self):
+        """First (android) fails, second (default) succeeds."""
+        calls = []
+
+        SAMPLE_TRANSCRIPT = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello world"
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+            if len(calls) == 1:
+                raise subprocess.CalledProcessError(1, cmd)
+            try:
+                o_idx = cmd.index("-o")
+                parent = Path(cmd[o_idx + 1]).parent
+                (parent / "test_id.en.vtt").write_text(SAMPLE_TRANSCRIPT)
+            except (ValueError, IndexError):
+                pass
+            return MagicMock(stdout="", stderr="")
+
+        result = transcript_youtube("test_id", run_cmd=fake_run)
+
+        assert result == "Hello world"
+        assert len(calls) == 2
+
+    def test_retry_both_fail_return_empty_and_log_stderr(self, caplog):
+        caplog.set_level("WARNING")
+
+        def fake_run(cmd, **kwargs):
+            raise subprocess.CalledProcessError(1, cmd, stderr="no longer available")
+
+        result = transcript_youtube("test_id", run_cmd=fake_run)
+
+        assert result == ""
+        assert "no longer available" in caplog.text

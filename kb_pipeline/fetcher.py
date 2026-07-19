@@ -5,7 +5,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import feedparser
 import requests
@@ -60,15 +60,20 @@ def _strip_subtitle_formatting(raw: str) -> str:
     return " ".join(lines)
 
 
-def transcript_youtube(video_id: str) -> str:
-    cmd = (["yt-dlp"] if shutil.which("yt-dlp") else
-           [sys.executable, "-m", "yt_dlp"]
-           if subprocess.run([sys.executable, "-m", "yt_dlp", "--version"],
-                             capture_output=True, text=True).returncode == 0
-           else None)
-    if not cmd:
-        logger.warning("  [!] yt-dlp not found")
-        return ""
+def transcript_youtube(video_id: str, *, run_cmd: Optional[Callable[..., Any]] = None) -> str:
+    if run_cmd is None:
+        cmd = (["yt-dlp"] if shutil.which("yt-dlp") else
+               [sys.executable, "-m", "yt_dlp"]
+               if subprocess.run([sys.executable, "-m", "yt_dlp", "--version"],
+                                 capture_output=True, text=True).returncode == 0
+               else None)
+        if not cmd:
+            logger.warning("  [!] yt-dlp not found")
+            return ""
+        _run = subprocess.run
+    else:
+        cmd = ["yt-dlp"]
+        _run = run_cmd
 
     with tempfile.TemporaryDirectory() as tmpdir:
         base_args = [
@@ -85,16 +90,20 @@ def transcript_youtube(video_id: str) -> str:
         last_error: Optional[Exception] = None
         for attempt_cmd in attempts:
             try:
-                subprocess.run(
+                _run(
                     attempt_cmd,
                     capture_output=True, text=True, timeout=120, check=True,
                 )
+                last_error = None
                 break
             except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
                 last_error = e
+                stderr = e.stderr if isinstance(e, subprocess.CalledProcessError) else ""
+                logger.debug("  [!] yt-dlp attempt failed for %s:\n%s", video_id, stderr)
 
         if last_error is not None:
-            logger.warning("  [!] yt-dlp failed for %s: %s", video_id, last_error)
+            stderr = last_error.stderr if isinstance(last_error, subprocess.CalledProcessError) else ""
+            logger.warning("  [!] yt-dlp failed for %s: %s", video_id, stderr or last_error)
             return ""
 
         sub_files = sorted(Path(tmpdir).iterdir())
