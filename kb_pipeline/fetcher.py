@@ -1,5 +1,10 @@
 import logging
+import re
+import shutil
 import subprocess
+import sys
+import tempfile
+from pathlib import Path
 from typing import Any
 
 import feedparser
@@ -39,19 +44,54 @@ def fetch_youtube(source: Source) -> list[Any]:
     return feed.entries if not feed.bozo else []
 
 
+def _strip_subtitle_formatting(raw: str) -> str:
+    lines: list[str] = []
+    for line in raw.splitlines():
+        stripped = line.strip()
+        if (stripped
+            and not stripped.startswith("WEBVTT")
+            and not stripped.startswith("Kind:")
+            and not stripped.startswith("Language:")
+            and "-->" not in stripped
+            and not stripped.replace(",", "").replace(".", "").replace(" ", "").isdigit()):
+            cleaned = re.sub(r"<[^>]+>", "", stripped)
+            if cleaned:
+                lines.append(cleaned)
+    return " ".join(lines)
+
+
 def transcript_youtube(video_id: str) -> str:
-    try:
-        r = subprocess.run(
-            ["yt-dlp", "--write-auto-subs", "--sub-lang", "en",
-             "--skip-download", "--print", "subtitle",
-             f"https://www.youtube.com/watch?v={video_id}"],
-            capture_output=True, text=True, timeout=120,
-        )
-        r.check_returncode()
-        return r.stdout.strip()
-    except (FileNotFoundError, subprocess.TimeoutExpired, subprocess.CalledProcessError) as e:
-        logger.warning("  [!] yt-dlp failed for %s: %s", video_id, e)
+    cmd = (["yt-dlp"] if shutil.which("yt-dlp") else
+           [sys.executable, "-m", "yt_dlp"]
+           if subprocess.run([sys.executable, "-m", "yt_dlp", "--version"],
+                             capture_output=True, text=True).returncode == 0
+           else None)
+    if not cmd:
+        logger.warning("  [!] yt-dlp not found")
         return ""
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            subprocess.run(
+                [*cmd,
+                 "--write-auto-subs", "--sub-lang", "en",
+                 "--skip-download",
+                 "--extractor-args", "youtube:player_client=android",
+                 "-o", f"{tmpdir}/%(id)s.%(ext)s",
+                 f"https://www.youtube.com/watch?v={video_id}"],
+                capture_output=True, text=True, timeout=120, check=True,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
+            logger.warning("  [!] yt-dlp failed for %s: %s", video_id, e)
+            return ""
+
+        sub_files = sorted(Path(tmpdir).iterdir())
+        if not sub_files:
+            logger.warning("  [!] no subtitle files for %s", video_id)
+            return ""
+
+        raw = sub_files[0].read_text()
+        return _strip_subtitle_formatting(raw)
 
 
 def extract_text(html: str) -> str:
