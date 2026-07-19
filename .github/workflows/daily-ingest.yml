@@ -40,6 +40,13 @@ jobs:
           path: ~/.kb-pipeline/state.json
           key: kb-state-v1
 
+      - name: Write YouTube cookies
+        env:
+          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+        if: env.YOUTUBE_COOKIES != ''
+        run: |
+          echo "$YOUTUBE_COOKIES" | base64 -d > /tmp/yt-cookies.txt
+
       - name: Run daily ingest
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
