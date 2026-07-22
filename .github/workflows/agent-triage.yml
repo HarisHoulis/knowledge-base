@@ -41,11 +41,7 @@ jobs:
         with:
           model: deepseek/deepseek-v4-flash
           use_github_token: true
-          prompt: |
-            Implement the work described in issue #${{ steps.find-issue.outputs.issue_number }} of this repository.
-            Read the issue body, implement the specification, commit the changes, and open a pull request.
-            Use the /implement and /push skills.
-            When opening the PR, include "Closes #${{ steps.find-issue.outputs.issue_number }}" in the PR body.
+          prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }} and if all is well /auto-push
 
       - name: Mark failed
         if: failure()
