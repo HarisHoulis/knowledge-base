@@ -1,0 +1,59 @@
+name: Agent Triage & Implement
+
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Issue number to implement (overrides automatic selection)"
+        type: number
+        required: false
+        default: 0
+
+jobs:
+  triage-and-implement:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Find and claim issue
+        id: find-issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_OVERRIDE: ${{ inputs.issue }}
+        run: |
+          ISSUE_NUMBER=$(bash scripts/agent-triage.sh)
+          echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
+
+      - uses: anomalyco/opencode/github@latest
+        if: steps.find-issue.outputs.issue_number != ''
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          model: deepseek/deepseek-v4-flash
+          use_github_token: true
+          prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }} and if all is well /auto-push
+
+      - name: Mark failed
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE="${{ steps.find-issue.outputs.issue_number || inputs.issue }}"
+          if [[ -z "$ISSUE" || "$ISSUE" = "0" ]]; then
+            echo "[agent-triage] No issue number to mark as failed." >&2
+            exit 0
+          fi
+          gh issue edit "$ISSUE" --add-label "needs-triage"
+          gh issue comment "$ISSUE" --body \
+            "The automated agent triage workflow failed to implement this issue.
+             See the [failed run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details."
