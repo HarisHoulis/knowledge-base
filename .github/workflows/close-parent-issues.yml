@@ -1,0 +1,19 @@
+name: Close Parent Issues
+
+on:
+  issues:
+    types: [closed]
+
+jobs:
+  check-parent:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Close parent if all sub-issues resolved
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/close-completed-parent.sh ${{ github.event.issue.number }}
