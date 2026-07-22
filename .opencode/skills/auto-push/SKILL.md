@@ -1,7 +1,6 @@
 ---
-name: push
-description: Ship all changes via Conventional Commits. Use when the user wants to commit and push, ship changes, or publish work.
-disable-model-invocation: true
+name: auto-push
+description: Ship finished work: commit, push, and open a PR. Use when work is done and ready to ship, when the user wants to commit and push, publish changes, open a pull request, or wrap up a session.
 ---
 
 # Push

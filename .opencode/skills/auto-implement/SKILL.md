@@ -1,7 +1,6 @@
 ---
-name: implement
-description: "Implement a piece of work based on a spec or set of tickets."
-disable-model-invocation: true
+name: auto-implement
+description: "Build working code from a spec or set of tickets. Use when the user provides a specification to implement, tickets to build out, or requirements to code up."
 ---
 
 Implement the work described by the user in the spec or tickets.
