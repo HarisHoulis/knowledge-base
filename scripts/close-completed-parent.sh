@@ -17,7 +17,7 @@ if [ -z "$GITHUB_REPOSITORY" ]; then
     fi
 fi
 
-PARENT=$(gh api "/repos/$GITHUB_REPOSITORY/issues/$ISSUE_NUMBER" --jq '.parent.number // empty' 2>/dev/null || true)
+PARENT=$(gh issue view "$ISSUE_NUMBER" --json parent --jq '.parent.number // empty' 2>/dev/null || true)
 
 if [ -z "$PARENT" ]; then
     echo "[close-completed-parent] Issue #$ISSUE_NUMBER has no parent. Nothing to do."
