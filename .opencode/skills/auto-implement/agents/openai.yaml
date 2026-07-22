@@ -1,5 +1,0 @@
-interface:
-  display_name: "Implement"
-  short_description: "Build working code from a spec or set of tickets. Triggered by specifications, tickets, or requirements to implement."
-policy:
-  allow_implicit_invocation: true
