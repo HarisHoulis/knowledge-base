@@ -24,6 +24,11 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Find and claim issue
         id: find-issue
         env:
@@ -33,7 +38,20 @@ jobs:
           ISSUE_NUMBER=$(bash scripts/agent-triage.sh)
           echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
 
+      - name: Verify issue still assignable
+        if: steps.find-issue.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ISSUE="${{ steps.find-issue.outputs.issue_number }}"
+          ASSIGNEE=$(gh issue view "$ISSUE" --json assignees --jq '.assignees[].login // "none"')
+          if [ "$ASSIGNEE" != "github-actions[bot]" ]; then
+            echo "[agent-triage] Issue #$ISSUE was re-assigned to $ASSIGNEE. Aborting." >&2
+            exit 1
+          fi
+
       - uses: anomalyco/opencode/github@latest
+        timeout-minutes: 30
         if: steps.find-issue.outputs.issue_number != ''
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
