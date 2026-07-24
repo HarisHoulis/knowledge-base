@@ -35,7 +35,7 @@ if [[ ",$LABELS," != *",ready-for-agent,"* ]]; then
     exit 1
 fi
 
-echo "[agent-triage] Assigning issue #$ISSUE_NUMBER to github-actions[bot]..." >&2
-gh issue edit "$ISSUE_NUMBER" --add-assignee "github-actions[bot]"
+echo "[agent-triage] Claiming issue #$ISSUE_NUMBER with in-progress label..." >&2
+gh issue edit "$ISSUE_NUMBER" --add-label "in-progress"
 
 echo "$ISSUE_NUMBER"

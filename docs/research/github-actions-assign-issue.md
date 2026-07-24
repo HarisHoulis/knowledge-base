@@ -2,9 +2,9 @@
 
 ## Short Answer
 
-**You cannot assign `github-actions[bot]` (or any user) to an issue using only `GITHUB_TOKEN` (a GitHub App installation token).** The GraphQL mutation that the GitHub CLI uses (`replaceActorsForAssignable`) explicitly rejects installation tokens. The REST API endpoints (`POST /repos/{owner}/{repo}/issues/{issue_number}/assignees`, `PATCH /repos/{owner}/{repo}/issues/{issue_number}`) also fail with installation tokens because the underlying implementation uses the same restricted mutation.
+**You cannot assign `github-actions[bot]` to an issue from a GitHub Actions workflow, regardless of whether you use `GITHUB_TOKEN` (an installation token) or a Personal Access Token.** With `GITHUB_TOKEN`, the `replaceActorsForAssignable` GraphQL mutation rejects installation tokens. With a PAT, the mutation accepts the token but rejects `github-actions[bot]` as an ineligible assignee — the bot account is not a repository collaborator and does not meet GitHub's assignee eligibility criteria.
 
-The only workaround is to use a different token type: a Personal Access Token (classic or fine-grained) stored as a repository secret, or a dedicated GitHub App installation token generated via `actions/create-github-app-token`.
+The only way to assign a user from a workflow is to assign a human collaborator using a PAT.
 
 ---
 
@@ -89,9 +89,15 @@ Creating a new issue with pre-assigned assignees is documented as "silently drop
 
 **Source:** [REST API endpoints for issues -- Create an issue](https://docs.github.com/en/rest/issues/issues#create-an-issue)
 
-### Approach 5: Using a label instead of assignment -- NOT A SUBSTITUTE
+### Approach 5: Using a label instead of assignment -- WORKS AS CLAIMING MECHANISM
 
-Labels are not a substitute for assignment. GitHub's issue system treats assignees and labels as separate, non-interchangeable concepts. A label cannot make an issue appear in a user's "Assigned" view, trigger assignment-based notifications, or populate the issue's `assignees` field. The REST API endpoints for labels (`POST /repos/{owner}/{repo}/issues/{issue_number}/labels`) work with installation tokens, but this is a fundamentally different feature.
+Labels are not a substitute for assignment — they don't populate the `assignees` field, trigger assignment-based notifications, or appear in a user's "Assigned" view. However, a label like `in-progress` can serve as a claiming mechanism for automated workflows, since label operations work with both GITHUB_TOKEN and PATs.
+
+```bash
+gh issue edit $ISSUE_NUMBER --add-label "in-progress"
+```
+
+**Source:** [REST API endpoints for labels](https://docs.github.com/en/rest/issues/labels)
 
 ### Approach 6: Configuring GitHub App permissions -- NOT POSSIBLE
 
@@ -121,15 +127,21 @@ Instead of GITHUB_TOKEN, generate an installation token from a dedicated GitHub 
 
 **Source:** [Making authenticated API requests with a GitHub App in a GitHub Actions workflow](https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/making-authenticated-api-requests-with-a-github-app-in-a-github-actions-workflow)
 
-### Approach 8: Using a Personal Access Token stored as a secret -- WORKS (recommended)
+### Approach 8: Using a Personal Access Token stored as a secret -- PARTIAL (works for human assignees, NOT for `github-actions[bot]`)
 
-Store a PAT (classic or fine-grained) as a repository secret and use it instead of GITHUB_TOKEN:
+A PAT bypasses the token-type restriction (it's a user token), but the `replaceActorsForAssignable` mutation also checks whether the **target assignee** has access to the repository. `github-actions[bot]` does not have access, so assigning the bot still fails with:
+
+```
+GraphQL: Bot does not have access to the repository. (replaceActorsForAssignable)
+```
+
+A PAT **does** work for assigning human collaborators who are repo contributors:
 
 ```yaml
 - name: Assign issue
   env:
     GH_TOKEN: ${{ secrets.MY_PAT }}
-  run: gh issue edit $ISSUE_NUMBER --add-assignee "github-actions[bot]"
+  run: gh issue edit $ISSUE_NUMBER --add-assignee "human-username"
 ```
 
 Or via the REST API:
@@ -139,7 +151,7 @@ curl -X POST \
   -H "Authorization: Bearer ${{ secrets.MY_PAT }}" \
   -H "Accept: application/vnd.github+json" \
   https://api.github.com/repos/${{ github.repository }}/issues/$ISSUE_NUMBER/assignees \
-  -d '{"assignees":["github-actions[bot]"]}'
+  -d '{"assignees":["human-username"]}'
 ```
 
 The PAT must have `issues: write` scope (classic) or `issues: write` permission (fine-grained).
@@ -148,7 +160,7 @@ The PAT must have `issues: write` scope (classic) or `issues: write` permission 
 
 ### Approach 9: Using `@me` special value -- Does not help
 
-The GitHub CLI supports `@me` as a special assignee value that resolves to the currently authenticated user. However, when using GITHUB_TOKEN, the "authenticated user" is the `github-actions[bot]` bot account, not a human. Using `gh issue edit <number> --add-assignee "@me"` with GITHUB_TOKEN would attempt to assign `github-actions[bot]`, which hits the same `replaceActorsForAssignable` restriction.
+The GitHub CLI supports `@me` as a special assignee value that resolves to the currently authenticated user. However, when using GITHUB_TOKEN, the "authenticated user" is the `github-actions[bot]` bot account, not a human. Using `gh issue edit <number> --add-assignee "@me"` with GITHUB_TOKEN would attempt to assign `github-actions[bot]`, which hits the same `replaceActorsForAssignable` restriction. With a PAT, `@me` resolves to the PAT owner — which works, but assigns a human, not the bot.
 
 **Source:** [cli/cli/pkg/cmd/pr/shared/params.go -- MeReplacer](https://github.com/cli/cli/blob/trunk/pkg/cmd/pr/shared/params.go)
 
@@ -162,19 +174,21 @@ A workflow triggered by `repository_dispatch` still runs inside GitHub Actions a
 
 GitHub App installation tokens represent the _application_, not a user. The `replaceActorsForAssignable` mutation modifies the actor-to-issue relationship, which is a user-centric operation. GitHub restricts this to ensure that assignment changes are attributable to a real user identity (PAT or OAuth token) rather than an automated application. This is a design choice to maintain audit trail integrity.
 
+Additionally, the mutation validates that the target assignee is eligible (repo collaborator, commenter, etc.). `github-actions[bot]` is a system account that cannot be added as a collaborator.
+
 ---
 
 ## Summary Table
 
-| Approach | Works? | Notes |
+| Approach | Works for `github-actions[bot]`? | Notes |
 |---|---|---|
 | `gh issue edit --add-assignee` with GITHUB_TOKEN | No | GraphQL mutation blocked for installation tokens |
 | REST API `POST .../assignees` with GITHUB_TOKEN | No | Same underlying restriction |
 | REST API `PATCH .../issues` with GITHUB_TOKEN | No | Same underlying restriction |
-| Labels instead of assignment | N/A | Different concept, not a substitute |
+| Labels instead of assignment | **Yes** (as claim mechanism) | Different concept from assignment, but works with any token |
 | Permissions adjustment | No | Restriction is by token type, not scope level |
 | Separate GitHub App token | No | Still a GitHub App installation token |
-| PAT stored as secret | **Yes** | The only reliable workaround |
+| PAT stored as secret | **Yes** for human assignees, **No** for bot | PAT bypasses token-type check; bot fails eligibility check |
 | `@me` with GITHUB_TOKEN | No | Resolves to bot, which is still blocked |
 | `repository_dispatch` | No | Token type unchanged |
 
@@ -182,11 +196,6 @@ GitHub App installation tokens represent the _application_, not a user. The `rep
 
 ## Recommendation
 
-Store a fine-grained Personal Access Token (with `issues: write` permission, scoped to the repository) as a repository secret named e.g. `PAT_ISSUES`. Use it as:
+**Do not attempt to assign `github-actions[bot]` to issues — it is not a valid assignee.** For the agent-triage workflow, use an `in-progress` label as a claiming mechanism instead. Label operations work with any token type and are not subject to the `replaceActorsForAssignable` restriction.
 
-```yaml
-env:
-  GH_TOKEN: ${{ secrets.PAT_ISSUES }}
-```
-
-Then run `gh issue edit` or `gh api` commands as normal. This is the minimal viable workaround.
+If you need actual assignment semantics (e.g., for human notification), assign a real collaborator username using a PAT.
