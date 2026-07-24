@@ -32,7 +32,7 @@ jobs:
       - name: Find and claim issue
         id: find-issue
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_ISSUES }}
           ISSUE_OVERRIDE: ${{ inputs.issue }}
         run: |
           ISSUE_NUMBER=$(bash scripts/agent-triage.sh)
