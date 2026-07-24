@@ -38,15 +38,15 @@ jobs:
           ISSUE_NUMBER=$(bash scripts/agent-triage.sh)
           echo "issue_number=$ISSUE_NUMBER" >> $GITHUB_OUTPUT
 
-      - name: Verify issue still assignable
+      - name: Verify issue still claimable
         if: steps.find-issue.outputs.issue_number != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           ISSUE="${{ steps.find-issue.outputs.issue_number }}"
-          ASSIGNEE=$(gh issue view "$ISSUE" --json assignees --jq '.assignees[].login // "none"')
-          if [ "$ASSIGNEE" != "github-actions[bot]" ]; then
-            echo "[agent-triage] Issue #$ISSUE was re-assigned to $ASSIGNEE. Aborting." >&2
+          HAS_LABEL=$(gh issue view "$ISSUE" --json labels --jq '[.labels[].name] | any(. == "in-progress")')
+          if [ "$HAS_LABEL" != "true" ]; then
+            echo "[agent-triage] Issue #$ISSUE lost its 'in-progress' label. Aborting." >&2
             exit 1
           fi
 
@@ -71,7 +71,7 @@ jobs:
             echo "[agent-triage] No issue number to mark as failed." >&2
             exit 0
           fi
-          gh issue edit "$ISSUE" --add-label "needs-triage"
+          gh issue edit "$ISSUE" --add-label "needs-triage" --remove-label "in-progress"
           gh issue comment "$ISSUE" --body \
             "The automated agent triage workflow failed to implement this issue.
              See the [failed run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details."
