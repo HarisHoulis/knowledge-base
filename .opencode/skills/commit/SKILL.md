@@ -26,7 +26,7 @@ Map the change to a Conventional Commits type:
 
 Scope is the affected module, one or two words — optional.
 
-Propose `<type>(<scope>): <summary>`. Show the user; accept edits. If the type is obvious (added code = `feat`, typo fix = `docs`), skip the prompt and commit.
+Propose a single-line `<type>(<scope>): <summary>` — no body paragraph. Show the user; accept edits. If the type is obvious (added code = `feat`, typo fix = `docs`), skip the prompt and commit.
 
 Completion criterion: message confirmed (explicitly or by skipping).
 
