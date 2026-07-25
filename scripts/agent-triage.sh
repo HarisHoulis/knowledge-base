@@ -36,6 +36,6 @@ if [[ ",$LABELS," != *",ready-for-agent,"* ]]; then
 fi
 
 echo "[agent-triage] Claiming issue #$ISSUE_NUMBER with in-progress label..." >&2
-gh issue edit "$ISSUE_NUMBER" --add-label "in-progress"
+gh issue edit "$ISSUE_NUMBER" --add-label "in-progress" > /dev/null
 
 echo "$ISSUE_NUMBER"
