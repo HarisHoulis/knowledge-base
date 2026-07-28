@@ -24,8 +24,13 @@ Completion criterion: remote confirms the push.
 `gh pr view` to check if a PR exists for this branch.
 
 If none exists, create one:
-- Read `.github/PULL_REQUEST_TEMPLATE.md` if it exists.
-- For each `<!-- ... -->` placeholder in the template, replace it with content derived from `git log` (since the base branch) or the diff.
-- Create the PR with: `gh pr create --title "..." --body "$body"` (do NOT use `--fill` — it skips the template).
 
-Completion criterion: PR exists on the remote.
+1. Check for template at `.github/PULL_REQUEST_TEMPLATE.md`.
+2. **Must** read it with the Read tool if found.
+3. For each `<!-- ... -->` placeholder in the template, replace it with content derived from `git log` (since the base branch) or the diff.
+4. Create the PR with: `gh pr create --title "..." --body "$body"` (do NOT use `--fill`).
+5. Verify: `gh pr view --json body` and confirm the body includes the filled-out template (not empty, not a fallback).
+
+**Failure mode**: If the template exists but the PR body does not contain its filled-out structure, mark the step as failed.
+
+Completion criterion: PR exists on the remote with a body derived from the template.
