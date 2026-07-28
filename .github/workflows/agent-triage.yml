@@ -75,7 +75,7 @@ jobs:
             echo "[agent-triage] No issue number to mark as failed." >&2
             exit 0
           fi
-          gh issue edit "$ISSUE" --add-label "needs-triage" --remove-label "in-progress"
+          gh api -X PUT "repos/{owner}/{repo}/issues/$ISSUE/labels" -f labels[]=needs-triage
           gh issue comment "$ISSUE" --body \
             "The automated agent triage workflow failed to implement this issue.
              See the [failed run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details."
