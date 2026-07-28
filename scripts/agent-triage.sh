@@ -15,7 +15,7 @@ if [ -n "$ISSUE_NUMBER" ]; then
         exit 1
     fi
     echo "[agent-triage] Claiming issue #$ISSUE_NUMBER with in-progress label..." >&2
-    gh issue edit "$ISSUE_NUMBER" --add-label "in-progress" > /dev/null
+    gh api -X PUT "repos/{owner}/{repo}/issues/$ISSUE_NUMBER/labels" -f labels[]=in-progress > /dev/null
     echo "$ISSUE_NUMBER"
     exit 0
 fi
@@ -96,6 +96,6 @@ if [[ ",$LABELS," != *",ready-for-agent,"* ]]; then
 fi
 
 echo "[agent-triage] Claiming issue #$SELECTED with in-progress label..." >&2
-gh issue edit "$SELECTED" --add-label "in-progress" > /dev/null
+gh api -X PUT "repos/{owner}/{repo}/issues/$SELECTED/labels" -f labels[]=in-progress > /dev/null
 
 echo "$SELECTED"
