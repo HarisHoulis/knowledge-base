@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Redirect Test Feed</title>
+    <link>https://example.com/</link>
+    <description>A feed with redirect-style entries</description>
+    <item>
+      <title>Jake Wharton on Kotlin</title>
+      <link>https://example.com/real-article</link>
+      <description>Read it at https://cash.app/...</description>
+      <content:encoded xmlns:content="http://purl.org/rss/1.0/modules/content/">
+        <![CDATA[<p>Read it at code.cash.app/...</p>]]>
+      </content:encoded>
+      <author>Jake Wharton</author>
+      <pubDate>Mon, 15 Jan 2024 00:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

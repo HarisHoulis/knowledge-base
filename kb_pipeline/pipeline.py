@@ -8,7 +8,7 @@ from typing import Any, Callable, Optional
 
 from .config import SOURCES, Source
 from .state import load_state, save_state
-from .fetcher import fetch_rss, fetch_youtube, extract_text, transcript_youtube
+from .fetcher import fetch_rss, fetch_url_text, fetch_youtube, extract_text, transcript_youtube
 from .llm import classify_summarize
 from .writer import write_draft, write_entry, promote_draft
 from .audit import classification_audit, content_audit, AuditResult
@@ -121,6 +121,7 @@ def run_pipeline(
     sources: Optional[list[Source]] = None,
     *,
     transcript_fn: Callable[[str], str] = transcript_youtube,
+    fetch_url_text_fn: Callable[[str], str] = fetch_url_text,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
@@ -162,6 +163,16 @@ def run_pipeline(
                     stats["skipped"] += 1
                     continue
                 text = extract_text(content)
+
+            if (not text or len(text) < 200) and src.type != "youtube":
+                link_url = entry.get("link", "")
+                if link_url:
+                    logger.info("  link fallback for: %s", entry.get("title", "")[:60])
+                    fetched = fetch_url_text_fn(link_url)
+                    if fetched:
+                        text = extract_text(fetched)
+                    else:
+                        logger.info("  link fallback failed for: %s", entry.get("title", "")[:60])
 
             if not text or len(text) < 200:
                 logger.info("  skipping (too short): %s", entry.get("title", "")[:60])
