@@ -231,6 +231,98 @@ class TestExtractYoutubeVideoId:
         assert _extract_youtube_video_id("https://www.youtube.com/watch?v=invalid") is None
 
 
+SHORT_CONTENT = "<p>Read it at code.cash.app/...</p>"
+
+
+class TestRunPipelineLinkFallback:
+    def test_rss_short_content_falls_back_to_link(self):
+        from kb_pipeline.pipeline import run_pipeline
+
+        fixture = Path(__file__).parent / "fixtures" / "redirect-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        def stub_fetch_url(url: str) -> str:
+            if "real-article" in url:
+                return "This is the full article content with enough text to pass the 200 character threshold for classification. " * 10
+            return ""
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            fetch_url_text_fn=stub_fetch_url,
+        )
+
+        assert stats["written"] == 1
+
+    def test_rss_short_content_link_fails_skips_gracefully(self, caplog):
+        from kb_pipeline.pipeline import run_pipeline
+
+        caplog.set_level("INFO")
+        fixture = Path(__file__).parent / "fixtures" / "redirect-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        def stub_fetch_url(url: str) -> str:
+            return ""
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            fetch_url_text_fn=stub_fetch_url,
+        )
+
+        assert stats["skipped"] >= 1
+        assert "link fallback" in caplog.text
+
+    def test_youtube_short_content_no_fallback(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        def mock_fetch(src):
+            from feedparser import FeedParserDict
+            return [FeedParserDict({"link": "https://www.youtube.com/watch?v=test123", "title": "Test Video"})]
+
+        monkeypatch.setattr("kb_pipeline.pipeline.fetch_youtube", mock_fetch)
+
+        source = Source(id="test", type="youtube", url="https://www.youtube.com/feeds/videos.xml?channel_id=UC_test")
+
+        def stub_transcript(video_id: str) -> str:
+            return "short"
+
+        fetch_calls: list[str] = []
+        def stub_fetch_url(url: str) -> str:
+            fetch_calls.append(url)
+            return "should not be called"
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            transcript_fn=stub_transcript,
+            fetch_url_text_fn=stub_fetch_url,
+        )
+
+        assert fetch_calls == []
+        assert stats["skipped"] >= 1
+
+    def test_normal_content_no_fallback(self):
+        from kb_pipeline.pipeline import run_pipeline
+
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        fetch_calls: list[str] = []
+        def stub_fetch_url(url: str) -> str:
+            fetch_calls.append(url)
+            return ""
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            fetch_url_text_fn=stub_fetch_url,
+        )
+
+        assert fetch_calls == []
+        assert stats["written"] == 1
+
+
 class TestRunPipelineWithTranscript:
     def test_rss_source_does_not_call_transcript(self) -> None:
         from kb_pipeline.pipeline import run_pipeline

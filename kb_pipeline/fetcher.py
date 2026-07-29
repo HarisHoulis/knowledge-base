@@ -122,6 +122,20 @@ def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run
         return _strip_subtitle_formatting(raw)
 
 
+def fetch_url_text(url: str, *, get: Callable[..., Any] = requests.get) -> str:
+    try:
+        r = get(url, timeout=30)
+        r.raise_for_status()
+        text = trafilatura.extract(r.text, output_format="markdown", include_links=True)
+        if not text:
+            logger.warning("  [!] URL text extract failed (%s)", url)
+            return ""
+        return text
+    except requests.RequestException as e:
+        logger.warning("  [!] URL fetch failed (%s): %s", url, e)
+        return ""
+
+
 def extract_text(html: str) -> str:
     if not html.strip():
         return ""

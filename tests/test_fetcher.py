@@ -5,8 +5,9 @@ from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+import requests
 
-from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text, transcript_youtube
+from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text, fetch_url_text, transcript_youtube
 
 
 SAMPLE_VTT = """WEBVTT
@@ -103,6 +104,56 @@ class TestExtractText:
         result = extract_text(html)
         assert isinstance(result, str)
         assert len(result) > 0
+
+
+SAMPLE_HTML = """<html><body><article><h1>Real Article</h1><p>This is the full article content that should be fetched from the link URL when the RSS entry content is too short.</p><p>It has enough text to pass the 200 character threshold for classification.</p></article></body></html>"""
+
+
+class TestFetchUrlText:
+    def test_fetches_url_and_returns_text(self):
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_url_text("https://example.com/article", get=fake_get)
+        assert len(result) > 200
+
+    def test_network_error_returns_empty(self, caplog):
+        caplog.set_level("WARNING")
+
+        def fake_get(url, **kwargs):
+            raise requests.RequestException("connection failed")
+
+        result = fetch_url_text("https://example.com/article", get=fake_get)
+        assert result == ""
+        assert "fetch failed" in caplog.text
+
+    def test_timeout_returns_empty(self, caplog):
+        caplog.set_level("WARNING")
+
+        def fake_get(url, **kwargs):
+            raise requests.Timeout("timed out")
+
+        result = fetch_url_text("https://example.com/article", get=fake_get)
+        assert result == ""
+        assert "timed out" in caplog.text or "fetch failed" in caplog.text
+
+    def test_non_html_response_returns_empty(self, caplog):
+        caplog.set_level("WARNING")
+
+        response = MagicMock()
+        response.text = "not html content"
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_url_text("https://example.com/article", get=fake_get)
+        assert result == ""
+        assert "extract failed" in caplog.text
 
 
 class TestTranscriptYoutube:
