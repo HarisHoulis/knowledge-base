@@ -27,6 +27,7 @@ class Source:
     channel: str = ""
     playlist: str = ""
     headers: dict[str, str] = field(default_factory=dict)
+    cookie_env_var: str = ""
 
 
 SOURCES: list[Source] = [
@@ -41,6 +42,7 @@ SOURCES: list[Source] = [
     Source(id="john-ousterhout",  type="youtube", playlist="PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB"),
     Source(id="gilded-rose",      type="youtube", playlist="PL1ssMPpyqociJNwykAOB9_KEZVW7BW7m2"),
     Source(id="ai-engineer",      type="youtube", channel="UCLKPca3kwwd-B59HNr-_lvA"),
+    Source(id="bytebytego",       type="rss",  url="https://blog.bytebytego.com/feed", cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE"),
 ]
 
 SYSTEM_PROMPT = """You are a knowledge-base curator. Given an article or transcript, output a JSON object with:
