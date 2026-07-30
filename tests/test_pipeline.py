@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Callable, Optional
 
 from kb_pipeline.audit import AuditResult
-from kb_pipeline.config import Source
+from kb_pipeline.config import SOURCES, Source
 
 SAMPLE_TEXT = "some source text"
 SAMPLE_URL = "https://example.com/article"
@@ -339,3 +339,19 @@ class TestRunPipelineWithTranscript:
 
         assert calls == [], "transcript_fn should not be called for RSS sources"
         assert stats["sources"] == 1
+
+
+def test_source_cookie_env_var_defaults_to_empty() -> None:
+    source = Source(id="x", type="rss")
+    assert source.cookie_env_var == ""
+
+
+def test_existing_sources_instantiate_without_error() -> None:
+    for s in SOURCES:
+        assert isinstance(s, Source)
+
+
+def test_bytebytego_source_has_cookie_env_var() -> None:
+    src = next((s for s in SOURCES if s.id == "bytebytego"), None)
+    assert src is not None
+    assert src.cookie_env_var == "BYTEBYTEGO_SUBSTACK_COOKIE"
