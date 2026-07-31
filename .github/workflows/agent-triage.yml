@@ -38,7 +38,7 @@ jobs:
       - name: Find and claim issue
         id: find-issue
         env:
-          GH_TOKEN: ${{ secrets.PAT_ISSUES }}
+          GH_TOKEN: ${{ secrets.PAT_AGENT }}
           ISSUE_OVERRIDE: ${{ inputs.issue }}
         run: |
           ISSUE_NUMBER=$(bash scripts/agent-triage.sh)
@@ -61,7 +61,7 @@ jobs:
         if: steps.find-issue.outputs.issue_number != ''
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.PAT_AGENT }}
         with:
           model: deepseek/deepseek-v4-flash
           use_github_token: true
