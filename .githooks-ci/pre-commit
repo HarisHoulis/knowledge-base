@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if git diff --cached --name-only --diff-filter=ACDMRT -- .github/workflows/ | grep -q .; then
+    echo "ERROR: staged changes include files under .github/workflows/." >&2
+    echo "The run token cannot push workflow files. Do NOT commit them." >&2
+    echo "Run: bash scripts/suggest-workflow-change.sh <issue-number>" >&2
+    echo "It extracts the diff into a proposal under docs/workflow-proposals/ and reverts the workflow files." >&2
+    exit 1
+fi
+
+exit 0

@@ -28,6 +28,10 @@ _Avoid_: Cron job, launchd job, scheduled task
 **Weekly Digest**:
 A recurring 30-minute review of newly added concepts.
 
+**Workflow Proposal**:
+A markdown file under `docs/workflow-proposals/` capturing an agent's intended changes to `.github/workflows/*` as a unified diff. Committed to the agent's PR but never applied by the agent — the run token lacks `workflows` permission. A human applies the diff manually after review.
+_Avoid_: Workflow suggestion, proposed workflow change
+
 **State**:
 Persistent tracking of which source URLs have already been processed, stored outside the KB tree.
 _Avoid_: Processed hashes
