@@ -60,6 +60,8 @@ jobs:
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
+          GIT_TRACE: "1"
+          GIT_TRACE_CURL: "1"
         with:
           model: deepseek/deepseek-v4-flash
           use_github_token: true
