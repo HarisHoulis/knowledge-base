@@ -4,7 +4,7 @@
 - **Surgical Diffs:** Touch only what you must. Do not "improve" or refactor adjacent code, formatting, or comments unless asked.
 - **Dead Code:** Remove variables, imports, or functions that YOUR changes make unused. Do not touch pre-existing dead code.
 - **Dependencies:** Prioritize native framework utilities over introducing new third-party packages.
-- **Handoff:** When context window fills to 10% capacity, invoke `/handoff` to write a handoff document to `.handoffs/<issue-num>-<timestamp>.md`. Then `git add .handoffs/ && git commit -m "chore: handoff <issue-num>"` to record it. Do not `git push` — the opencode GitHub action handler pushes the branch and opens the PR after the agent finishes; the handoff document ships with it.
+- **Handoff:** When context window fills to 10% capacity, invoke `/handoff` to write a handoff document to `.handoffs/<issue-num>-<timestamp>.md`. Then `git add .handoffs/ && git commit -m "chore: handoff <issue-num>"` to record it. Do not `git push` — the opencode GitHub action handler pushes the branch and opens the PR after the agent finishes; the handoff document ships with it. This applies to agent-triage CI runs; in a local interactive session, push normally.
 - **Info Retrieval:** Launch subagents to retrieve info/context or do research.
 
 ## Global Engineering Standards
