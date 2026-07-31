@@ -63,7 +63,7 @@ jobs:
         with:
           model: deepseek/deepseek-v4-flash
           use_github_token: true
-          prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }} and if all is well /auto-push
+          prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }}
 
       - name: Mark failed
         if: failure()

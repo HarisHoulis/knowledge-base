@@ -11,9 +11,10 @@ This skill runs in headless CI. Rules:
 
 - Never prompt the user or wait for input — all operations must be autonomous.
 - Git auth uses GITHUB_TOKEN (injected by the GitHub Action). Do not rely on SSH or interactive auth.
-- Branch name format: `agent/<issue-number>-<short-kebab-title>`.
-- Before branching: check if the branch already exists on `origin` (from a prior handoff). If yes, switch to it and resume. Otherwise branch from `origin/main`.
+- Work on the current branch. The opencode GitHub action handler created it and will push it and open the PR after you finish. Do NOT create a new branch and do NOT run `git push`.
+- If a handoff file exists in `.handoffs/` (from a prior run), read it to resume the work.
 - All commits must use Conventional Commits messages.
+- End your final response with the populated `.github/PULL_REQUEST_TEMPLATE.md` (read it directly with the Read tool — don't use Glob, it skips hidden directories). Replace each `<!-- ... -->` placeholder with content derived from the change. The handler uses your final response as the PR body.
 
 ## Budget
 
