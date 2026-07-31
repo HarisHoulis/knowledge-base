@@ -68,7 +68,8 @@ fi
 echo "gh: unrecognized invocation: $*" >&2
 exit 1
 MOCKEOF
-    sed -i '' "s|CF|$calls_file|g" "$mock_dir/gh"
+    sed "s|CF|$calls_file|g" "$mock_dir/gh" > "$mock_dir/gh.tmp"
+    mv "$mock_dir/gh.tmp" "$mock_dir/gh"
     chmod +x "$mock_dir/gh"
 }
 
