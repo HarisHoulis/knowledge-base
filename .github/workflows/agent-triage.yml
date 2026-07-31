@@ -18,12 +18,21 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      id-token: write
 
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Configure git auth for push
+        run: |
+          git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n "x-access-token:${{ github.token }}" | base64 | tr -d '\n')"
+          git config --global http.version HTTP/1.1
 
       - name: Find and claim issue
         id: find-issue
@@ -54,6 +63,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           model: deepseek/deepseek-v4-flash
+          use_github_token: true
           prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }}
 
       - name: Mark failed
