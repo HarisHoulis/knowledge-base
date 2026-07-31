@@ -25,6 +25,12 @@
 
 <!-- Link any related GitHub issues, e.g., "Closes #12" -->
 
+## Workflow changes
+
+<!-- If this PR proposes changes to .github/workflows/*, mark and explain. Leave unchecked if none. -->
+
+- [ ] Proposed, not applied — apply the diff manually after review (see `docs/workflow-proposals/`)
+
 ## Notes
 
 <!-- Anything a reviewer (or future you) should know -->
