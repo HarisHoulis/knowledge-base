@@ -122,6 +122,7 @@ def run_pipeline(
     *,
     transcript_fn: Callable[[str], str] = transcript_youtube,
     fetch_url_text_fn: Callable[[str], str] = fetch_url_text,
+    classify_fn: Callable[..., Optional[dict[str, Any]]] = classify_summarize,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
@@ -179,7 +180,7 @@ def run_pipeline(
                 stats["skipped"] += 1
                 continue
 
-            result = classify_summarize(text, entry)
+            result = classify_fn(text, entry)
             if not result:
                 stats["skipped"] += 1
                 continue

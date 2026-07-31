@@ -250,6 +250,7 @@ class TestRunPipelineLinkFallback:
             dry_run=True,
             sources=[source],
             fetch_url_text_fn=stub_fetch_url,
+            classify_fn=stub_classify_ok,
         )
 
         assert stats["written"] == 1
@@ -317,6 +318,7 @@ class TestRunPipelineLinkFallback:
             dry_run=True,
             sources=[source],
             fetch_url_text_fn=stub_fetch_url,
+            classify_fn=stub_classify_ok,
         )
 
         assert fetch_calls == []
