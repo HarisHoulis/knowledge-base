@@ -60,6 +60,11 @@ if [ "$1" = "issue" ] && [ "$2" = "view" ]; then
     exit 0
 fi
 
+# api
+if [ "$1" = "api" ]; then
+    exit 0
+fi
+
 echo "gh: unrecognized invocation: $*" >&2
 exit 1
 MOCKEOF
@@ -111,7 +116,7 @@ test_leaf_not_blocked() {
     local fail=0
     [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
     [ "$(cat "$test_dir/stdout")" = "5" ] || { echo "  FAIL: expected stdout '5', got '$(cat "$test_dir/stdout")'"; fail=1; }
-    grep -q "issue edit 5" "$calls_file" || { echo "  FAIL: expected gh issue edit 5"; fail=1; }
+    grep -q "api.*issues/5/labels" "$calls_file" || { echo "  FAIL: expected gh api labels claim for 5"; fail=1; }
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
     echo "PASS: leaf not blocked picks issue"
@@ -187,7 +192,7 @@ test_leaf_blocked_skips_to_next() {
     local fail=0
     [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
     [ "$(cat "$test_dir/stdout")" = "6" ] || { echo "  FAIL: expected stdout '6', got '$(cat "$test_dir/stdout")'"; fail=1; }
-    grep -q "issue edit 6" "$calls_file" || { echo "  FAIL: expected gh issue edit 6"; fail=1; }
+    grep -q "api.*issues/6/labels" "$calls_file" || { echo "  FAIL: expected gh api labels claim for 6"; fail=1; }
     grep -q "issue view 5" "$calls_file" || { echo "  FAIL: expected gh issue view 5 (checking blocked)"; fail=1; }
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
@@ -217,7 +222,7 @@ test_parent_picks_unblocked_sub() {
     local fail=0
     [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
     [ "$(cat "$test_dir/stdout")" = "12" ] || { echo "  FAIL: expected stdout '12', got '$(cat "$test_dir/stdout")'"; fail=1; }
-    grep -q "issue edit 12" "$calls_file" || { echo "  FAIL: expected gh issue edit 12"; fail=1; }
+    grep -q "api.*issues/12/labels" "$calls_file" || { echo "  FAIL: expected gh api labels claim for 12"; fail=1; }
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
     echo "PASS: parent picks oldest unblocked sub-issue"
@@ -246,7 +251,7 @@ test_parent_all_subs_blocked_falls_back() {
     local fail=0
     [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
     [ "$(cat "$test_dir/stdout")" = "10" ] || { echo "  FAIL: expected stdout '10', got '$(cat "$test_dir/stdout")'"; fail=1; }
-    grep -q "issue edit 10" "$calls_file" || { echo "  FAIL: expected gh issue edit 10 (parent fallback)"; fail=1; }
+    grep -q "api.*issues/10/labels" "$calls_file" || { echo "  FAIL: expected gh api labels claim for 10 (parent fallback)"; fail=1; }
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
     echo "PASS: parent with all subs blocked falls back to parent"
@@ -274,7 +279,7 @@ test_parent_blocked_skips_to_next() {
     local fail=0
     [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
     [ "$(cat "$test_dir/stdout")" = "5" ] || { echo "  FAIL: expected stdout '5', got '$(cat "$test_dir/stdout")'"; fail=1; }
-    grep -q "issue edit 5" "$calls_file" || { echo "  FAIL: expected gh issue edit 5"; fail=1; }
+    grep -q "api.*issues/5/labels" "$calls_file" || { echo "  FAIL: expected gh api labels claim for 5"; fail=1; }
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
     echo "PASS: blocked parent skips to next candidate"
