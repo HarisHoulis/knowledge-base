@@ -132,26 +132,15 @@ class TestFetchArticle:
         assert len(result) >= 200
         assert seen_headers == {"Cookie": "session=abc"}
 
-    def test_http_4xx_returns_empty(self, caplog):
+    @pytest.mark.parametrize("status_code,message", [(404, "404 Client Error"), (500, "500 Server Error")])
+    def test_http_error_status_returns_empty(self, caplog, status_code, message):
         caplog.set_level("WARNING")
 
         def fake_get(url, **kwargs):
             r = requests.Response()
-            r.status_code = 404
+            r.status_code = status_code
             r.url = url
-            raise requests.HTTPError("404 Client Error", response=r)
-
-        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
-        assert "fetch failed" in caplog.text
-
-    def test_http_5xx_returns_empty(self, caplog):
-        caplog.set_level("WARNING")
-
-        def fake_get(url, **kwargs):
-            r = requests.Response()
-            r.status_code = 500
-            r.url = url
-            raise requests.HTTPError("500 Server Error", response=r)
+            raise requests.HTTPError(message, response=r)
 
         assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
         assert "fetch failed" in caplog.text
@@ -200,6 +189,12 @@ class TestVerifySourceAuth:
     def test_returns_false_when_no_cookie_env_var_declared(self):
         source = Source(id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml")
         assert verify_source_auth(source) is False
+
+    def test_getenv_seam_is_injected(self):
+        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        assert verify_source_auth(source, getenv=lambda var: "cookie" if var == "BYTEBYTEGO_SUBSTACK_COOKIE" else None) is True
+        assert verify_source_auth(source, getenv=lambda var: None) is False
 
 
 class TestFetchUrlText:
