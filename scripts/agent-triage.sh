@@ -37,17 +37,17 @@ if [ -z "$CANDIDATES" ]; then
 fi
 
 is_claimable() {
-    local issue="$1"
-    local blocked assignees labels
+    local ISSUE="$1"
+    local BLOCKED ASSIGNEES LABELS
 
-    blocked=$(gh issue view "$issue" --json blockedBy --jq '.blockedBy.totalCount')
-    [ "$blocked" -eq 0 ] || return 1
+    BLOCKED=$(gh issue view "$ISSUE" --json blockedBy --jq '.blockedBy.totalCount')
+    [ "$BLOCKED" -eq 0 ] || return 1
 
-    assignees=$(gh issue view "$issue" --json assignees --jq '.assignees.totalCount')
-    [ "$assignees" -eq 0 ] || return 1
+    ASSIGNEES=$(gh issue view "$ISSUE" --json assignees --jq '.assignees.totalCount')
+    [ "$ASSIGNEES" -eq 0 ] || return 1
 
-    labels=$(gh issue view "$issue" --json labels --jq '[.labels[].name] | join(",")')
-    [[ ",$labels," == *",ready-for-agent,"* ]]
+    LABELS=$(gh issue view "$ISSUE" --json labels --jq '[.labels[].name] | join(",")')
+    [[ ",$LABELS," == *",ready-for-agent,"* ]]
 }
 
 SELECTED=""
