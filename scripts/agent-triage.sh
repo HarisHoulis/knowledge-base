@@ -43,7 +43,7 @@ is_claimable() {
     BLOCKED=$(gh issue view "$ISSUE" --json blockedBy --jq '.blockedBy.totalCount')
     [ "$BLOCKED" -eq 0 ] || return 1
 
-    ASSIGNEES=$(gh issue view "$ISSUE" --json assignees --jq '.assignees.totalCount')
+    ASSIGNEES=$(gh issue view "$ISSUE" --json assignees --jq '.assignees | length')
     [ "$ASSIGNEES" -eq 0 ] || return 1
 
     LABELS=$(gh issue view "$ISSUE" --json labels --jq '[.labels[].name] | join(",")')
@@ -96,7 +96,7 @@ if [ -z "$SELECTED" ]; then
 - Has viable parent -> sub-issue candidates
 
 All ready-for-agent issues were either blocked, assigned, or had no claimable sub-issues.
-This may indicate a systemic bottleneck."
+This may indicate a systemic bottleneck." > /dev/null
     exit 0
 fi
 

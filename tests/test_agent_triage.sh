@@ -26,6 +26,7 @@ fi
 
 # issue create
 if [ "$1" = "issue" ] && [ "$2" = "create" ]; then
+    echo "https://github.com/owner/repo/issues/99"
     exit 0
 fi
 
@@ -37,28 +38,71 @@ fi
 # issue view
 if [ "$1" = "issue" ] && [ "$2" = "view" ]; then
     NUM="$3"
-    TAG=""
-    if echo "$*" | grep -q "blockedBy.*totalCount"; then
-        TAG="BLOCKED"
-    elif echo "$*" | grep -q "subIssues.*totalCount"; then
-        TAG="SUBCOUNT"
-    elif echo "$*" | grep -q "subIssues.*OPEN.*number"; then
-        TAG="OPENSUBS"
-    elif echo "$*" | grep -q "labels.*join"; then
-        TAG="LABELS"
-    elif echo "$*" | grep -q "assignees.*totalCount"; then
-        TAG="ASSIGNEES"
-    fi
-    if [ -n "$TAG" ]; then
-        VARNAME="MOCK_GH_VIEW_${NUM}_${TAG}"
-        VAL="${!VARNAME:-}"
-        if [ "$TAG" = "LABELS" ] && [ -z "$VAL" ]; then
-            [ "$NUM" = "99" ] && echo "" || echo "ready-for-agent"
-        else
-            echo "${VAL:-0}"
-        fi
+    FIELD=""
+    QUERY=""
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --json) FIELD="$2"; shift 2;;
+            --jq) QUERY="$2"; shift 2;;
+            *) shift;;
+        esac
+    done
+
+    PAYLOAD=""
+    case "$FIELD" in
+        blockedBy)
+            VARNAME="MOCK_GH_VIEW_${NUM}_BLOCKED"
+            VAL="${!VARNAME:-0}"
+            PAYLOAD="{\"blockedBy\":{\"nodes\":[],\"totalCount\":$VAL}}"
+            ;;
+        assignees)
+            VARNAME="MOCK_GH_VIEW_${NUM}_ASSIGNEES"
+            VAL="${!VARNAME:-0}"
+            ASSIGNEES_JSON=""
+            i=0
+            while [ "$i" -lt "$VAL" ]; do
+                ASSIGNEES_JSON="$ASSIGNEES_JSON{\"login\":\"user$i\"},"
+                i=$((i+1))
+            done
+            ASSIGNEES_JSON="${ASSIGNEES_JSON%,}"
+            PAYLOAD="{\"assignees\":[$ASSIGNEES_JSON]}"
+            ;;
+        labels)
+            VARNAME="MOCK_GH_VIEW_${NUM}_LABELS"
+            VAL="${!VARNAME:-}"
+            if [ -z "$VAL" ]; then
+                [ "$NUM" = "99" ] && VAL="" || VAL="ready-for-agent"
+            fi
+            LABELS_JSON=""
+            if [ -n "$VAL" ]; then
+                IFS=',' read -ra ARR <<< "$VAL"
+                for l in "${ARR[@]}"; do
+                    LABELS_JSON="$LABELS_JSON{\"name\":\"$l\"},"
+                done
+                LABELS_JSON="${LABELS_JSON%,}"
+            fi
+            PAYLOAD="{\"labels\":[$LABELS_JSON]}"
+            ;;
+        subIssues)
+            VARNAME="MOCK_GH_VIEW_${NUM}_SUBCOUNT"
+            TC="${!VARNAME:-0}"
+            VARNAME="MOCK_GH_VIEW_${NUM}_OPENSUBS"
+            OPEN="${!VARNAME:-}"
+            NODES_JSON=""
+            if [ -n "$OPEN" ]; then
+                for s in $OPEN; do
+                    NODES_JSON="$NODES_JSON{\"number\":$s,\"state\":\"OPEN\"},"
+                done
+                NODES_JSON="${NODES_JSON%,}"
+            fi
+            PAYLOAD="{\"subIssues\":{\"totalCount\":$TC,\"nodes\":[$NODES_JSON]}}"
+            ;;
+    esac
+
+    if [ -z "$PAYLOAD" ]; then
         exit 0
     fi
+    echo "$PAYLOAD" | jq -r "$QUERY"
     exit 0
 fi
 
