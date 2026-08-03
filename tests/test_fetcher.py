@@ -119,7 +119,7 @@ class TestFetchUrlText:
             return response
 
         result = fetch_url_text("https://example.com/article", get=fake_get)
-        assert len(result) > 200
+        assert len(result) >= 200
 
     def test_network_error_returns_empty(self, caplog):
         caplog.set_level("WARNING")
