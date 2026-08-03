@@ -57,6 +57,27 @@ A browser session cookie required to access paywalled or authenticated content (
 **YouTube Cookie**:
 A Netscape-format cookie file from a dedicated throwaway YouTube account, required by yt-dlp to bypass IP-based bot detection from GitHub Actions cloud IPs. Stored as a base64-encoded GitHub secret (`YOUTUBE_COOKIES`), decoded at runtime to `/tmp/yt-cookies.txt`. Distinct from **Auth Cookie** — this is for the ingest subprocess tooling, not for source-level content access.
 
+## Agent Triage
+
+**ready-for-agent**:
+An open, unassigned issue that the automated agent is permitted to claim and implement. The canonical state for claimable work.
+_Avoid_: unblocked, todo
+
+**in-progress**:
+An issue that an agent run has claimed by atomically replacing its labels with this one. An issue in this state is not claimable — the triage script skips it.
+
+**needs-triage**:
+Applied to an issue when the agent failed to implement it. Signals a human must act.
+
+**Claimability gate**:
+The predicate an issue must satisfy for the triage script to pick it: open, unassigned, unblocked, and labeled `ready-for-agent`. Applied to both top-level candidates and sub-issues.
+
+**Viable candidate**:
+An issue that passes the **Claimability gate**.
+
+**Parent / Sub-issue**:
+A GitHub parent issue and its native sub-issues. A parent with sub-issues is never implemented directly by the agent — it descends into sub-issues and claims the first claimable one. If none are claimable, the parent is skipped.
+
 ## Trusted Sources
 
 | Person | Domain | Primary Channel |
