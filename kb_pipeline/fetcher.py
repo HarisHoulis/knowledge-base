@@ -17,6 +17,13 @@ from .config import Source
 logger = logging.getLogger(__name__)
 
 
+def verify_source_auth(source: Source, *, getenv: Callable[[str], Optional[str]] = os.getenv) -> bool:
+    var = source.cookie_env_var
+    if not var:
+        return False
+    return bool(getenv(var))
+
+
 def fetch_rss(source: Source) -> list[Any]:
     if source.headers:
         try:
@@ -122,9 +129,9 @@ def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run
         return _strip_subtitle_formatting(raw)
 
 
-def fetch_url_text(url: str, *, get: Callable[..., Any] = requests.get) -> str:
+def fetch_article(url: str, headers: dict[str, str], *, get: Callable[..., Any] = requests.get) -> str:
     try:
-        r = get(url, timeout=30)
+        r = get(url, headers=headers, timeout=30)
         r.raise_for_status()
         text = trafilatura.extract(r.text, output_format="markdown", include_links=True)
         if not text:
@@ -134,6 +141,10 @@ def fetch_url_text(url: str, *, get: Callable[..., Any] = requests.get) -> str:
     except requests.RequestException as e:
         logger.warning("  [!] URL fetch failed (%s): %s", url, e)
         return ""
+
+
+def fetch_url_text(url: str, *, get: Callable[..., Any] = requests.get) -> str:
+    return fetch_article(url, {}, get=get)
 
 
 def extract_text(html: str) -> str:
