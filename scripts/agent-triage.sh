@@ -36,13 +36,26 @@ if [ -z "$CANDIDATES" ]; then
     exit 0
 fi
 
+is_claimable() {
+    local ISSUE="$1"
+    local BLOCKED ASSIGNEES LABELS
+
+    BLOCKED=$(gh issue view "$ISSUE" --json blockedBy --jq '.blockedBy.totalCount')
+    [ "$BLOCKED" -eq 0 ] || return 1
+
+    ASSIGNEES=$(gh issue view "$ISSUE" --json assignees --jq '.assignees.totalCount')
+    [ "$ASSIGNEES" -eq 0 ] || return 1
+
+    LABELS=$(gh issue view "$ISSUE" --json labels --jq '[.labels[].name] | join(",")')
+    [[ ",$LABELS," == *",ready-for-agent,"* ]]
+}
+
 SELECTED=""
 for NUM in $CANDIDATES; do
     echo "[agent-triage] Checking issue #$NUM..." >&2
 
-    BLOCKED=$(gh issue view "$NUM" --json blockedBy --jq '.blockedBy.totalCount')
-    if [ "$BLOCKED" -gt 0 ]; then
-        echo "[agent-triage] Issue #$NUM is blocked. Skipping." >&2
+    if ! is_claimable "$NUM"; then
+        echo "[agent-triage] Issue #$NUM is not claimable. Skipping." >&2
         continue
     fi
 
@@ -52,21 +65,19 @@ for NUM in $CANDIDATES; do
         VIABLE_SUB=""
         SUB_NUMBERS=$(gh issue view "$NUM" --json subIssues --jq '.subIssues.nodes | sort_by(.number) | .[] | select(.state == "OPEN") | .number')
         for SUB in $SUB_NUMBERS; do
-            SUB_BLOCKED=$(gh issue view "$SUB" --json blockedBy --jq '.blockedBy.totalCount')
-            if [ "$SUB_BLOCKED" -eq 0 ]; then
+            if is_claimable "$SUB"; then
                 VIABLE_SUB="$SUB"
                 break
             fi
         done
 
         if [ -n "$VIABLE_SUB" ]; then
-            echo "[agent-triage] Picking unblocked sub-issue #$VIABLE_SUB." >&2
+            echo "[agent-triage] Picking claimable sub-issue #$VIABLE_SUB." >&2
             SELECTED="$VIABLE_SUB"
-        else
-            echo "[agent-triage] All sub-issues blocked or closed. Implementing parent #$NUM." >&2
-            SELECTED="$NUM"
+            break
         fi
-        break
+        echo "[agent-triage] No claimable sub-issues. Skipping parent #$NUM." >&2
+        continue
     fi
 
     SELECTED="$NUM"
@@ -81,18 +92,12 @@ if [ -z "$SELECTED" ]; then
         --body "The automated agent triage scan found no issues that are:
 - Labeled ready-for-agent
 - Not blocked
+- Unassigned
 - Has viable parent -> sub-issue candidates
 
-All ready-for-agent issues were either blocked or had all sub-issues blocked.
+All ready-for-agent issues were either blocked, assigned, or had no claimable sub-issues.
 This may indicate a systemic bottleneck."
     exit 0
-fi
-
-echo "[agent-triage] Validating issue #$SELECTED..." >&2
-LABELS=$(gh issue view "$SELECTED" --json labels --jq '[.labels[].name] | join(",")')
-if [[ ",$LABELS," != *",ready-for-agent,"* ]]; then
-    echo "[agent-triage] Issue #$SELECTED does not have label 'ready-for-agent' (got: $LABELS). Exiting." >&2
-    exit 1
 fi
 
 echo "[agent-triage] Claiming issue #$SELECTED with in-progress label..." >&2
