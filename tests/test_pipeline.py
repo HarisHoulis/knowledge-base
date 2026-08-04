@@ -357,3 +357,140 @@ def test_bytebytego_source_has_cookie_env_var() -> None:
     src = next((s for s in SOURCES if s.id == "bytebytego"), None)
     assert src is not None
     assert src.cookie_env_var == "BYTEBYTEGO_SUBSTACK_COOKIE"
+
+
+def make_auth_issue_stub() -> tuple[list[tuple[str, str]], Any]:
+    calls: list[tuple[str, str]] = []
+
+    def stub(source: Source, env_var: str) -> None:
+        calls.append((source.id, env_var))
+
+    return calls, stub
+
+
+AUTH_SOURCE = Source(
+    id="bytebytego", type="rss",
+    url="https://blog.bytebytego.com/feed",
+    cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+)
+
+
+class TestRunPipelineStartupAuth:
+    def test_auth_failure_aborts_and_files_issue(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        issues, auth_issue_fn = make_auth_issue_stub()
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[AUTH_SOURCE],
+            verify_auth_fn=lambda src: False,
+            auth_issue_fn=auth_issue_fn,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert stats["sources"] == 0
+        assert stats["written"] == 0
+        assert issues == [("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")]
+
+    def test_auth_success_proceeds(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        issues, auth_issue_fn = make_auth_issue_stub()
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        source = Source(id="bytebytego", type="rss", url=str(fixture),
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            verify_auth_fn=lambda src: True,
+            auth_issue_fn=auth_issue_fn,
+            fetch_article_fn=lambda url, headers: "full article text " * 20,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert issues == []
+        assert stats["written"] == 1
+
+    def test_no_cookie_env_var_skips_check(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        called: list[Source] = []
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            verify_auth_fn=lambda src: called.append(src) or False,
+            auth_issue_fn=lambda src, env: None,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert called == []
+        assert stats["written"] == 1
+
+
+class TestRunPipelineFetchArticle:
+    def test_authenticated_rss_uses_fetch_article_with_cookie(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        calls: list[tuple[str, dict[str, str]]] = []
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        source = Source(id="bytebytego", type="rss", url=str(fixture),
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+
+        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+            calls.append((url, headers))
+            return "full article text " * 20
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            verify_auth_fn=lambda src: True,
+            auth_issue_fn=lambda src, env: None,
+            fetch_article_fn=stub_fetch_article,
+            getenv_fn=lambda var: "abc123",
+            classify_fn=stub_classify_ok,
+        )
+
+        assert stats["written"] == 1
+        assert len(calls) == 1
+        assert calls[0][0].endswith("structured-concurrency")
+        assert calls[0][1] == {"Cookie": "abc123"}
+
+    def test_unauthenticated_rss_uses_summary_path(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        calls: list[tuple[str, dict[str, str]]] = []
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            fetch_article_fn=lambda url, headers: calls.append((url, headers)) or "",
+            classify_fn=stub_classify_ok,
+        )
+
+        assert stats["written"] == 1
+        assert calls == []
+
+    def test_empty_fetch_article_aborts_and_files_issue(self) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        issues, auth_issue_fn = make_auth_issue_stub()
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[AUTH_SOURCE],
+            verify_auth_fn=lambda src: True,
+            auth_issue_fn=auth_issue_fn,
+            fetch_article_fn=lambda url, headers: "",
+            getenv_fn=lambda var: "abc123",
+            classify_fn=stub_classify_ok,
+        )
+
+        assert stats["written"] == 0
+        assert issues == [("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")]

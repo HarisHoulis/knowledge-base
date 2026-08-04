@@ -1,5 +1,6 @@
 import hashlib
 import logging
+import os
 import re
 import subprocess
 import time
@@ -8,7 +9,15 @@ from typing import Any, Callable, Optional
 
 from .config import SOURCES, Source
 from .state import load_state, save_state
-from .fetcher import fetch_rss, fetch_url_text, fetch_youtube, extract_text, transcript_youtube
+from .fetcher import (
+    extract_text,
+    fetch_article,
+    fetch_rss,
+    fetch_url_text,
+    fetch_youtube,
+    transcript_youtube,
+    verify_source_auth,
+)
 from .llm import classify_summarize
 from .writer import write_draft, write_entry, promote_draft
 from .audit import classification_audit, content_audit, AuditResult
@@ -59,6 +68,42 @@ def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
 def _extract_youtube_video_id(url: str) -> Optional[str]:
     m = re.search(r"(?:v=|youtu\.be/)([a-zA-Z0-9_-]{11})", url)
     return m.group(1) if m else None
+
+
+def _file_auth_issue(source: Source, env_var: str) -> None:
+    title = f"Auth failure: {source.id}"
+    body = (
+        f"## Pipeline halted — source authentication failed\n\n"
+        f"- **Source ID:** `{source.id}`\n"
+        f"- **Env var:** `{env_var}`\n\n"
+        f"Check that the cookie environment variable is set and has not expired."
+    )
+    try:
+        subprocess.run(
+            ["gh", "issue", "create", "--title", title, "--body", body],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=30,
+        )
+        logger.info("  auth issue created for %s", source.id)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        logger.warning("  auth issue creation failed: %s", e)
+
+
+def _check_source_auth(
+    source: Source,
+    *,
+    verify_fn: Callable[[Source], bool] = verify_source_auth,
+    issue_fn: Callable[[Source, str], None] = _file_auth_issue,
+) -> bool:
+    env_var = source.cookie_env_var
+    if not env_var:
+        return True
+    if verify_fn(source):
+        return True
+    issue_fn(source, env_var)
+    return False
 
 
 def _audit_with_retry(
@@ -123,6 +168,10 @@ def run_pipeline(
     transcript_fn: Callable[[str], str] = transcript_youtube,
     fetch_url_text_fn: Callable[[str], str] = fetch_url_text,
     classify_fn: Callable[..., Optional[dict[str, Any]]] = classify_summarize,
+    fetch_article_fn: Callable[[str, dict[str, str]], str] = fetch_article,
+    verify_auth_fn: Callable[[Source], bool] = verify_source_auth,
+    auth_issue_fn: Callable[[Source, str], None] = _file_auth_issue,
+    getenv_fn: Callable[[str], Optional[str]] = os.getenv,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
@@ -130,6 +179,9 @@ def run_pipeline(
     stats = {"sources": 0, "seen": 0, "written": 0, "skipped": 0}
 
     for src in sources:
+        if not _check_source_auth(src, verify_fn=verify_auth_fn, issue_fn=auth_issue_fn):
+            logger.warning("  auth check failed for %s; aborting", src.id)
+            return stats
         logger.info("[%s]", src.id)
         entries = fetch_rss(src) if src.type == "rss" else fetch_youtube(src)
         logger.info("  %d in feed", len(entries))
@@ -154,18 +206,27 @@ def run_pipeline(
                     text = transcript_fn(video_id)
 
             if not text:
-                content = ""
-                if entry.get("content"):
-                    content = entry["content"][0].get("value", "")
-                if not content:
-                    content = entry.get("summary", "")
-                if not content:
-                    logger.info("  skipping (no content): %s", entry.get("title", "")[:60])
-                    stats["skipped"] += 1
-                    continue
-                text = extract_text(content)
+                if src.type == "rss" and src.cookie_env_var:
+                    headers = {"Cookie": getenv_fn(src.cookie_env_var) or ""}
+                    content = fetch_article_fn(url, headers)
+                    if not content:
+                        logger.warning("  article fetch empty for %s (%s); aborting", src.id, src.cookie_env_var)
+                        auth_issue_fn(src, src.cookie_env_var)
+                        return stats
+                    text = extract_text(content)
+                else:
+                    content = ""
+                    if entry.get("content"):
+                        content = entry["content"][0].get("value", "")
+                    if not content:
+                        content = entry.get("summary", "")
+                    if not content:
+                        logger.info("  skipping (no content): %s", entry.get("title", "")[:60])
+                        stats["skipped"] += 1
+                        continue
+                    text = extract_text(content)
 
-            if (not text or len(text) < 200) and src.type != "youtube":
+            if (not text or len(text) < 200) and src.type != "youtube" and not src.cookie_env_var:
                 link_url = entry.get("link", "")
                 if link_url:
                     logger.info("  link fallback for: %s", entry.get("title", "")[:60])
