@@ -7,7 +7,15 @@ from unittest.mock import MagicMock
 import pytest
 import requests
 
-from kb_pipeline.fetcher import _strip_subtitle_formatting, extract_text, fetch_url_text, transcript_youtube
+from kb_pipeline.config import Source
+from kb_pipeline.fetcher import (
+    _strip_subtitle_formatting,
+    extract_text,
+    fetch_article,
+    fetch_url_text,
+    transcript_youtube,
+    verify_source_auth,
+)
 
 
 SAMPLE_VTT = """WEBVTT
@@ -107,6 +115,86 @@ class TestExtractText:
 
 
 SAMPLE_HTML = """<html><body><article><h1>Real Article</h1><p>This is the full article content that should be fetched from the link URL when the RSS entry content is too short.</p><p>It has enough text to pass the 200 character threshold for classification.</p></article></body></html>"""
+
+
+class TestFetchArticle:
+    def test_fetches_article_with_headers_and_returns_markdown(self):
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+        seen_headers = {}
+
+        def fake_get(url, **kwargs):
+            seen_headers.update(kwargs.get("headers", {}))
+            return response
+
+        result = fetch_article("https://example.com/article", {"Cookie": "session=abc"}, get=fake_get)
+        assert len(result) >= 200
+        assert seen_headers == {"Cookie": "session=abc"}
+
+    @pytest.mark.parametrize("status_code,message", [(404, "404 Client Error"), (500, "500 Server Error")])
+    def test_http_error_status_returns_empty(self, caplog, status_code, message):
+        caplog.set_level("WARNING")
+
+        def fake_get(url, **kwargs):
+            r = requests.Response()
+            r.status_code = status_code
+            r.url = url
+            raise requests.HTTPError(message, response=r)
+
+        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
+        assert "fetch failed" in caplog.text
+
+    def test_empty_response_returns_empty(self, caplog):
+        caplog.set_level("WARNING")
+
+        response = MagicMock()
+        response.text = ""
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
+
+    def test_connection_error_returns_empty(self, caplog):
+        caplog.set_level("WARNING")
+
+        def fake_get(url, **kwargs):
+            raise requests.ConnectionError("connection failed")
+
+        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
+        assert "fetch failed" in caplog.text
+
+
+class TestVerifySourceAuth:
+    def test_returns_true_when_env_var_set_and_non_empty(self, monkeypatch):
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "auth_cookie_value")
+        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        assert verify_source_auth(source) is True
+
+    def test_returns_false_when_env_var_unset(self, monkeypatch):
+        monkeypatch.delenv("BYTEBYTEGO_SUBSTACK_COOKIE", raising=False)
+        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        assert verify_source_auth(source) is False
+
+    def test_returns_false_when_env_var_empty(self, monkeypatch):
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "")
+        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        assert verify_source_auth(source) is False
+
+    def test_returns_false_when_no_cookie_env_var_declared(self):
+        source = Source(id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml")
+        assert verify_source_auth(source) is False
+
+    def test_getenv_seam_is_injected(self):
+        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
+                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        assert verify_source_auth(source, getenv=lambda var: "cookie" if var == "BYTEBYTEGO_SUBSTACK_COOKIE" else None) is True
+        assert verify_source_auth(source, getenv=lambda var: None) is False
 
 
 class TestFetchUrlText:
