@@ -433,9 +433,10 @@ class TestRunPipelineStartupAuth:
 
 
 class TestRunPipelineFetchArticle:
-    def test_authenticated_rss_uses_fetch_article_with_cookie(self) -> None:
+    def test_authenticated_rss_uses_fetch_article_with_cookie(self, monkeypatch) -> None:
         from kb_pipeline.pipeline import run_pipeline
 
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "abc123")
         calls: list[tuple[str, dict[str, str]]] = []
         fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
         source = Source(id="bytebytego", type="rss", url=str(fixture),
@@ -451,7 +452,6 @@ class TestRunPipelineFetchArticle:
             verify_auth_fn=lambda src: True,
             auth_issue_fn=lambda src, env: None,
             fetch_article_fn=stub_fetch_article,
-            getenv_fn=lambda var: "abc123",
             classify_fn=stub_classify_ok,
         )
 
@@ -477,9 +477,10 @@ class TestRunPipelineFetchArticle:
         assert stats["written"] == 1
         assert calls == []
 
-    def test_empty_fetch_article_aborts_and_files_issue(self) -> None:
+    def test_empty_fetch_article_aborts_and_files_issue(self, monkeypatch) -> None:
         from kb_pipeline.pipeline import run_pipeline
 
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "abc123")
         issues, auth_issue_fn = make_auth_issue_stub()
 
         stats = run_pipeline(
@@ -488,7 +489,6 @@ class TestRunPipelineFetchArticle:
             verify_auth_fn=lambda src: True,
             auth_issue_fn=auth_issue_fn,
             fetch_article_fn=lambda url, headers: "",
-            getenv_fn=lambda var: "abc123",
             classify_fn=stub_classify_ok,
         )
 

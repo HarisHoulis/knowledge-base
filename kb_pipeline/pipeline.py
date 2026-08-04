@@ -44,14 +44,7 @@ def _build_audit_feedback_text(
     return "\n".join(lines).strip()
 
 
-def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
-    title = f"Audit exhaustion: {entry_path.name}"
-    body = (
-        f"## Pipeline halted — audit retries exhausted\n\n"
-        f"- **Entry path:** `{entry_path}`\n"
-        f"- **URL:** {url}\n\n"
-        f"### Combined audit feedback\n\n```\n{feedback}\n```"
-    )
+def _create_gh_issue(title: str, body: str) -> bool:
     try:
         subprocess.run(
             ["gh", "issue", "create", "--title", title, "--body", body],
@@ -60,9 +53,22 @@ def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
             check=True,
             timeout=30,
         )
-        logger.info("  escalation issue created for %s", entry_path)
+        return True
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logger.warning("  escalation failed: %s", e)
+        logger.warning("  gh issue creation failed: %s", e)
+        return False
+
+
+def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
+    title = f"Audit exhaustion: {entry_path.name}"
+    body = (
+        f"## Pipeline halted — audit retries exhausted\n\n"
+        f"- **Entry path:** `{entry_path}`\n"
+        f"- **URL:** {url}\n\n"
+        f"### Combined audit feedback\n\n```\n{feedback}\n```"
+    )
+    if _create_gh_issue(title, body):
+        logger.info("  escalation issue created for %s", entry_path)
 
 
 def _extract_youtube_video_id(url: str) -> Optional[str]:
@@ -78,17 +84,8 @@ def _file_auth_issue(source: Source, env_var: str) -> None:
         f"- **Env var:** `{env_var}`\n\n"
         f"Check that the cookie environment variable is set and has not expired."
     )
-    try:
-        subprocess.run(
-            ["gh", "issue", "create", "--title", title, "--body", body],
-            capture_output=True,
-            text=True,
-            check=True,
-            timeout=30,
-        )
+    if _create_gh_issue(title, body):
         logger.info("  auth issue created for %s", source.id)
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logger.warning("  auth issue creation failed: %s", e)
 
 
 def _check_source_auth(
@@ -171,7 +168,6 @@ def run_pipeline(
     fetch_article_fn: Callable[[str, dict[str, str]], str] = fetch_article,
     verify_auth_fn: Callable[[Source], bool] = verify_source_auth,
     auth_issue_fn: Callable[[Source, str], None] = _file_auth_issue,
-    getenv_fn: Callable[[str], Optional[str]] = os.getenv,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
@@ -182,6 +178,8 @@ def run_pipeline(
         if not _check_source_auth(src, verify_fn=verify_auth_fn, issue_fn=auth_issue_fn):
             logger.warning("  auth check failed for %s; aborting", src.id)
             return stats
+
+    for src in sources:
         logger.info("[%s]", src.id)
         entries = fetch_rss(src) if src.type == "rss" else fetch_youtube(src)
         logger.info("  %d in feed", len(entries))
@@ -207,7 +205,7 @@ def run_pipeline(
 
             if not text:
                 if src.type == "rss" and src.cookie_env_var:
-                    headers = {"Cookie": getenv_fn(src.cookie_env_var) or ""}
+                    headers = {"Cookie": os.environ.get(src.cookie_env_var, "")}
                     content = fetch_article_fn(url, headers)
                     if not content:
                         logger.warning("  article fetch empty for %s (%s); aborting", src.id, src.cookie_env_var)
