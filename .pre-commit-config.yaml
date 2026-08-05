@@ -6,6 +6,7 @@ repos:
         args: [--fix]
         stages: [pre-push]
       - id: ruff-format
+        types_or: [python, markdown]
         stages: [pre-push]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
