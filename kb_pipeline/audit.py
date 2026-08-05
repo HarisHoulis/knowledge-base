@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 
 AuditResult = dict[str, Any]
 
-CLASSIFICATION_AUDIT_PROMPT = """You are a classification audit assistant. Your job is to verify that the assigned domain, subdomain, and concept are appropriate for the source text.
+CLASSIFICATION_AUDIT_PROMPT = """You are a classification audit assistant. Your job \
+is to verify that the assigned domain, subdomain, and concept are appropriate \
+for the source text.
 
 Source text:
 {source_text}
@@ -29,9 +31,11 @@ Check:
 Output ONLY valid JSON with no markdown formatting, using this schema:
 {{"pass": true}}
 or
-{{"pass": false, "issues": [{{"field": "domain|subdomain|concept", "description": "specific issue"}}]}}"""
+{{"pass": false, "issues": [{{"field": "domain|subdomain|concept", \
+"description": "specific issue"}}]}}"""
 
-CONTENT_AUDIT_PROMPT = """You are a content audit assistant. Your job is to verify that a draft summary accurately reflects the source text.
+CONTENT_AUDIT_PROMPT = """You are a content audit assistant. Your job is to verify \
+that a draft summary accurately reflects the source text.
 
 Source text:
 {source_text}
@@ -41,13 +45,15 @@ Draft summary:
 
 Check the draft summary against the source text for:
 1. Hallucinations — claims not supported by the source text
-2. Critical omissions — important information from the source that is missing from the summary
+2. Critical omissions — important information from the source that is \
+missing from the summary
 3. Distortions — claims that misrepresent what the source says
 
 Output ONLY valid JSON with no markdown formatting, using this schema:
 {{"pass": true}}
 or
-{{"pass": false, "issues": [{{"field": "summary", "description": "specific issue"}}]}}"""
+{{"pass": false, "issues": [{{"field": "summary", "description": \
+"specific issue"}}]}}"""
 
 
 def _call_llm(prompt: str) -> str:
@@ -57,7 +63,10 @@ def _call_llm(prompt: str) -> str:
         json={
             "model": DEEPSEEK_MODEL,
             "messages": [
-                {"role": "system", "content": "You are a precise auditor. Output only JSON."},
+                {
+                    "role": "system",
+                    "content": "You are a precise auditor. Output only JSON.",
+                },
                 {"role": "user", "content": prompt},
             ],
             "response_format": {"type": "json_object"},
@@ -93,15 +102,26 @@ def content_audit(
     audit_fn: Optional[Callable[[str], str]] = None,
 ) -> AuditResult:
     summary = data.get("summary", "")
-    prompt = CONTENT_AUDIT_PROMPT.format(source_text=source_text[:15000], summary=summary)
+    prompt = CONTENT_AUDIT_PROMPT.format(
+        source_text=source_text[:15000], summary=summary
+    )
     return _run_audit(prompt, audit_fn)
 
 
-def _run_audit(prompt: str, audit_fn: Optional[Callable[[str], str]] = None) -> AuditResult:
+def _run_audit(
+    prompt: str, audit_fn: Optional[Callable[[str], str]] = None
+) -> AuditResult:
     try:
         raw = audit_fn(prompt) if audit_fn else _call_llm(prompt)
         result: AuditResult = json.loads(raw)
         return result
-    except (requests.RequestException, json.JSONDecodeError, KeyError, IndexError, TypeError, ConnectionError) as e:
+    except (
+        requests.RequestException,
+        json.JSONDecodeError,
+        KeyError,
+        IndexError,
+        TypeError,
+        ConnectionError,
+    ) as e:
         logger.warning("audit failed: %s", e)
         return {"pass": True}

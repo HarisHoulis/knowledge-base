@@ -33,3 +33,10 @@ addopts = "-m 'not integration'"
 
 [tool.mypy]
 mypy_path = "stubs"
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "SIM", "BLE", "RUF100"]

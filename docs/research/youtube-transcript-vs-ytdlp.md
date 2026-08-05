@@ -60,9 +60,12 @@ The pipeline calls yt-dlp as a subprocess with these arguments:
 cmd = ["yt-dlp"]  # or ["python", "-m", "yt_dlp"]
 base_args = [
     *cmd,
-    "--write-auto-subs", "--sub-lang", "en",
+    "--write-auto-subs",
+    "--sub-lang",
+    "en",
     "--skip-download",
-    "-o", f"{tmpdir}/%(id)s.%(ext)s",
+    "-o",
+    f"{tmpdir}/%(id)s.%(ext)s",
     f"https://www.youtube.com/watch?v={video_id}",
 ]
 attempts = [

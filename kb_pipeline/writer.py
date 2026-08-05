@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 
 def _render(data: dict[str, Any], source_url: str) -> tuple[str, str, str, str]:
     domain = data.get("domain", "uncategorized")
-    sub    = data.get("subdomain", "misc")
-    name   = data.get("concept", "untitled")
-    title  = data.get("title", name)
+    sub = data.get("subdomain", "misc")
+    name = data.get("concept", "untitled")
+    title = data.get("title", name)
 
     sources = data.get("sources") or [{"title": title, "url": source_url}]
     summary = data.get("summary", "")
-    points  = data.get("key_points", [])
+    points = data.get("key_points", [])
 
     md = "---\n"
     for k in ("domain", "subdomain", "concept", "title"):
@@ -60,7 +60,11 @@ def promote_draft(draft_path: Path) -> None:
     draft_path.rename(target)
     logger.info("  promoted -> %s", target.relative_to(KB_PATH))
 
-    for parent in [draft_path.parent, draft_path.parent.parent, draft_path.parent.parent.parent]:
+    for parent in [
+        draft_path.parent,
+        draft_path.parent.parent,
+        draft_path.parent.parent.parent,
+    ]:
         try:
             if parent != KB_PATH / DRAFTS_DIR and not any(parent.iterdir()):
                 parent.rmdir()

@@ -8,7 +8,6 @@ from kb_pipeline.audit import classification_audit, content_audit
 from kb_pipeline.config import Source
 from kb_pipeline.pipeline import run_pipeline
 
-
 CORRECT_SOURCE = (
     "Structured concurrency is a programming paradigm that ensures coroutines are "
     "launched within a well-defined scope. When the scope completes or is cancelled, "
@@ -36,7 +35,10 @@ CORRECT_DATA = {
         "Automatic cancellation propagates from parent to child coroutines",
     ],
     "sources": [
-        {"title": "Structured Concurrency in Kotlin", "url": "https://example.com/structured-concurrency"}
+        {
+            "title": "Structured Concurrency in Kotlin",
+            "url": "https://example.com/structured-concurrency",
+        }
     ],
 }
 
@@ -63,9 +65,7 @@ INCORRECT_DATA = {
         "Python uses braces for block structure",
         "Python was created by Brendan Eich",
     ],
-    "sources": [
-        {"title": "Python History", "url": "https://example.com/python"}
-    ],
+    "sources": [{"title": "Python History", "url": "https://example.com/python"}],
 }
 
 
@@ -161,6 +161,7 @@ def test_audit_dry_run_leaves_no_drafts():
     with tempfile.TemporaryDirectory() as tmp:
         kb_path = Path(tmp)
         from kb_pipeline import config
+
         old_kb = config.KB_PATH
         config.KB_PATH = kb_path
 

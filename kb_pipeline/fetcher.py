@@ -17,7 +17,9 @@ from .config import Source
 logger = logging.getLogger(__name__)
 
 
-def verify_source_auth(source: Source, *, getenv: Callable[[str], Optional[str]] = os.getenv) -> bool:
+def verify_source_auth(
+    source: Source, *, getenv: Callable[[str], Optional[str]] = os.getenv
+) -> bool:
     var = source.cookie_env_var
     if not var:
         return False
@@ -56,25 +58,42 @@ def _strip_subtitle_formatting(raw: str) -> str:
     lines: list[str] = []
     for line in raw.splitlines():
         stripped = line.strip()
-        if (stripped
+        if (
+            stripped
             and not stripped.startswith("WEBVTT")
             and not stripped.startswith("Kind:")
             and not stripped.startswith("Language:")
             and "-->" not in stripped
-            and not stripped.replace(",", "").replace(".", "").replace(" ", "").isdigit()):
+            and not stripped.replace(",", "")
+            .replace(".", "")
+            .replace(" ", "")
+            .isdigit()
+        ):
             cleaned = re.sub(r"<[^>]+>", "", stripped)
             if cleaned:
                 lines.append(cleaned)
     return " ".join(lines)
 
 
-def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run_cmd: Optional[Callable[..., Any]] = None) -> str:
+def transcript_youtube(
+    video_id: str,
+    *,
+    cookies_path: Optional[str] = None,
+    run_cmd: Optional[Callable[..., Any]] = None,
+) -> str:
     if run_cmd is None:
-        cmd = (["yt-dlp"] if shutil.which("yt-dlp") else
-               [sys.executable, "-m", "yt_dlp"]
-               if subprocess.run([sys.executable, "-m", "yt_dlp", "--version"],
-                                 capture_output=True, text=True).returncode == 0
-               else None)
+        cmd = (
+            ["yt-dlp"]
+            if shutil.which("yt-dlp")
+            else [sys.executable, "-m", "yt_dlp"]
+            if subprocess.run(
+                [sys.executable, "-m", "yt_dlp", "--version"],
+                capture_output=True,
+                text=True,
+            ).returncode
+            == 0
+            else None
+        )
         if not cmd:
             logger.warning("  [!] yt-dlp not found")
             return ""
@@ -89,10 +108,14 @@ def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run
     with tempfile.TemporaryDirectory() as tmpdir:
         base_args = [
             *cmd,
-            "--write-auto-subs", "--sub-lang", "en",
+            "--write-auto-subs",
+            "--sub-lang",
+            "en",
             "--skip-download",
-            "--js-runtimes", "node",
-            "-o", f"{tmpdir}/%(id)s.%(ext)s",
+            "--js-runtimes",
+            "node",
+            "-o",
+            f"{tmpdir}/%(id)s.%(ext)s",
             f"https://www.youtube.com/watch?v={video_id}",
         ]
         if cookies_path:
@@ -106,18 +129,35 @@ def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run
             try:
                 _run(
                     attempt_cmd,
-                    capture_output=True, text=True, timeout=120, check=True,
+                    capture_output=True,
+                    text=True,
+                    timeout=120,
+                    check=True,
                 )
                 last_error = None
                 break
-            except (subprocess.CalledProcessError, FileNotFoundError, subprocess.TimeoutExpired) as e:
+            except (
+                subprocess.CalledProcessError,
+                FileNotFoundError,
+                subprocess.TimeoutExpired,
+            ) as e:
                 last_error = e
-                stderr = e.stderr if isinstance(e, subprocess.CalledProcessError) else ""
-                logger.debug("  [!] yt-dlp attempt failed for %s:\n%s", video_id, stderr)
+                stderr = (
+                    e.stderr if isinstance(e, subprocess.CalledProcessError) else ""
+                )
+                logger.debug(
+                    "  [!] yt-dlp attempt failed for %s:\n%s", video_id, stderr
+                )
 
         if last_error is not None:
-            stderr = last_error.stderr if isinstance(last_error, subprocess.CalledProcessError) else ""
-            logger.warning("  [!] yt-dlp failed for %s: %s", video_id, stderr or last_error)
+            stderr = (
+                last_error.stderr
+                if isinstance(last_error, subprocess.CalledProcessError)
+                else ""
+            )
+            logger.warning(
+                "  [!] yt-dlp failed for %s: %s", video_id, stderr or last_error
+            )
             return ""
 
         sub_files = sorted(Path(tmpdir).iterdir())
@@ -129,7 +169,9 @@ def transcript_youtube(video_id: str, *, cookies_path: Optional[str] = None, run
         return _strip_subtitle_formatting(raw)
 
 
-def fetch_article(url: str, headers: dict[str, str], *, get: Callable[..., Any] = requests.get) -> str:
+def fetch_article(
+    url: str, headers: dict[str, str], *, get: Callable[..., Any] = requests.get
+) -> str:
     try:
         r = get(url, headers=headers, timeout=30)
         r.raise_for_status()
