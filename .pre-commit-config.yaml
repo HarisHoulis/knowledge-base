@@ -4,7 +4,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+        stages: [pre-push]
       - id: ruff-format
+        stages: [pre-push]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v2.3.0
@@ -12,6 +14,7 @@ repos:
       - id: mypy
         args: ["."]
         pass_filenames: false
+        stages: [pre-push]
         additional_dependencies:
           - types-requests
           - trafilatura

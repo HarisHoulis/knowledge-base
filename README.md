@@ -9,3 +9,13 @@ See [CONTEXT.md](CONTEXT.md) for the domain tree and pipeline architecture.
 ## Pipeline
 
 `python -m kb_pipeline` polls RSS feeds from trusted sources, extracts + classifies content via LLM, and writes to the appropriate domain path.
+
+## Development
+
+Linting and formatting run automatically on `git push` via pre-commit. Install the hook once:
+
+```
+pre-commit install --hook-type pre-push
+```
+
+To run the checks manually: `ruff check`, `ruff format --check`, and `mypy .`.
