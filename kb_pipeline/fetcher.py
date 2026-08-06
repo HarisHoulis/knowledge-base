@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Literal, Optional
 
 import feedparser
 import requests
@@ -15,6 +15,9 @@ import trafilatura
 from .config import Source
 
 logger = logging.getLogger(__name__)
+
+ExtractionErrorType = Literal["exception", "empty"]
+ExtractionErrorCallback = Callable[[ExtractionErrorType], None]
 
 
 def verify_source_auth(
@@ -170,28 +173,63 @@ def transcript_youtube(
 
 
 def fetch_article(
-    url: str, headers: dict[str, str], *, get: Callable[..., Any] = requests.get
+    url: str,
+    headers: dict[str, str],
+    *,
+    get: Callable[..., Any] = requests.get,
+    extract_fn: Callable[..., Optional[str]] = trafilatura.extract,
+    on_error: Optional[ExtractionErrorCallback] = None,
 ) -> str:
     try:
         r = get(url, headers=headers, timeout=30)
         r.raise_for_status()
-        text = trafilatura.extract(r.text, output_format="markdown", include_links=True)
-        if not text:
-            logger.warning("  [!] URL text extract failed (%s)", url)
-            return ""
-        return text
     except requests.RequestException as e:
         logger.warning("  [!] URL fetch failed (%s): %s", url, e)
         return ""
+    try:
+        text = extract_fn(r.text, output_format="markdown", include_links=True)
+    except Exception as e:
+        logger.warning("  [!] URL text extract raised (%s): %s", url, e)
+        if on_error is not None:
+            on_error("exception")
+        return ""
+    if not text:
+        logger.warning("  [!] URL text extract failed (%s)", url)
+        if on_error is not None:
+            on_error("empty")
+        return ""
+    return text
 
 
-def fetch_url_text(url: str, *, get: Callable[..., Any] = requests.get) -> str:
-    return fetch_article(url, {}, get=get)
+def fetch_url_text(
+    url: str,
+    *,
+    get: Callable[..., Any] = requests.get,
+    extract_fn: Callable[..., Optional[str]] = trafilatura.extract,
+    on_error: Optional[ExtractionErrorCallback] = None,
+) -> str:
+    return fetch_article(url, {}, get=get, extract_fn=extract_fn, on_error=on_error)
 
 
-def extract_text(html: str) -> str:
+def extract_text(
+    html: str,
+    *,
+    extract_fn: Callable[..., Optional[str]] = trafilatura.extract,
+    on_error: Optional[ExtractionErrorCallback] = None,
+) -> str:
     if not html.strip():
         return ""
     if not html.strip().startswith("<"):
         return html.strip()
-    return trafilatura.extract(html, output_format="markdown", include_links=True) or ""
+    try:
+        text = extract_fn(html, output_format="markdown", include_links=True)
+    except Exception as e:
+        logger.warning("  [!] text extract raised (%s): %s", type(e).__name__, e)
+        if on_error is not None:
+            on_error("exception")
+        return ""
+    if not text:
+        if on_error is not None:
+            on_error("empty")
+        return ""
+    return text
