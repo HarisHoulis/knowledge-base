@@ -3,10 +3,10 @@ repos:
     rev: v0.16.1
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [--fix, --exit-non-zero-on-fix]
         stages: [pre-push]
       - id: ruff-format
-        types_or: [python, markdown]
+        types_or: [python, pyi, jupyter, markdown]
         stages: [pre-push]
 
   - repo: https://github.com/pre-commit/mirrors-mypy
