@@ -117,7 +117,9 @@ class TestExtractText:
         def boom(html, **kwargs):
             raise ValueError("malformed markup")
 
-        result = extract_text("<html><body>bad</body></html>", extract_fn=boom, on_error=reported.append)
+        result = extract_text(
+            "<html><body>bad</body></html>", extract_fn=boom, on_error=reported.append
+        )
         assert result == ""
         assert reported == ["exception"]
 
@@ -145,7 +147,6 @@ class TestExtractText:
         assert extract_text("", on_error=reported.append) == ""
         assert extract_text("   \n  \t  ", on_error=reported.append) == ""
         assert reported == []
-
 
 
 SAMPLE_HTML = (
@@ -225,7 +226,10 @@ class TestFetchArticle:
             raise requests.ConnectionError("connection failed")
 
         result = fetch_article(
-            "https://example.com/article", {"Cookie": "x"}, get=fake_get, on_error=reported.append
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            on_error=reported.append,
         )
         assert result == ""
         assert reported == []
@@ -241,7 +245,10 @@ class TestFetchArticle:
             raise requests.HTTPError(f"{status_code} Client Error", response=r)
 
         result = fetch_article(
-            "https://example.com/article", {"Cookie": "x"}, get=fake_get, on_error=reported.append
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            on_error=reported.append,
         )
         assert result == ""
         assert reported == []
@@ -259,7 +266,11 @@ class TestFetchArticle:
             raise ValueError("malformed markup")
 
         result = fetch_article(
-            "https://example.com/article", {"Cookie": "x"}, get=fake_get, extract_fn=boom, on_error=reported.append
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            extract_fn=boom,
+            on_error=reported.append,
         )
         assert result == ""
         assert reported == ["exception"]
@@ -274,8 +285,11 @@ class TestFetchArticle:
             return response
 
         result = fetch_article(
-            "https://example.com/article", {"Cookie": "x"}, get=fake_get,
-            extract_fn=lambda html, **kwargs: None, on_error=reported.append,
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
         )
         assert result == ""
         assert reported == ["empty"]
@@ -293,7 +307,10 @@ class TestFetchArticle:
 
         with pytest.raises(RuntimeError):
             fetch_article(
-                "https://example.com/article", {"Cookie": "x"}, get=fake_get, extract_fn=boom
+                "https://example.com/article",
+                {"Cookie": "x"},
+                get=fake_get,
+                extract_fn=boom,
             )
 
 
@@ -412,7 +429,10 @@ class TestFetchUrlText:
             raise ValueError("malformed markup")
 
         result = fetch_url_text(
-            "https://example.com/article", get=fake_get, extract_fn=boom, on_error=reported.append
+            "https://example.com/article",
+            get=fake_get,
+            extract_fn=boom,
+            on_error=reported.append,
         )
         assert result == ""
         assert reported == ["exception"]
@@ -427,8 +447,10 @@ class TestFetchUrlText:
             return response
 
         result = fetch_url_text(
-            "https://example.com/article", get=fake_get,
-            extract_fn=lambda html, **kwargs: None, on_error=reported.append,
+            "https://example.com/article",
+            get=fake_get,
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
         )
         assert result == ""
         assert reported == ["empty"]
@@ -455,8 +477,10 @@ class TestFetchUrlText:
             return response
 
         result = fetch_url_text(
-            "https://example.com/article", get=fake_get,
-            extract_fn=lambda html, **kwargs: None, on_error=reported.append,
+            "https://example.com/article",
+            get=fake_get,
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
         )
         assert result == "just some plain text"
         assert reported == []
