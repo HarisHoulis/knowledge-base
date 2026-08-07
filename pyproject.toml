@@ -21,8 +21,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "mypy",
+    "mypy==2.3.0",
     "types-requests",
+    "ruff==0.16.1",
 ]
 
 [tool.pytest.ini_options]
