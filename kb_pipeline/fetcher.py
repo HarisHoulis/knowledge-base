@@ -186,9 +186,11 @@ def fetch_article(
     except requests.RequestException as e:
         logger.warning("  [!] URL fetch failed (%s): %s", url, e)
         return ""
+    if not r.text.strip().startswith("<"):
+        return r.text.strip()
     try:
         text = extract_fn(r.text, output_format="markdown", include_links=True)
-    except Exception as e:
+    except (TypeError, ValueError) as e:
         logger.warning("  [!] URL text extract raised (%s): %s", url, e)
         if on_error is not None:
             on_error("exception")
@@ -223,12 +225,13 @@ def extract_text(
         return html.strip()
     try:
         text = extract_fn(html, output_format="markdown", include_links=True)
-    except Exception as e:
+    except (TypeError, ValueError) as e:
         logger.warning("  [!] text extract raised (%s): %s", type(e).__name__, e)
         if on_error is not None:
             on_error("exception")
         return ""
     if not text:
+        logger.warning("  [!] text extract failed")
         if on_error is not None:
             on_error("empty")
         return ""

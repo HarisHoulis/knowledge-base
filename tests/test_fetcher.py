@@ -121,7 +121,8 @@ class TestExtractText:
         assert result == ""
         assert reported == ["exception"]
 
-    def test_extraction_empty_reports_empty(self):
+    def test_extraction_empty_reports_empty(self, caplog):
+        caplog.set_level("WARNING")
         reported: list[str] = []
 
         result = extract_text(
@@ -131,6 +132,7 @@ class TestExtractText:
         )
         assert result == ""
         assert reported == ["empty"]
+        assert "extract failed" in caplog.text
 
     def test_plain_text_does_not_report_failure(self):
         reported: list[str] = []
@@ -143,6 +145,13 @@ class TestExtractText:
         assert extract_text("", on_error=reported.append) == ""
         assert extract_text("   \n  \t  ", on_error=reported.append) == ""
         assert reported == []
+
+    def test_unexpected_extraction_error_propagates(self):
+        def boom(html, **kwargs):
+            raise RuntimeError("bug in extractor")
+
+        with pytest.raises(RuntimeError):
+            extract_text("<html><body>bad</body></html>", extract_fn=boom)
 
 
 SAMPLE_HTML = (
@@ -277,6 +286,38 @@ class TestFetchArticle:
         assert result == ""
         assert reported == ["empty"]
 
+    def test_unexpected_extraction_error_propagates(self):
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        def boom(html, **kwargs):
+            raise RuntimeError("bug in extractor")
+
+        with pytest.raises(RuntimeError):
+            fetch_article(
+                "https://example.com/article", {"Cookie": "x"}, get=fake_get, extract_fn=boom
+            )
+
+    def test_plain_text_body_passes_through_without_report(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = "just some plain text"
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_article(
+            "https://example.com/article", {"Cookie": "x"}, get=fake_get,
+            extract_fn=lambda html, **kwargs: None, on_error=reported.append,
+        )
+        assert result == "just some plain text"
+        assert reported == []
+
 
 class TestVerifySourceAuth:
     def test_returns_true_when_env_var_set_and_non_empty(self, monkeypatch):
@@ -366,7 +407,7 @@ class TestFetchUrlText:
         assert result == ""
         assert "timed out" in caplog.text or "fetch failed" in caplog.text
 
-    def test_non_html_response_returns_empty(self, caplog):
+    def test_non_html_response_returns_text_without_log(self, caplog):
         caplog.set_level("WARNING")
 
         response = MagicMock()
@@ -377,8 +418,8 @@ class TestFetchUrlText:
             return response
 
         result = fetch_url_text("https://example.com/article", get=fake_get)
-        assert result == ""
-        assert "extract failed" in caplog.text
+        assert result == "not html content"
+        assert "extract failed" not in caplog.text
 
     def test_article_link_extraction_exception_reports_exception(self):
         reported: list[str] = []
@@ -424,6 +465,22 @@ class TestFetchUrlText:
             "https://example.com/article", get=fake_get, on_error=reported.append
         )
         assert result == ""
+        assert reported == []
+
+    def test_article_link_plain_text_passes_through_without_report(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = "just some plain text"
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_url_text(
+            "https://example.com/article", get=fake_get,
+            extract_fn=lambda html, **kwargs: None, on_error=reported.append,
+        )
+        assert result == "just some plain text"
         assert reported == []
 
 
