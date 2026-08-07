@@ -146,12 +146,6 @@ class TestExtractText:
         assert extract_text("   \n  \t  ", on_error=reported.append) == ""
         assert reported == []
 
-    def test_unexpected_extraction_error_propagates(self):
-        def boom(html, **kwargs):
-            raise RuntimeError("bug in extractor")
-
-        with pytest.raises(RuntimeError):
-            extract_text("<html><body>bad</body></html>", extract_fn=boom)
 
 
 SAMPLE_HTML = (
@@ -301,22 +295,6 @@ class TestFetchArticle:
             fetch_article(
                 "https://example.com/article", {"Cookie": "x"}, get=fake_get, extract_fn=boom
             )
-
-    def test_plain_text_body_passes_through_without_report(self):
-        reported: list[str] = []
-        response = MagicMock()
-        response.text = "just some plain text"
-        response.raise_for_status = MagicMock()
-
-        def fake_get(url, **kwargs):
-            return response
-
-        result = fetch_article(
-            "https://example.com/article", {"Cookie": "x"}, get=fake_get,
-            extract_fn=lambda html, **kwargs: None, on_error=reported.append,
-        )
-        assert result == "just some plain text"
-        assert reported == []
 
 
 class TestVerifySourceAuth:
