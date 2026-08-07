@@ -80,13 +80,19 @@ Remove `state.json` entirely. At pipeline start, scan `concepts/` (and optionall
 # Hypothetical — replaces load_state()
 import subprocess, re, hashlib
 
+
 def load_state_from_git():
     result = subprocess.run(
         ["git", "grep", "--no-index", "-h", "^  url:", "concepts/", "drafts/"],
-        capture_output=True, text=True, check=False, cwd=KB_PATH,
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=KB_PATH,
     )
     urls = re.findall(r'url:\s*"(.+)"', result.stdout)
-    return {"processed_hashes": [hashlib.sha256(u.encode()).hexdigest()[:16] for u in urls]}
+    return {
+        "processed_hashes": [hashlib.sha256(u.encode()).hexdigest()[:16] for u in urls]
+    }
 ```
 
 ### Pros

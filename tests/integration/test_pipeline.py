@@ -6,17 +6,24 @@ import pytest
 
 from kb_pipeline import config
 from kb_pipeline.config import Source
-from kb_pipeline.fetcher import fetch_rss, extract_text
+from kb_pipeline.fetcher import extract_text, fetch_rss
 from kb_pipeline.llm import classify_summarize
 from kb_pipeline.pipeline import run_pipeline
 
 FIXTURE = Path(__file__).parent.parent / "fixtures" / "simple-rss.xml"
-EXPECTED_KEYS = {"domain", "subdomain", "concept", "title", "summary", "key_points", "sources"}
+EXPECTED_KEYS = {
+    "domain",
+    "subdomain",
+    "concept",
+    "title",
+    "summary",
+    "key_points",
+    "sources",
+}
 
 
 @pytest.mark.integration
 class TestPipelineIntegration:
-
     def test_llm_returns_valid_json_from_fixture(self) -> None:
         if not os.environ.get("DEEPSEEK_API_KEY"):
             pytest.skip("DEEPSEEK_API_KEY not set")
@@ -62,7 +69,9 @@ class TestPipelineIntegration:
                 drafts = kb_path / config.DRAFTS_DIR
                 concept_files = list(concepts.rglob("*")) if concepts.exists() else []
                 draft_files = list(drafts.rglob("*")) if drafts.exists() else []
-                assert not concept_files, f"dry-run wrote concept files: {concept_files}"
+                assert not concept_files, (
+                    f"dry-run wrote concept files: {concept_files}"
+                )
                 assert not draft_files, f"dry-run wrote draft files: {draft_files}"
             finally:
                 config.KB_PATH = old_kb

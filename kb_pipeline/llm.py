@@ -4,7 +4,13 @@ from typing import Any, Optional
 
 import requests
 
-from .config import DEEPSEEK_API_KEY, DEEPSEEK_API_URL, DEEPSEEK_MODEL, SYSTEM_PROMPT, VALID_DOMAINS
+from .config import (
+    DEEPSEEK_API_KEY,
+    DEEPSEEK_API_URL,
+    DEEPSEEK_MODEL,
+    SYSTEM_PROMPT,
+    VALID_DOMAINS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +45,10 @@ def classify_summarize(
         f"---\n\n{text[:15000]}"
     )
     if audit_feedback:
-        prompt += f"\n\n---\nPrevious audit feedback — please address these issues:\n{audit_feedback}"
+        prompt += (
+            "\n\n---\nPrevious audit feedback — please address these issues:\n"
+            f"{audit_feedback}"
+        )
     try:
         r = requests.post(
             f"{DEEPSEEK_API_URL}/chat/completions",

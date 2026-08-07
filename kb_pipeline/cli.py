@@ -1,14 +1,14 @@
 import logging
 import sys
 from datetime import datetime, timezone
-from typing import Optional, Tuple
+from typing import Optional
 
 from .pipeline import run_pipeline
 
 logger = logging.getLogger(__name__)
 
 
-def parse_args() -> Tuple[bool, Optional[int], bool]:
+def parse_args() -> tuple[bool, Optional[int], bool]:
     dry_run = "--dry-run" in sys.argv
     audit = "--audit" in sys.argv
     limit: Optional[int] = None
@@ -28,9 +28,18 @@ def main() -> None:
 
     dry_run, limit, audit = parse_args()
 
-    logger.info("[pipeline] %s - %s", "dry-run" if dry_run else "live", datetime.now(timezone.utc).isoformat())
+    logger.info(
+        "[pipeline] %s - %s",
+        "dry-run" if dry_run else "live",
+        datetime.now(timezone.utc).isoformat(),
+    )
 
     stats = run_pipeline(dry_run=dry_run, limit=limit, audit=audit)
 
-    logger.info("done  %d sources, %d seen, %d written, %d skipped",
-                stats["sources"], stats["seen"], stats["written"], stats["skipped"])
+    logger.info(
+        "done  %d sources, %d seen, %d written, %d skipped",
+        stats["sources"],
+        stats["seen"],
+        stats["written"],
+        stats["skipped"],
+    )

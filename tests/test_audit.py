@@ -8,7 +8,9 @@ def stub_pass(prompt: str) -> str:
 
 
 def stub_fail(prompt: str) -> str:
-    return json.dumps({"pass": False, "issues": [{"field": "summary", "description": "test issue"}]})
+    return json.dumps(
+        {"pass": False, "issues": [{"field": "summary", "description": "test issue"}]}
+    )
 
 
 def stub_malformed(prompt: str) -> str:
@@ -30,7 +32,10 @@ class TestClassificationAudit:
 
     def test_returns_fail(self):
         result = classification_audit(DATA, TEXT, audit_fn=stub_fail)
-        assert result == {"pass": False, "issues": [{"field": "summary", "description": "test issue"}]}
+        assert result == {
+            "pass": False,
+            "issues": [{"field": "summary", "description": "test issue"}],
+        }
 
     def test_malformed_json_falls_back(self):
         result = classification_audit(DATA, TEXT, audit_fn=stub_malformed)
@@ -62,7 +67,10 @@ class TestContentAudit:
 
     def test_returns_fail(self):
         result = content_audit(DATA, TEXT, audit_fn=stub_fail)
-        assert result == {"pass": False, "issues": [{"field": "summary", "description": "test issue"}]}
+        assert result == {
+            "pass": False,
+            "issues": [{"field": "summary", "description": "test issue"}],
+        }
 
     def test_malformed_json_falls_back(self):
         result = content_audit(DATA, TEXT, audit_fn=stub_malformed)

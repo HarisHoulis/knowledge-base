@@ -6,12 +6,18 @@ import time
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from .audit import AuditResult, classification_audit, content_audit
 from .config import SOURCES, Source
-from .state import load_state, save_state
-from .fetcher import fetch_rss, fetch_url_text, fetch_youtube, extract_text, transcript_youtube
+from .fetcher import (
+    extract_text,
+    fetch_rss,
+    fetch_url_text,
+    fetch_youtube,
+    transcript_youtube,
+)
 from .llm import classify_summarize
-from .writer import write_draft, write_entry, promote_draft
-from .audit import classification_audit, content_audit, AuditResult
+from .state import load_state, save_state
+from .writer import promote_draft, write_draft, write_entry
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +88,9 @@ def _audit_with_retry(
         if retry > 0:
             feedback_text = _build_audit_feedback_text(combined_feedback)
             if feedback_text:
-                new_result = classify_fn(source_text, meta, audit_feedback=feedback_text)
+                new_result = classify_fn(
+                    source_text, meta, audit_feedback=feedback_text
+                )
                 if new_result:
                     result = new_result
 
@@ -99,13 +107,25 @@ def _audit_with_retry(
 
         failing: list[tuple[str, AuditResult]] = []
         if not ca_passed:
-            failing.append(("Classification", ca_result if ca_result is not None else {"pass": False}))
+            failing.append(
+                (
+                    "Classification",
+                    ca_result if ca_result is not None else {"pass": False},
+                )
+            )
         if not co_passed:
-            failing.append(("Content", co_result if co_result is not None else {"pass": False}))
+            failing.append(
+                ("Content", co_result if co_result is not None else {"pass": False})
+            )
         combined_feedback = failing
 
         if retry < MAX_RETRIES:
-            logger.info("  retry %d/%d: %d audit(s) failing", retry + 1, MAX_RETRIES, len(failing))
+            logger.info(
+                "  retry %d/%d: %d audit(s) failing",
+                retry + 1,
+                MAX_RETRIES,
+                len(failing),
+            )
 
     logger.warning("  audit exhausted after %d retries for %s", MAX_RETRIES, url)
 
@@ -160,7 +180,9 @@ def run_pipeline(
                 if not content:
                     content = entry.get("summary", "")
                 if not content:
-                    logger.info("  skipping (no content): %s", entry.get("title", "")[:60])
+                    logger.info(
+                        "  skipping (no content): %s", entry.get("title", "")[:60]
+                    )
                     stats["skipped"] += 1
                     continue
                 text = extract_text(content)
@@ -173,7 +195,10 @@ def run_pipeline(
                     if fetched:
                         text = extract_text(fetched)
                     else:
-                        logger.info("  link fallback failed for: %s", entry.get("title", "")[:60])
+                        logger.info(
+                            "  link fallback failed for: %s",
+                            entry.get("title", "")[:60],
+                        )
 
             if not text or len(text) < 200:
                 logger.info("  skipping (too short): %s", entry.get("title", "")[:60])
@@ -186,9 +211,19 @@ def run_pipeline(
                 continue
 
             if dry_run:
-                logger.info("  would write: %s/%s/%s.md", result.get("domain"), result.get("subdomain"), result.get("concept"))
+                logger.info(
+                    "  would write: %s/%s/%s.md",
+                    result.get("domain"),
+                    result.get("subdomain"),
+                    result.get("concept"),
+                )
                 if audit:
-                    logger.info("  would audit and promote to concepts/%s/%s/%s.md", result.get("domain"), result.get("subdomain"), result.get("concept"))
+                    logger.info(
+                        "  would audit and promote to concepts/%s/%s/%s.md",
+                        result.get("domain"),
+                        result.get("subdomain"),
+                        result.get("concept"),
+                    )
             elif audit:
                 draft_path = write_draft(result, url)
                 ok = _audit_with_retry(result, text, url, entry, draft_path)

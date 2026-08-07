@@ -1,4 +1,3 @@
-import os
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -16,7 +15,6 @@ from kb_pipeline.fetcher import (
     transcript_youtube,
     verify_source_auth,
 )
-
 
 SAMPLE_VTT = """WEBVTT
 Kind: captions
@@ -114,7 +112,12 @@ class TestExtractText:
         assert len(result) > 0
 
 
-SAMPLE_HTML = """<html><body><article><h1>Real Article</h1><p>This is the full article content that should be fetched from the link URL when the RSS entry content is too short.</p><p>It has enough text to pass the 200 character threshold for classification.</p></article></body></html>"""
+SAMPLE_HTML = (
+    "<html><body><article><h1>Real Article</h1><p>This is the full article content "
+    "that should be fetched from the link URL when the RSS entry content is too "
+    "short.</p><p>It has enough text to pass the 200 character threshold for "
+    "classification.</p></article></body></html>"
+)
 
 
 class TestFetchArticle:
@@ -128,11 +131,15 @@ class TestFetchArticle:
             seen_headers.update(kwargs.get("headers", {}))
             return response
 
-        result = fetch_article("https://example.com/article", {"Cookie": "session=abc"}, get=fake_get)
+        result = fetch_article(
+            "https://example.com/article", {"Cookie": "session=abc"}, get=fake_get
+        )
         assert len(result) >= 200
         assert seen_headers == {"Cookie": "session=abc"}
 
-    @pytest.mark.parametrize("status_code,message", [(404, "404 Client Error"), (500, "500 Server Error")])
+    @pytest.mark.parametrize(
+        "status_code,message", [(404, "404 Client Error"), (500, "500 Server Error")]
+    )
     def test_http_error_status_returns_empty(self, caplog, status_code, message):
         caplog.set_level("WARNING")
 
@@ -142,7 +149,10 @@ class TestFetchArticle:
             r.url = url
             raise requests.HTTPError(message, response=r)
 
-        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
+        assert (
+            fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get)
+            == ""
+        )
         assert "fetch failed" in caplog.text
 
     def test_empty_response_returns_empty(self, caplog):
@@ -155,7 +165,10 @@ class TestFetchArticle:
         def fake_get(url, **kwargs):
             return response
 
-        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
+        assert (
+            fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get)
+            == ""
+        )
 
     def test_connection_error_returns_empty(self, caplog):
         caplog.set_level("WARNING")
@@ -163,37 +176,66 @@ class TestFetchArticle:
         def fake_get(url, **kwargs):
             raise requests.ConnectionError("connection failed")
 
-        assert fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get) == ""
+        assert (
+            fetch_article("https://example.com/article", {"Cookie": "x"}, get=fake_get)
+            == ""
+        )
         assert "fetch failed" in caplog.text
 
 
 class TestVerifySourceAuth:
     def test_returns_true_when_env_var_set_and_non_empty(self, monkeypatch):
         monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "auth_cookie_value")
-        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
-                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
         assert verify_source_auth(source) is True
 
     def test_returns_false_when_env_var_unset(self, monkeypatch):
         monkeypatch.delenv("BYTEBYTEGO_SUBSTACK_COOKIE", raising=False)
-        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
-                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
         assert verify_source_auth(source) is False
 
     def test_returns_false_when_env_var_empty(self, monkeypatch):
         monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "")
-        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
-                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
         assert verify_source_auth(source) is False
 
     def test_returns_false_when_no_cookie_env_var_declared(self):
-        source = Source(id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml")
+        source = Source(
+            id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml"
+        )
         assert verify_source_auth(source) is False
 
     def test_getenv_seam_is_injected(self):
-        source = Source(id="bytebytego", type="rss", url="https://blog.bytebytego.com/feed",
-                        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE")
-        assert verify_source_auth(source, getenv=lambda var: "cookie" if var == "BYTEBYTEGO_SUBSTACK_COOKIE" else None) is True
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+        assert (
+            verify_source_auth(
+                source,
+                getenv=lambda var: (
+                    "cookie" if var == "BYTEBYTEGO_SUBSTACK_COOKIE" else None
+                ),
+            )
+            is True
+        )
         assert verify_source_auth(source, getenv=lambda var: None) is False
 
 
@@ -249,7 +291,7 @@ class TestTranscriptYoutube:
         """First (android) fails, second (default) succeeds."""
         calls = []
 
-        SAMPLE_TRANSCRIPT = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello world"
+        sample_transcript = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello world"
 
         def fake_run(cmd, **kwargs):
             calls.append(cmd)
@@ -258,7 +300,7 @@ class TestTranscriptYoutube:
             try:
                 o_idx = cmd.index("-o")
                 parent = Path(cmd[o_idx + 1]).parent
-                (parent / "test_id.en.vtt").write_text(SAMPLE_TRANSCRIPT)
+                (parent / "test_id.en.vtt").write_text(sample_transcript)
             except (ValueError, IndexError):
                 pass
             return MagicMock(stdout="", stderr="")
@@ -284,6 +326,7 @@ def _fake_run_collector(calls: list) -> Callable:
     def fake_run(cmd, **kwargs):
         calls.append(cmd)
         return MagicMock(stdout="", stderr="")
+
     return fake_run
 
 
@@ -301,7 +344,11 @@ class TestTranscriptYoutubeArgs:
 
     def test_cookies_arg_present_when_path_given(self):
         calls = []
-        transcript_youtube("test_id", cookies_path="/tmp/yt-cookies.txt", run_cmd=_fake_run_collector(calls))
+        transcript_youtube(
+            "test_id",
+            cookies_path="/tmp/yt-cookies.txt",
+            run_cmd=_fake_run_collector(calls),
+        )
 
         assert len(calls) >= 1
         for cmd in calls:
@@ -330,7 +377,11 @@ class TestTranscriptYoutubeArgs:
     def test_explicit_cookies_path_overrides_env_var(self, monkeypatch):
         monkeypatch.setenv("YT_COOKIES_PATH", "/env/cookies.txt")
         calls = []
-        transcript_youtube("test_id", cookies_path="/explicit/cookies.txt", run_cmd=_fake_run_collector(calls))
+        transcript_youtube(
+            "test_id",
+            cookies_path="/explicit/cookies.txt",
+            run_cmd=_fake_run_collector(calls),
+        )
 
         for cmd in calls:
             assert "--cookies" in cmd

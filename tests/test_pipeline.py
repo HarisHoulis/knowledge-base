@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from kb_pipeline.audit import AuditResult
 from kb_pipeline.config import SOURCES, Source
@@ -9,8 +9,11 @@ SAMPLE_URL = "https://example.com/article"
 SAMPLE_META: dict[str, Any] = {"title": "Test", "link": SAMPLE_URL}
 SAMPLE_DRAFT = Path("/tmp/drafts/test.md")
 SAMPLE_RESULT: dict[str, Any] = {
-    "domain": "a", "subdomain": "b", "concept": "c",
-    "summary": "test", "key_points": [],
+    "domain": "a",
+    "subdomain": "b",
+    "concept": "c",
+    "summary": "test",
+    "key_points": [],
 }
 
 
@@ -19,7 +22,10 @@ def stub_audit_pass(data: Any, source_text: str) -> AuditResult:
 
 
 def stub_audit_fail(data: Any, source_text: str) -> AuditResult:
-    return {"pass": False, "issues": [{"field": "summary", "description": "test issue"}]}
+    return {
+        "pass": False,
+        "issues": [{"field": "summary", "description": "test issue"}],
+    }
 
 
 def stub_classify_ok(
@@ -34,7 +40,11 @@ class CountedAuditStub:
         self.call_count = 0
 
     def __call__(self, data: Any, source_text: str) -> AuditResult:
-        idx = self.call_count if self.call_count < len(self.results) else len(self.results) - 1
+        idx = (
+            self.call_count
+            if self.call_count < len(self.results)
+            else len(self.results) - 1
+        )
         self.call_count += 1
         return self.results[idx]
 
@@ -65,7 +75,11 @@ class TestAuditWithRetry:
         esc_calls, esc_fn = make_escalation_stub()
 
         ok = _audit_with_retry(
-            SAMPLE_RESULT, SAMPLE_TEXT, SAMPLE_URL, SAMPLE_META, SAMPLE_DRAFT,
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
             classify_fn=stub_classify_ok,
             ca_audit_fn=stub_audit_pass,
             co_audit_fn=stub_audit_pass,
@@ -83,12 +97,19 @@ class TestAuditWithRetry:
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
         co_stub = CountedAuditStub(
-            {"pass": False, "issues": [{"field": "summary", "description": "wrong summary"}]},
+            {
+                "pass": False,
+                "issues": [{"field": "summary", "description": "wrong summary"}],
+            },
             {"pass": True},
         )
 
         ok = _audit_with_retry(
-            SAMPLE_RESULT, SAMPLE_TEXT, SAMPLE_URL, SAMPLE_META, SAMPLE_DRAFT,
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
             classify_fn=stub_classify_ok,
             ca_audit_fn=stub_audit_pass,
             co_audit_fn=co_stub,
@@ -107,12 +128,19 @@ class TestAuditWithRetry:
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
         ca_stub = CountedAuditStub(
-            {"pass": False, "issues": [{"field": "domain", "description": "wrong domain"}]},
+            {
+                "pass": False,
+                "issues": [{"field": "domain", "description": "wrong domain"}],
+            },
             {"pass": True},
         )
 
         ok = _audit_with_retry(
-            SAMPLE_RESULT, SAMPLE_TEXT, SAMPLE_URL, SAMPLE_META, SAMPLE_DRAFT,
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
             classify_fn=stub_classify_ok,
             ca_audit_fn=ca_stub,
             co_audit_fn=stub_audit_pass,
@@ -132,12 +160,19 @@ class TestAuditWithRetry:
         esc_calls, esc_fn = make_escalation_stub()
         ca_stub = CountedAuditStub({"pass": True})
         co_stub = CountedAuditStub(
-            {"pass": False, "issues": [{"field": "summary", "description": "bad summary"}]},
+            {
+                "pass": False,
+                "issues": [{"field": "summary", "description": "bad summary"}],
+            },
             {"pass": True},
         )
 
         ok = _audit_with_retry(
-            SAMPLE_RESULT, SAMPLE_TEXT, SAMPLE_URL, SAMPLE_META, SAMPLE_DRAFT,
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
             classify_fn=stub_classify_ok,
             ca_audit_fn=ca_stub,
             co_audit_fn=co_stub,
@@ -158,7 +193,11 @@ class TestAuditWithRetry:
         esc_calls, esc_fn = make_escalation_stub()
 
         ok = _audit_with_retry(
-            SAMPLE_RESULT, SAMPLE_TEXT, SAMPLE_URL, SAMPLE_META, SAMPLE_DRAFT,
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
             classify_fn=stub_classify_ok,
             ca_audit_fn=stub_audit_fail,
             co_audit_fn=stub_audit_fail,
@@ -179,12 +218,22 @@ class TestAuditWithRetry:
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
         co_stub = CountedAuditStub(
-            {"pass": False, "issues": [{"field": "summary", "description": "still wrong"}]},
-            {"pass": False, "issues": [{"field": "summary", "description": "still wrong 2"}]},
+            {
+                "pass": False,
+                "issues": [{"field": "summary", "description": "still wrong"}],
+            },
+            {
+                "pass": False,
+                "issues": [{"field": "summary", "description": "still wrong 2"}],
+            },
         )
 
         ok = _audit_with_retry(
-            SAMPLE_RESULT, SAMPLE_TEXT, SAMPLE_URL, SAMPLE_META, SAMPLE_DRAFT,
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
             classify_fn=stub_classify_ok,
             ca_audit_fn=stub_audit_pass,
             co_audit_fn=co_stub,
@@ -203,17 +252,27 @@ class TestExtractYoutubeVideoId:
     def test_watch_url(self) -> None:
         from kb_pipeline.pipeline import _extract_youtube_video_id
 
-        assert _extract_youtube_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+        assert (
+            _extract_youtube_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+            == "dQw4w9WgXcQ"
+        )
 
     def test_short_url(self) -> None:
         from kb_pipeline.pipeline import _extract_youtube_video_id
 
-        assert _extract_youtube_video_id("https://youtu.be/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+        assert (
+            _extract_youtube_video_id("https://youtu.be/dQw4w9WgXcQ") == "dQw4w9WgXcQ"
+        )
 
     def test_with_query_params(self) -> None:
         from kb_pipeline.pipeline import _extract_youtube_video_id
 
-        assert _extract_youtube_video_id("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=30s") == "dQw4w9WgXcQ"
+        assert (
+            _extract_youtube_video_id(
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=30s"
+            )
+            == "dQw4w9WgXcQ"
+        )
 
     def test_non_youtube_url(self) -> None:
         from kb_pipeline.pipeline import _extract_youtube_video_id
@@ -228,7 +287,9 @@ class TestExtractYoutubeVideoId:
     def test_invalid_video_id_length(self) -> None:
         from kb_pipeline.pipeline import _extract_youtube_video_id
 
-        assert _extract_youtube_video_id("https://www.youtube.com/watch?v=invalid") is None
+        assert (
+            _extract_youtube_video_id("https://www.youtube.com/watch?v=invalid") is None
+        )
 
 
 SHORT_CONTENT = "<p>Read it at code.cash.app/...</p>"
@@ -243,7 +304,10 @@ class TestRunPipelineLinkFallback:
 
         def stub_fetch_url(url: str) -> str:
             if "real-article" in url:
-                return "This is the full article content with enough text to pass the 200 character threshold for classification. " * 10
+                return (
+                    "This is the full article content with enough text to pass the 200 "
+                    "character threshold for classification. " * 10
+                )
             return ""
 
         stats = run_pipeline(
@@ -279,16 +343,29 @@ class TestRunPipelineLinkFallback:
 
         def mock_fetch(src):
             from feedparser import FeedParserDict
-            return [FeedParserDict({"link": "https://www.youtube.com/watch?v=test123", "title": "Test Video"})]
+
+            return [
+                FeedParserDict(
+                    {
+                        "link": "https://www.youtube.com/watch?v=test123",
+                        "title": "Test Video",
+                    }
+                )
+            ]
 
         monkeypatch.setattr("kb_pipeline.pipeline.fetch_youtube", mock_fetch)
 
-        source = Source(id="test", type="youtube", url="https://www.youtube.com/feeds/videos.xml?channel_id=UC_test")
+        source = Source(
+            id="test",
+            type="youtube",
+            url="https://www.youtube.com/feeds/videos.xml?channel_id=UC_test",
+        )
 
         def stub_transcript(video_id: str) -> str:
             return "short"
 
         fetch_calls: list[str] = []
+
         def stub_fetch_url(url: str) -> str:
             fetch_calls.append(url)
             return "should not be called"
@@ -310,6 +387,7 @@ class TestRunPipelineLinkFallback:
         source = Source(id="test", type="rss", url=str(fixture))
 
         fetch_calls: list[str] = []
+
         def stub_fetch_url(url: str) -> str:
             fetch_calls.append(url)
             return ""
@@ -330,6 +408,7 @@ class TestRunPipelineWithTranscript:
         from kb_pipeline.pipeline import run_pipeline
 
         calls: list[str] = []
+
         def spy_transcript(video_id: str) -> str:
             calls.append(video_id)
             return ""
@@ -337,7 +416,9 @@ class TestRunPipelineWithTranscript:
         fixture = Path(__file__).parent / "fixtures" / "simple-rss.xml"
         source = Source(id="test", type="rss", url=str(fixture))
 
-        stats = run_pipeline(dry_run=True, sources=[source], transcript_fn=spy_transcript)
+        stats = run_pipeline(
+            dry_run=True, sources=[source], transcript_fn=spy_transcript
+        )
 
         assert calls == [], "transcript_fn should not be called for RSS sources"
         assert stats["sources"] == 1

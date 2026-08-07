@@ -21,8 +21,9 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "mypy",
+    "mypy==2.3.0",
     "types-requests",
+    "ruff==0.16.1",
 ]
 
 [tool.pytest.ini_options]
@@ -33,3 +34,10 @@ addopts = "-m 'not integration'"
 
 [tool.mypy]
 mypy_path = "stubs"
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "SIM", "BLE", "RUF100"]
