@@ -57,6 +57,13 @@ A browser session cookie required to access paywalled or authenticated content (
 **YouTube Cookie**:
 A Netscape-format cookie file from a dedicated throwaway YouTube account, required by yt-dlp to bypass IP-based bot detection from GitHub Actions cloud IPs. Stored as a base64-encoded GitHub secret (`YOUTUBE_COOKIES`), decoded at runtime to `/tmp/yt-cookies.txt`. Distinct from **Auth Cookie** — this is for the ingest subprocess tooling, not for source-level content access.
 
+**Content Extraction Error**:
+A failure to extract article text from fetched content. Two distinct types:
+- **Exception** — extraction raised (e.g., malformed HTML that breaks the extractor).
+- **Silent empty result** — extraction returned no text (e.g., paywalled, JS-rendered, or malformed pages), so the entry is dropped without an error being raised.
+
+All errors collected during a single Pipeline run are surfaced as one cumulative GitHub issue, so the operator can triage failing Sources in one place.
+
 ## Agent Triage
 
 **ready-for-agent**:
