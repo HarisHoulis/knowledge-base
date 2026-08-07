@@ -111,6 +111,43 @@ class TestExtractText:
         assert isinstance(result, str)
         assert len(result) > 0
 
+    def test_extraction_exception_reports_exception_and_returns_empty(self):
+        reported: list[str] = []
+
+        def boom(html, **kwargs):
+            raise ValueError("malformed markup")
+
+        result = extract_text(
+            "<html><body>bad</body></html>", extract_fn=boom, on_error=reported.append
+        )
+        assert result == ""
+        assert reported == ["exception"]
+
+    def test_extraction_empty_reports_empty(self, caplog):
+        caplog.set_level("WARNING")
+        reported: list[str] = []
+
+        result = extract_text(
+            "<html><body><p>Hidden</p></body></html>",
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
+        )
+        assert result == ""
+        assert reported == ["empty"]
+        assert "extract failed" in caplog.text
+
+    def test_plain_text_does_not_report_failure(self):
+        reported: list[str] = []
+        result = extract_text(SAMPLE_PLAIN_TEXT, on_error=reported.append)
+        assert result == SAMPLE_PLAIN_TEXT
+        assert reported == []
+
+    def test_empty_input_does_not_report_failure(self):
+        reported: list[str] = []
+        assert extract_text("", on_error=reported.append) == ""
+        assert extract_text("   \n  \t  ", on_error=reported.append) == ""
+        assert reported == []
+
 
 SAMPLE_HTML = (
     "<html><body><article><h1>Real Article</h1><p>This is the full article content "
@@ -181,6 +218,100 @@ class TestFetchArticle:
             == ""
         )
         assert "fetch failed" in caplog.text
+
+    def test_network_error_not_reported_to_collector(self):
+        reported: list[str] = []
+
+        def fake_get(url, **kwargs):
+            raise requests.ConnectionError("connection failed")
+
+        result = fetch_article(
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            on_error=reported.append,
+        )
+        assert result == ""
+        assert reported == []
+
+    @pytest.mark.parametrize("status_code", [404, 500])
+    def test_http_status_error_not_reported_to_collector(self, status_code):
+        reported: list[str] = []
+
+        def fake_get(url, **kwargs):
+            r = requests.Response()
+            r.status_code = status_code
+            r.url = url
+            raise requests.HTTPError(f"{status_code} Client Error", response=r)
+
+        result = fetch_article(
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            on_error=reported.append,
+        )
+        assert result == ""
+        assert reported == []
+
+    def test_extraction_exception_reports_exception(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        def boom(html, **kwargs):
+            raise ValueError("malformed markup")
+
+        result = fetch_article(
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            extract_fn=boom,
+            on_error=reported.append,
+        )
+        assert result == ""
+        assert reported == ["exception"]
+
+    def test_extraction_empty_reports_empty(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_article(
+            "https://example.com/article",
+            {"Cookie": "x"},
+            get=fake_get,
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
+        )
+        assert result == ""
+        assert reported == ["empty"]
+
+    def test_unexpected_extraction_error_propagates(self):
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        def boom(html, **kwargs):
+            raise RuntimeError("bug in extractor")
+
+        with pytest.raises(RuntimeError):
+            fetch_article(
+                "https://example.com/article",
+                {"Cookie": "x"},
+                get=fake_get,
+                extract_fn=boom,
+            )
 
 
 class TestVerifySourceAuth:
@@ -271,7 +402,7 @@ class TestFetchUrlText:
         assert result == ""
         assert "timed out" in caplog.text or "fetch failed" in caplog.text
 
-    def test_non_html_response_returns_empty(self, caplog):
+    def test_non_html_response_returns_text_without_log(self, caplog):
         caplog.set_level("WARNING")
 
         response = MagicMock()
@@ -282,8 +413,77 @@ class TestFetchUrlText:
             return response
 
         result = fetch_url_text("https://example.com/article", get=fake_get)
+        assert result == "not html content"
+        assert "extract failed" not in caplog.text
+
+    def test_article_link_extraction_exception_reports_exception(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        def boom(html, **kwargs):
+            raise ValueError("malformed markup")
+
+        result = fetch_url_text(
+            "https://example.com/article",
+            get=fake_get,
+            extract_fn=boom,
+            on_error=reported.append,
+        )
         assert result == ""
-        assert "extract failed" in caplog.text
+        assert reported == ["exception"]
+
+    def test_article_link_extraction_empty_reports_empty(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = SAMPLE_HTML
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_url_text(
+            "https://example.com/article",
+            get=fake_get,
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
+        )
+        assert result == ""
+        assert reported == ["empty"]
+
+    def test_article_link_network_error_not_reported_to_collector(self):
+        reported: list[str] = []
+
+        def fake_get(url, **kwargs):
+            raise requests.Timeout("timed out")
+
+        result = fetch_url_text(
+            "https://example.com/article", get=fake_get, on_error=reported.append
+        )
+        assert result == ""
+        assert reported == []
+
+    def test_article_link_plain_text_passes_through_without_report(self):
+        reported: list[str] = []
+        response = MagicMock()
+        response.text = "just some plain text"
+        response.raise_for_status = MagicMock()
+
+        def fake_get(url, **kwargs):
+            return response
+
+        result = fetch_url_text(
+            "https://example.com/article",
+            get=fake_get,
+            extract_fn=lambda html, **kwargs: None,
+            on_error=reported.append,
+        )
+        assert result == "just some plain text"
+        assert reported == []
 
 
 class TestTranscriptYoutube:
