@@ -38,10 +38,10 @@ fi
 
 is_claimable() {
     local ISSUE="$1"
-    local BLOCKED ASSIGNEES LABELS
+    local OPEN_BLOCKERS ASSIGNEES LABELS
 
-    BLOCKED=$(gh issue view "$ISSUE" --json blockedBy --jq '.blockedBy.totalCount')
-    [ "$BLOCKED" -eq 0 ] || return 1
+    OPEN_BLOCKERS=$(gh issue view "$ISSUE" --json blockedBy --jq '[.blockedBy.nodes[] | select(.state == "OPEN")] | length')
+    [ "$OPEN_BLOCKERS" -eq 0 ] || return 1
 
     ASSIGNEES=$(gh issue view "$ISSUE" --json assignees --jq '.assignees | length')
     [ "$ASSIGNEES" -eq 0 ] || return 1
