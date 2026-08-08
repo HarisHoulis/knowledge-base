@@ -52,8 +52,22 @@ if [ "$1" = "issue" ] && [ "$2" = "view" ]; then
     case "$FIELD" in
         blockedBy)
             VARNAME="MOCK_GH_VIEW_${NUM}_BLOCKED"
-            VAL="${!VARNAME:-0}"
-            PAYLOAD="{\"blockedBy\":{\"nodes\":[],\"totalCount\":$VAL}}"
+            OPEN="${!VARNAME:-0}"
+            VARNAME="MOCK_GH_VIEW_${NUM}_CLOSEDBLOCKERS"
+            CLOSED="${!VARNAME:-0}"
+            NODES_JSON=""
+            i=0
+            while [ "$i" -lt "$OPEN" ]; do
+                NODES_JSON="$NODES_JSON{\"number\":$((8000+i)),\"state\":\"OPEN\"},"
+                i=$((i+1))
+            done
+            i=0
+            while [ "$i" -lt "$CLOSED" ]; do
+                NODES_JSON="$NODES_JSON{\"number\":$((9000+i)),\"state\":\"CLOSED\"},"
+                i=$((i+1))
+            done
+            NODES_JSON="${NODES_JSON%,}"
+            PAYLOAD="{\"blockedBy\":{\"nodes\":[$NODES_JSON],\"totalCount\":$((OPEN+CLOSED))}}"
             ;;
         assignees)
             VARNAME="MOCK_GH_VIEW_${NUM}_ASSIGNEES"
@@ -244,6 +258,33 @@ test_leaf_blocked_skips_to_next() {
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
     echo "PASS: leaf blocked skips to next candidate"
+}
+
+test_blocked_by_closed_issue_is_claimable() {
+    local test_dir; test_dir=$(mktemp -d)
+    local mock_dir="$test_dir/mocks"
+    local calls_file="$test_dir/gh_calls"
+    mkdir -p "$mock_dir"
+    make_mock_gh "$mock_dir" "$calls_file"
+
+    local rc
+    set +e
+    MOCK_GH_LIST_RESULT='5' \
+    MOCK_GH_VIEW_5_BLOCKED='0' \
+    MOCK_GH_VIEW_5_CLOSEDBLOCKERS='1' \
+    MOCK_GH_VIEW_5_SUBCOUNT='0' \
+        PATH="$mock_dir:$PATH" \
+        bash "$SCRIPT_DIR/scripts/agent-triage.sh" > "$test_dir/stdout" 2> "$test_dir/stderr"
+    rc=$?
+    set -e
+
+    local fail=0
+    [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
+    [ "$(cat "$test_dir/stdout")" = "5" ] || { echo "  FAIL: expected stdout '5', got '$(cat "$test_dir/stdout")'"; fail=1; }
+    grep -q "api.*issues/5/labels" "$calls_file" || { echo "  FAIL: expected gh api labels claim for 5"; fail=1; }
+    rm -rf "$test_dir"
+    [ "$fail" -eq 0 ] || return 1
+    echo "PASS: leaf blocked only by closed issue is claimable"
 }
 
 test_parent_picks_unblocked_sub() {
@@ -495,6 +536,7 @@ test_leaf_not_blocked && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_uses_provided_issue && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_rejects_issue_without_label && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_leaf_blocked_skips_to_next && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+test_blocked_by_closed_issue_is_claimable && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_parent_picks_unblocked_sub && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_parent_skips_in_progress_sub && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_parent_all_subs_blocked_skips_to_next && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
