@@ -57,6 +57,7 @@ jobs:
           fi
 
       - uses: anomalyco/opencode/github@latest
+        id: opencode
         timeout-minutes: 30
         if: steps.find-issue.outputs.issue_number != ''
         env:
@@ -65,7 +66,14 @@ jobs:
         with:
           model: deepseek/deepseek-v4-flash
           use_github_token: true
+          share: false
           prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }}
+
+      - name: Post-process agent PR
+        if: steps.opencode.outcome == 'success' && steps.find-issue.outputs.issue_number != ''
+        env:
+          GH_TOKEN: ${{ secrets.PAT_AGENT }}
+        run: bash scripts/agent-triage-postprocess.sh "${{ steps.find-issue.outputs.issue_number }}"
 
       - name: Mark failed
         if: failure()
