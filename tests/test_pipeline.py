@@ -338,6 +338,36 @@ class TestRunPipelineLinkFallback:
         assert stats["skipped"] >= 1
         assert "link fallback" in caplog.text
 
+    def test_link_fallback_uses_fetched_markdown_directly(self):
+        from kb_pipeline.pipeline import run_pipeline
+
+        fixture = Path(__file__).parent / "fixtures" / "redirect-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        raw_html = (
+            "<html><body><p>full article content here</p>" * 30 + "</body></html>"
+        )
+
+        received: list[str] = []
+
+        def capturing_classify(
+            text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
+        ) -> dict[str, Any]:
+            received.append(text)
+            return dict(SAMPLE_RESULT)
+
+        def stub_fetch_url(url: str) -> str:
+            return raw_html
+
+        run_pipeline(
+            dry_run=True,
+            sources=[source],
+            fetch_url_text_fn=stub_fetch_url,
+            classify_fn=capturing_classify,
+        )
+
+        assert received == [raw_html]
+
     def test_youtube_short_content_no_fallback(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
@@ -438,3 +468,288 @@ def test_bytebytego_source_has_cookie_env_var() -> None:
     src = next((s for s in SOURCES if s.id == "bytebytego"), None)
     assert src is not None
     assert src.cookie_env_var == "BYTEBYTEGO_SUBSTACK_COOKIE"
+
+
+class TestRunPipelineAuthFetch:
+    def test_auth_source_fetches_article_with_cookie_and_skips_summary(
+        self, monkeypatch
+    ) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie-value")
+        fixture = Path(__file__).parent / "fixtures" / "simple-rss.xml"
+        auth_source = Source(
+            id="bytebytego",
+            type="rss",
+            url=str(fixture),
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+
+        calls: list[tuple[str, dict[str, str]]] = []
+
+        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+            calls.append((url, headers))
+            return "markdown text " * 60
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[auth_source],
+            notify_fn=notify_fn,
+            fetch_article_fn=stub_fetch_article,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert calls == [
+            ("https://example.com/structured-concurrency", {"Cookie": "cookie-value"})
+        ]
+        assert notify_calls == []
+        assert stats["written"] == 1
+
+
+def make_auth_source() -> Source:
+    return Source(
+        id="bytebytego",
+        type="rss",
+        url="https://blog.bytebytego.com/feed",
+        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+    )
+
+
+def mock_two_entry_fetch(monkeypatch) -> None:
+    from feedparser import FeedParserDict
+
+    from kb_pipeline.fetcher import fetch_rss as real_fetch_rss
+
+    def mock_fetch(src):
+        if src.id == "bytebytego":
+            return [
+                FeedParserDict(
+                    {"link": "https://example.com/paid-1", "title": "Paid 1"}
+                ),
+                FeedParserDict(
+                    {"link": "https://example.com/paid-2", "title": "Paid 2"}
+                ),
+            ]
+        return real_fetch_rss(src)
+
+    monkeypatch.setattr("kb_pipeline.pipeline.fetch_rss", mock_fetch)
+
+
+class TestRunPipelineAuthMidFetch:
+    def test_empty_fetch_files_issue_and_aborts_source(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        from kb_pipeline import state as state_module
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
+        monkeypatch.setattr(state_module, "STATE_PATH", tmp_path / "state.json")
+        mock_two_entry_fetch(monkeypatch)
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+            return ""
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[make_auth_source()],
+            notify_fn=notify_fn,
+            fetch_article_fn=stub_fetch_article,
+        )
+
+        assert notify_calls == [("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")]
+        assert stats["seen"] == 1
+        assert stats["sources"] == 1
+
+    def test_empty_fetch_aborts_only_that_source(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
+        mock_two_entry_fetch(monkeypatch)
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        ok_source = Source(id="ok", type="rss", url=str(fixture))
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+            return ""
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[make_auth_source(), ok_source],
+            notify_fn=notify_fn,
+            fetch_article_fn=stub_fetch_article,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert notify_calls == []
+        assert stats["sources"] == 2
+        assert stats["seen"] == 2
+        assert stats["written"] == 1
+
+
+class TestNotifyAuthFailure:
+    def test_issue_body_contains_source_id_and_env_var(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import _notify_auth_failure
+
+        calls: list[list[str]] = []
+
+        def fake_run(cmd, **kwargs):
+            calls.append(cmd)
+
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+        _notify_auth_failure("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")
+
+        assert len(calls) == 1
+        cmd = calls[0]
+        assert cmd[cmd.index("--title") + 1] == "Auth failure: bytebytego"
+        body = cmd[cmd.index("--body") + 1]
+        assert "bytebytego" in body
+        assert "BYTEBYTEGO_SUBSTACK_COOKIE" in body
+
+    def test_subprocess_failure_logs_warning(self, monkeypatch, caplog) -> None:
+        from kb_pipeline.pipeline import _notify_auth_failure
+
+        caplog.set_level("WARNING")
+
+        def fake_run(cmd, **kwargs):
+            raise FileNotFoundError("gh not found")
+
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+        _notify_auth_failure("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")
+
+        assert "auth failure notification failed" in caplog.text
+
+
+class TestRunPipelineAuthDryRun:
+    def test_dry_run_logs_startup_failure_instead_of_issuing(
+        self, monkeypatch, caplog
+    ) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.delenv("BYTEBYTEGO_SUBSTACK_COOKIE", raising=False)
+        caplog.set_level("INFO")
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[make_auth_source()],
+            notify_fn=notify_fn,
+        )
+
+        assert notify_calls == []
+        assert "(dry run) would file auth issue" in caplog.text
+        assert stats["sources"] == 0
+
+    def test_dry_run_logs_mid_fetch_expiry_instead_of_issuing(
+        self, monkeypatch, caplog
+    ) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
+        mock_two_entry_fetch(monkeypatch)
+        caplog.set_level("INFO")
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+            return ""
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[make_auth_source()],
+            notify_fn=notify_fn,
+            fetch_article_fn=stub_fetch_article,
+        )
+
+        assert notify_calls == []
+        assert "(dry run) would file auth issue" in caplog.text
+        assert stats["seen"] == 1
+
+
+def make_notify_stub() -> tuple[list[tuple[str, str]], Any]:
+    calls: list[tuple[str, str]] = []
+
+    def stub(source_id: str, env_var: str) -> None:
+        calls.append((source_id, env_var))
+
+    return calls, stub
+
+
+class TestRunPipelineAuthStartupCheck:
+    def test_failed_auth_files_issue_and_skips_source(
+        self, monkeypatch, tmp_path
+    ) -> None:
+        from kb_pipeline import state as state_module
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.delenv("BYTEBYTEGO_SUBSTACK_COOKIE", raising=False)
+        monkeypatch.setattr(state_module, "STATE_PATH", tmp_path / "state.json")
+        auth_source = make_auth_source()
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        stats = run_pipeline(dry_run=False, sources=[auth_source], notify_fn=notify_fn)
+
+        assert notify_calls == [("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")]
+        assert stats["sources"] == 0
+        assert stats["seen"] == 0
+
+    def test_failed_auth_skips_only_that_source(self, monkeypatch, caplog) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.delenv("BYTEBYTEGO_SUBSTACK_COOKIE", raising=False)
+        caplog.set_level("INFO")
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        auth_source = make_auth_source()
+        ok_source = Source(id="ok", type="rss", url=str(fixture))
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[auth_source, ok_source],
+            notify_fn=notify_fn,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert notify_calls == []
+        assert stats["sources"] == 1
+        assert stats["written"] == 1
+        assert "bytebytego" in caplog.text
+        assert "BYTEBYTEGO_SUBSTACK_COOKIE" in caplog.text
+
+    def test_passed_auth_check_does_not_notify(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
+        fixture = Path(__file__).parent / "fixtures" / "simple-rss.xml"
+        auth_source = Source(
+            id="bytebytego",
+            type="rss",
+            url=str(fixture),
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+            return "markdown text " * 60
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[auth_source],
+            notify_fn=notify_fn,
+            fetch_article_fn=stub_fetch_article,
+            classify_fn=stub_classify_ok,
+        )
+
+        assert notify_calls == []
+        assert stats["sources"] == 1
+        assert stats["written"] == 1
