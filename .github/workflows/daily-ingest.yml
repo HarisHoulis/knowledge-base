@@ -11,10 +11,10 @@ on:
         required: false
         default: false
       limit:
-        description: "Maximum entries to process per source"
+        description: "Maximum entries to process per source (0 = unlimited)"
         type: number
         required: false
-        default: 0
+        default: 10
 
 jobs:
   ingest:
@@ -58,8 +58,10 @@ jobs:
           if [[ "${{ inputs.dry_run }}" == "true" ]]; then
             ARGS="$ARGS --dry-run"
           fi
-          if [[ -n "${{ inputs.limit }}" && "${{ inputs.limit }}" != "0" ]]; then
+          if [[ -n "${{ inputs.limit }}" ]]; then
             ARGS="$ARGS --limit=${{ inputs.limit }}"
+          else
+            ARGS="$ARGS --limit=10"
           fi
           bash scripts/daily-ingest.sh $ARGS
 
