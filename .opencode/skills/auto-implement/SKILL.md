@@ -15,7 +15,7 @@ This skill runs in headless CI. Rules:
 - If a handoff file exists in `.handoffs/` (from a prior run), read it to resume the work.
 - All commits must use Conventional Commits messages.
 - **Workflow changes are proposed, never pushed.** The run token lacks `workflows` permission, so commits touching `.github/workflows/` are blocked by the CI pre-commit hook. If your work requires changing a workflow file, run `bash scripts/suggest-workflow-change.sh <issue-number>`: it writes a Workflow Proposal (unified diff) to `docs/workflow-proposals/` and reverts the workflow files. Commit the proposal with the rest of your work, flag it in the PR body under the template's "Workflow changes" section, and do NOT claim it is applied. For a proposal-only issue, do not write `Closes #N` in the PR body.
-- End your final response with the populated `.github/PULL_REQUEST_TEMPLATE.md` (read it directly with the Read tool — don't use Glob, it skips hidden directories). Replace each `<!-- ... -->` placeholder with content derived from the change. The handler uses your final response as the PR body.
+- Your final response must be exactly the populated `.github/PULL_REQUEST_TEMPLATE.md` (read it directly with the Read tool — don't use Glob, it skips hidden directories). Replace each `<!-- ... -->` placeholder with content derived from the change, and output nothing else — no commentary, no preamble, no trailing prose. The handler uses your final response as the PR body.
 
 ## Budget
 
