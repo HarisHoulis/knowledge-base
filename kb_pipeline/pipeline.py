@@ -12,11 +12,14 @@ from .audit import AuditResult, classification_audit, content_audit
 from .config import SOURCES, Source
 from .fetcher import (
     ExtractionErrorType,
+    auth_headers,
     extract_text,
+    fetch_article,
     fetch_rss,
     fetch_url_text,
     fetch_youtube,
     transcript_youtube,
+    verify_source_auth,
 )
 from .llm import classify_summarize
 from .state import load_state, save_state
@@ -78,6 +81,20 @@ def _build_audit_feedback_text(
     return "\n".join(lines).strip()
 
 
+def _file_gh_issue(title: str, body: str, *, what: str) -> None:
+    try:
+        subprocess.run(
+            ["gh", "issue", "create", "--title", title, "--body", body],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=30,
+        )
+        logger.info("  %s issue created", what)
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        logger.warning("  %s failed: %s", what, e)
+
+
 def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
     title = f"Audit exhaustion: {entry_path.name}"
     body = (
@@ -86,8 +103,30 @@ def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
         f"- **URL:** {url}\n\n"
         f"### Combined audit feedback\n\n```\n{feedback}\n```"
     )
-    if _create_gh_issue(title, body):
-        logger.info("  escalation issue created for %s", entry_path)
+    _file_gh_issue(title, body, what="escalation")
+
+
+def _notify_auth_failure(source_id: str, env_var: str) -> None:
+    title = f"Auth failure: {source_id}"
+    body = (
+        f"## Pipeline skipped source due to auth failure\n\n"
+        f"- **Source:** `{source_id}`\n"
+        f"- **Environment variable:** `{env_var}`"
+    )
+    _file_gh_issue(title, body, what="auth failure notification")
+
+
+def _notify_or_log_auth_failure(
+    src: Source, *, dry_run: bool, notify_fn: Callable[[str, str], None]
+) -> None:
+    if dry_run:
+        logger.info(
+            "  (dry run) would file auth issue for %s (%s)",
+            src.id,
+            src.cookie_env_var,
+        )
+    else:
+        notify_fn(src.id, src.cookie_env_var)
 
 
 def _extract_youtube_video_id(url: str) -> Optional[str]:
@@ -170,6 +209,8 @@ def run_pipeline(
     *,
     transcript_fn: Callable[[str], str] = transcript_youtube,
     fetch_url_text_fn: Callable[[str], str] = fetch_url_text,
+    fetch_article_fn: Callable[[str, dict[str, str]], str] = fetch_article,
+    notify_fn: Callable[[str, str], None] = _notify_auth_failure,
     classify_fn: Callable[..., Optional[dict[str, Any]]] = classify_summarize,
     report_fn: Callable[[list[ExtractionFailure]], None] = _report_extraction_failures,
 ) -> dict[str, int]:
@@ -181,6 +222,14 @@ def run_pipeline(
 
     for src in sources:
         logger.info("[%s]", src.id)
+        if src.cookie_env_var and not verify_source_auth(src):
+            logger.warning(
+                "  auth check failed for %s (%s); skipping source",
+                src.id,
+                src.cookie_env_var,
+            )
+            _notify_or_log_auth_failure(src, dry_run=dry_run, notify_fn=notify_fn)
+            continue
         entries = fetch_rss(src) if src.type == "rss" else fetch_youtube(src)
         logger.info("  %d in feed", len(entries))
         stats["sources"] += 1
@@ -208,8 +257,22 @@ def run_pipeline(
                 video_id = _extract_youtube_video_id(url)
                 if video_id:
                     text = transcript_fn(video_id)
+            elif src.cookie_env_var:
+                headers = auth_headers(src)
+                text = fetch_article_fn(url, headers)
+                if not text:
+                    logger.warning(
+                        "  auth fetch empty for %s (%s): %s",
+                        src.id,
+                        src.cookie_env_var,
+                        url,
+                    )
+                    _notify_or_log_auth_failure(
+                        src, dry_run=dry_run, notify_fn=notify_fn
+                    )
+                    break
 
-            if not text:
+            if not text and not src.cookie_env_var:
                 content = ""
                 if entry.get("content"):
                     content = entry["content"][0].get("value", "")
@@ -223,13 +286,17 @@ def run_pipeline(
                     continue
                 text = extract_text(content, on_error=record_failure_type)
 
-            if (not text or len(text) < 200) and src.type != "youtube":
+            if (
+                (not text or len(text) < 200)
+                and src.type != "youtube"
+                and not src.cookie_env_var
+            ):
                 link_url = entry.get("link", "")
                 if link_url:
                     logger.info("  link fallback for: %s", entry.get("title", "")[:60])
                     fetched = fetch_url_text_fn(link_url)
                     if fetched:
-                        text = extract_text(fetched, on_error=record_failure_type)
+                        text = fetched
                     else:
                         logger.info(
                             "  link fallback failed for: %s",
