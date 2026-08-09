@@ -460,24 +460,40 @@ def _make_rss_fetch_stub(entries: list[dict[str, Any]]) -> Any:
     return mock_fetch
 
 
+def _make_report_stub() -> tuple[list[list[Any]], Any]:
+    reported: list[list[Any]] = []
+
+    def report_stub(failures: list[Any]) -> None:
+        reported.append(failures)
+
+    return reported, report_stub
+
+
+def _make_failing_extract(error_type: str) -> Any:
+    def fake_extract(
+        html: str, *, extract_fn: Any = None, on_error: Any = None
+    ) -> str:
+        if on_error is not None:
+            on_error(error_type)
+        return ""
+
+    return fake_extract
+
+
+def _patch_live_run(monkeypatch: Any) -> None:
+    monkeypatch.setattr("kb_pipeline.pipeline.save_state", lambda state: None)
+    monkeypatch.setattr("kb_pipeline.pipeline.write_entry", lambda result, url: None)
+
+
 class TestRunPipelineExtractionFailures:
     def test_live_run_reports_all_failures_once(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
-        reported: list[list[Any]] = []
-
-        def report_stub(failures: list[Any]) -> None:
-            reported.append(failures)
-
-        def fake_extract(
-            html: str, *, extract_fn: Any = None, on_error: Any = None
-        ) -> str:
-            if on_error is not None:
-                on_error("exception")
-            return ""
-
-        monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
-        monkeypatch.setattr("kb_pipeline.pipeline.save_state", lambda state: None)
+        reported, report_stub = _make_report_stub()
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.extract_text", _make_failing_extract("exception")
+        )
         monkeypatch.setattr(
             "kb_pipeline.pipeline.fetch_rss",
             _make_rss_fetch_stub(
@@ -512,20 +528,11 @@ class TestRunPipelineExtractionFailures:
     def test_silent_empty_final_result_is_recorded_as_empty(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
-        reported: list[list[Any]] = []
-
-        def report_stub(failures: list[Any]) -> None:
-            reported.append(failures)
-
-        def fake_extract(
-            html: str, *, extract_fn: Any = None, on_error: Any = None
-        ) -> str:
-            if on_error is not None:
-                on_error("empty")
-            return ""
-
-        monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
-        monkeypatch.setattr("kb_pipeline.pipeline.save_state", lambda state: None)
+        reported, report_stub = _make_report_stub()
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.extract_text", _make_failing_extract("empty")
+        )
         monkeypatch.setattr(
             "kb_pipeline.pipeline.fetch_rss",
             _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
@@ -550,11 +557,7 @@ class TestRunPipelineExtractionFailures:
     def test_transient_empty_recovered_by_fallback_not_recorded(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
-        reported: list[list[Any]] = []
-
-        def report_stub(failures: list[Any]) -> None:
-            reported.append(failures)
-
+        reported, report_stub = _make_report_stub()
         calls: list[str] = []
 
         def fake_extract(
@@ -567,11 +570,8 @@ class TestRunPipelineExtractionFailures:
                 return ""
             return SAMPLE_TEXT * 20
 
+        _patch_live_run(monkeypatch)
         monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
-        monkeypatch.setattr("kb_pipeline.pipeline.save_state", lambda state: None)
-        monkeypatch.setattr(
-            "kb_pipeline.pipeline.write_entry", lambda result, url: None
-        )
         monkeypatch.setattr(
             "kb_pipeline.pipeline.fetch_rss",
             _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
@@ -594,15 +594,8 @@ class TestRunPipelineExtractionFailures:
     def test_live_run_with_zero_failures_creates_no_report(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
-        reported: list[list[Any]] = []
-
-        def report_stub(failures: list[Any]) -> None:
-            reported.append(failures)
-
-        monkeypatch.setattr("kb_pipeline.pipeline.save_state", lambda state: None)
-        monkeypatch.setattr(
-            "kb_pipeline.pipeline.write_entry", lambda result, url: None
-        )
+        reported, report_stub = _make_report_stub()
+        _patch_live_run(monkeypatch)
         monkeypatch.setattr(
             "kb_pipeline.pipeline.fetch_rss",
             _make_rss_fetch_stub(
@@ -635,19 +628,10 @@ class TestRunPipelineExtractionFailures:
     def test_dry_run_collects_failures_but_creates_no_report(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
-        reported: list[list[Any]] = []
-
-        def report_stub(failures: list[Any]) -> None:
-            reported.append(failures)
-
-        def fake_extract(
-            html: str, *, extract_fn: Any = None, on_error: Any = None
-        ) -> str:
-            if on_error is not None:
-                on_error("exception")
-            return ""
-
-        monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
+        reported, report_stub = _make_report_stub()
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.extract_text", _make_failing_extract("exception")
+        )
         monkeypatch.setattr(
             "kb_pipeline.pipeline.fetch_rss",
             _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),

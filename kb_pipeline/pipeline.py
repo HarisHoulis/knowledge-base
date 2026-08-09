@@ -36,13 +36,7 @@ class ExtractionFailure:
     error_type: ExtractionErrorType
 
 
-def _report_extraction_failures(failures: list[ExtractionFailure]) -> None:
-    day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    title = f"Content extraction errors: {day} ({len(failures)} entries)"
-    body = "\n".join(
-        f"- **{f.source_id}** | {f.title} | {f.url} | `{f.error_type}`"
-        for f in failures
-    )
+def _create_gh_issue(title: str, body: str) -> bool:
     try:
         subprocess.run(
             ["gh", "issue", "create", "--title", title, "--body", body],
@@ -51,9 +45,21 @@ def _report_extraction_failures(failures: list[ExtractionFailure]) -> None:
             check=True,
             timeout=30,
         )
-        logger.info("  extraction failures issue created (%d entries)", len(failures))
+        return True
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logger.warning("  extraction failures escalation failed: %s", e)
+        logger.warning("  escalation failed: %s", e)
+        return False
+
+
+def _report_extraction_failures(failures: list[ExtractionFailure]) -> None:
+    day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    title = f"Content extraction errors: {day} ({len(failures)} entries)"
+    body = "\n".join(
+        f"- **{f.source_id}** | {f.title} | {f.url} | `{f.error_type}`"
+        for f in failures
+    )
+    if _create_gh_issue(title, body):
+        logger.info("  extraction failures issue created (%d entries)", len(failures))
 
 
 def _build_audit_feedback_text(
@@ -80,17 +86,8 @@ def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
         f"- **URL:** {url}\n\n"
         f"### Combined audit feedback\n\n```\n{feedback}\n```"
     )
-    try:
-        subprocess.run(
-            ["gh", "issue", "create", "--title", title, "--body", body],
-            capture_output=True,
-            text=True,
-            check=True,
-            timeout=30,
-        )
+    if _create_gh_issue(title, body):
         logger.info("  escalation issue created for %s", entry_path)
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logger.warning("  escalation failed: %s", e)
 
 
 def _extract_youtube_video_id(url: str) -> Optional[str]:
@@ -203,7 +200,7 @@ def run_pipeline(
             text = ""
             failure_type: Optional[ExtractionErrorType] = None
 
-            def collect(ftype: ExtractionErrorType) -> None:
+            def record_failure_type(ftype: ExtractionErrorType) -> None:
                 nonlocal failure_type
                 failure_type = ftype
 
@@ -224,7 +221,7 @@ def run_pipeline(
                     )
                     stats["skipped"] += 1
                     continue
-                text = extract_text(content, on_error=collect)
+                text = extract_text(content, on_error=record_failure_type)
 
             if (not text or len(text) < 200) and src.type != "youtube":
                 link_url = entry.get("link", "")
@@ -232,7 +229,7 @@ def run_pipeline(
                     logger.info("  link fallback for: %s", entry.get("title", "")[:60])
                     fetched = fetch_url_text_fn(link_url)
                     if fetched:
-                        text = extract_text(fetched, on_error=collect)
+                        text = extract_text(fetched, on_error=record_failure_type)
                     else:
                         logger.info(
                             "  link fallback failed for: %s",
