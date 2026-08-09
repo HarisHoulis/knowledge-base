@@ -237,7 +237,7 @@ def run_pipeline(
                         )
 
             if not text or len(text) < 200:
-                if failure_type is not None:
+                if not text and failure_type is not None:
                     failures.append(
                         ExtractionFailure(
                             src.id, entry.get("title", ""), url, failure_type

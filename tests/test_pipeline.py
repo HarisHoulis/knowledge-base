@@ -485,6 +485,14 @@ def _patch_live_run(monkeypatch: Any) -> None:
     monkeypatch.setattr("kb_pipeline.pipeline.write_entry", lambda result, url: None)
 
 
+def _patch_gh_run(monkeypatch: Any, calls: list[list[str]]) -> None:
+    def fake_run(cmd: list[str], **kwargs: Any) -> MagicMock:
+        calls.append(cmd)
+        return MagicMock(stdout="", stderr="")
+
+    monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+
 class TestRunPipelineExtractionFailures:
     def test_live_run_reports_all_failures_once(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
@@ -591,6 +599,43 @@ class TestRunPipelineExtractionFailures:
         assert stats["failed"] == 0
         assert len(calls) == 2
 
+    def test_short_fallback_recovery_is_not_recorded_as_failure(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        calls: list[str] = []
+
+        def fake_extract(
+            html: str, *, extract_fn: Any = None, on_error: Any = None
+        ) -> str:
+            calls.append(html)
+            if on_error is not None:
+                on_error("empty")
+            if len(calls) == 1:
+                return ""
+            return "too short to ingest"
+
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "<p>recovered via link</p>",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert reported == []
+        assert stats["failed"] == 0
+        assert stats["skipped"] >= 1
+
     def test_live_run_with_zero_failures_creates_no_report(self, monkeypatch):
         from kb_pipeline.pipeline import run_pipeline
 
@@ -663,16 +708,9 @@ class TestReportExtractionFailures:
         from kb_pipeline.pipeline import _report_extraction_failures
 
         calls: list[list[str]] = []
+        _patch_gh_run(monkeypatch, calls)
 
-        def fake_run(cmd, **kwargs):
-            calls.append(cmd)
-            return MagicMock(stdout="", stderr="")
-
-        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
-
-        _report_extraction_failures(
-            [self._failure(), self._failure()]
-        )
+        _report_extraction_failures([self._failure(), self._failure()])
 
         assert len(calls) == 1
         args = calls[0]
@@ -688,12 +726,7 @@ class TestReportExtractionFailures:
         from kb_pipeline.pipeline import ExtractionFailure, _report_extraction_failures
 
         calls: list[list[str]] = []
-
-        def fake_run(cmd, **kwargs):
-            calls.append(cmd)
-            return MagicMock(stdout="", stderr="")
-
-        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+        _patch_gh_run(monkeypatch, calls)
 
         _report_extraction_failures(
             [
