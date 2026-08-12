@@ -69,4 +69,18 @@ git push origin "$BRANCH"
 echo "[daily-ingest] Creating pull request..."
 $GH pr create --fill --base main
 
+INELIGIBLE=$(git show --name-only --format= HEAD | grep -vE '^(concepts/|drafts/).*\.md$' || true)
+if [ -n "$INELIGIBLE" ]; then
+    echo "[daily-ingest] PR touches non-content paths; leaving open for manual review:"
+    printf '%s\n' "$INELIGIBLE" | sed 's/^/  - /'
+    $GH pr comment --body "This PR touches non-content paths and was left open for manual review:
+
+$(printf '%s\n' "$INELIGIBLE" | sed 's/^/- /')"
+else
+    echo "[daily-ingest] Enabling squash auto-merge..."
+    if ! $GH pr merge --auto --squash; then
+        echo "[daily-ingest] Warning: failed to enable auto-merge (best-effort)." >&2
+    fi
+fi
+
 echo "[daily-ingest] Done."
