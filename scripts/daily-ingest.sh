@@ -73,9 +73,11 @@ INELIGIBLE=$(git show --name-only --format= HEAD | grep -vE '^(concepts/|drafts/
 if [ -n "$INELIGIBLE" ]; then
     echo "[daily-ingest] PR touches non-content paths; leaving open for manual review:"
     printf '%s\n' "$INELIGIBLE" | sed 's/^/  - /'
-    $GH pr comment --body "This PR touches non-content paths and was left open for manual review:
+    if ! $GH pr comment --body "This PR touches non-content paths and was left open for manual review:
 
-$(printf '%s\n' "$INELIGIBLE" | sed 's/^/- /')"
+$(printf '%s\n' "$INELIGIBLE" | sed 's/^/- /')"; then
+        echo "[daily-ingest] Warning: failed to comment on PR (best-effort)." >&2
+    fi
 else
     echo "[daily-ingest] Enabling squash auto-merge..."
     if ! $GH pr merge --auto --squash; then
