@@ -32,7 +32,7 @@ A scheduled GitHub Actions workflow runs the pipeline at 06:00 UTC daily, create
 - **Branch naming**: `daily-ingest/YYYY-MM-DD` derived from the run date. Created only when `git status --porcelain` is non-empty after the pipeline run.
 - **PR creation**: Via `gh pr create --fill --base main` on the new branch, authenticated with the `PAT_AGENT` personal access token. The PR body includes the run date and a summary of domains touched (derived from `git diff --stat`). Authoring the PR with a PAT (rather than `GITHUB_TOKEN`) lets the `pull_request` CI runs execute without manual approval. The branch push itself uses the `GITHUB_TOKEN` credentials persisted by `actions/checkout`.
 - **Empty run**: After the pipeline exits, if `git status --porcelain` is empty, the script exits 0 with no further action.
-- **Merge strategy**: Squash merge via the PR UI. The workflow does not auto-merge.
+- **Merge strategy**: Squash merge. For content-only PRs (every changed path is a `.md` under `concepts/` or `drafts/`), the script enables GitHub's squash auto-merge (`gh pr merge --auto --squash`) as a best-effort step — a failure only logs a warning and exits 0, so a transient API error never fails the run. A PR touching any non-content or non-`.md` path is left open with a `gh pr comment` listing the offending paths. See ADR 0006.
 - **Escalation**: Unchanged — `_escalate_failure` in `pipeline.py` calls `gh issue create`, which resolves auth to the workflow's `GH_TOKEN` env var (`PAT_AGENT`). Works without modification on GH Actions runners.
 - **Python setup**: `actions/setup-python@v5` with pip caching. Dependencies installed via `pip install -e ".[dev]"`.
 - **Runner**: `ubuntu-latest`.
