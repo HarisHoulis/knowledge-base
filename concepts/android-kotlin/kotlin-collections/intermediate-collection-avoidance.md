@@ -11,9 +11,13 @@ sources:
 
 # Intermediate collection avoidance
 
-Kotlin's collection extension functions like `map` are convenient but can create intermediate collections and extra iteration. Jake Wharton discusses how IDEs and manual refactoring can eliminate these overheads by fusing operations. For example, `users.map { it.name }.joinToString()` can be replaced with `users.joinToString() { it.name }`, which transforms each element during string construction, removing the intermediate list and iterator. Similarly, `users.map { it.name }.toTypedArray()` can be replaced with `Array(users.size) { users[it].name }`, and pre-sized lists can use `MutableList(users.size) { ... }` to avoid extra allocations. These approaches use indexed loops instead of iterators, resulting in significant performance improvements and lower memory allocation. However, the author cautions that random access is required for efficient indexed loops, making this technique best suited for internal use with known list implementations.
+Kotlin's collection extension functions make data transformation easy, but chaining functions like `map` and `joinToString` creates intermediate collections and extra iterators that waste memory and CPU. The article shows that IDE warnings can guide developers to fused operations, such as `users.joinToString() { it.name }`, which performs the mapping during string construction and eliminates the intermediate collection entirely.
 
-- Fuse map with terminal operations like joinToString to avoid intermediate collections and extra iterations.
-- Use Array(size) and MutableList(size) initializers with a lambda to compute elements directly, reducing overhead.
-- Benchmarks show lambda initialization variants are faster and allocate fewer bytes due to indexed loops and no intermediate collection.
-- These techniques require random access; avoid using them on lists with non-random-access performance (e.g., linked lists).
+For array or pre-sized list creation, the same principle applies. Instead of `users.map { it.name }.toTypedArray()`, using `Array(users.size) { users[it].name }` substitutes an indexed loop for the iterator and intermediate collection. This pattern is also available for primitive arrays (e.g., `IntArray`, `DoubleArray`) and `MutableList` initializers, enabling efficient element derivation from a source with random access.
+
+Benchmarks included in the article show significant improvements: the fused lambda forms are faster and allocate fewer bytes. However, this technique relies on random-access sources; using a linked or persistent list would degrade performance. Therefore, it is most appropriate in internal library code where the source list is controlled.
+
+- Use `joinToString` with a transform lambda to avoid intermediate `map` collections.
+- Initialize arrays and pre-sized lists with lambda-based constructors like `Array(size) { ... }` to use indexed loops.
+- Only apply the indexed-loop pattern when the source supports random access, or performance will suffer.
+- The fused operations are both shorter and faster, and benchmarks show lower memory allocation.
