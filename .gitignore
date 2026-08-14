@@ -1,5 +1,18 @@
-state.json
 .DS_Store
 *.egg-info/
 __pycache__/
 .ai/plans/
+
+# Python tooling & caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build & packaging
+build/
+dist/
+
+# Environment & secrets
+.venv/
+venv/
+.env
