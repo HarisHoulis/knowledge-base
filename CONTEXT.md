@@ -22,7 +22,7 @@ _Avoid_: Tier 1, auto-include source
 The automated process that fetches content from trusted sources, classifies it into a domain/subdomain/concept, writes a concept file, and runs audit checks. Does not interact with git — the scheduler handles version control.
 
 **Daily Ingest**:
-A scheduled GitHub Actions workflow that runs the pipeline on a timer (06:00 UTC), creates a feature branch with any new/changed concept files, and opens a pull request. When the PR contains only content (`.md` under `concepts/` or `drafts/`) it enables squash auto-merge, so it lands once CI is green; a PR touching any non-content or non-`.md` path is left open with a comment listing the offending paths. Skips the PR entirely if no new content was found.
+A scheduled GitHub Actions workflow that runs the pipeline on a timer (20:15 UTC), creates a feature branch with any new/changed concept files, and opens a pull request. When the PR contains only content (`.md` under `concepts/` or `drafts/`) it enables squash auto-merge, so it lands once CI is green; a PR touching any non-content or non-`.md` path is left open with a comment listing the offending paths. Skips the PR entirely if no new content was found.
 _Avoid_: Cron job, launchd job, scheduled task
 
 **Weekly Digest**:

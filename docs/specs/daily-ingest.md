@@ -6,11 +6,11 @@ The knowledge base pipeline curates concepts from 9 trusted sources, but it only
 
 ## Solution
 
-A scheduled GitHub Actions workflow runs the pipeline at 06:00 UTC daily, creates a feature branch with any new concept files, and opens a pull request for review. State (processed URL hashes) persists between runs via `actions/cache`. If the pipeline produces no changes, no branch or PR is created. Audit exhaustion continues to create a GitHub issue via the existing escalation mechanism.
+A scheduled GitHub Actions workflow runs the pipeline at 20:15 UTC daily, creates a feature branch with any new concept files, and opens a pull request for review. State (processed URL hashes) persists between runs via `actions/cache`. If the pipeline produces no changes, no branch or PR is created. Audit exhaustion continues to create a GitHub issue via the existing escalation mechanism.
 
 ## User Stories
 
-1. As a knowledge worker, I want the pipeline to run automatically at 06:00 UTC daily, so that new content is ingested without manual triggers.
+1. As a knowledge worker, I want the pipeline to run automatically at 20:15 UTC daily, so that new content is ingested without manual triggers.
 2. As a knowledge worker, I want processed-URL state to persist between runs on ephemeral runners, so that already-ingested entries are not re-processed each day.
 3. As a reviewer, I want new concepts to land in a pull request rather than being pushed directly to main, so that I can review and merge at my own pace.
 4. As a reviewer, I want each daily run to create its own branch (`daily-ingest/YYYY-MM-DD`), so that concurrent unmerged PRs don't collide.
@@ -25,7 +25,7 @@ A scheduled GitHub Actions workflow runs the pipeline at 06:00 UTC daily, create
 
 ## Implementation Decisions
 
-- **Trigger**: `schedule` (cron: `0 6 * * *`, 06:00 UTC) plus `workflow_dispatch` with optional `dry_run` and `limit` inputs.
+- **Trigger**: `schedule` (cron: `15 20 * * *`, 20:15 UTC) plus `workflow_dispatch` with optional `dry_run` and `limit` inputs.
 - **State persistence**: `actions/cache@v4` with a static key (`kb-state-v1`) storing `~/.kb-pipeline/state.json`. Restore at start, save at end (even on failure via `if: always()`).
 - **Credentials**: `DEEPSEEK_API_KEY` stored as a GitHub Actions secret. The existing `config.py` reads it from the environment.
 - **Wrapper script**: `scripts/daily-ingest.sh` — idempotent shell script that runs `python -m kb_pipeline`, checks `git status --porcelain`, and either creates a branch+PR or exits cleanly. The workflow calls this script.
