@@ -86,17 +86,6 @@ done
 
 if [ -z "$SELECTED" ]; then
     echo "[agent-triage] No viable candidates found after scanning all issues." >&2
-    gh issue create \
-        --title "Agent Triage: No viable candidates found" \
-        --label "needs-triage" \
-        --body "The automated agent triage scan found no issues that are:
-- Labeled ready-for-agent
-- Not blocked
-- Unassigned
-- Has viable parent -> sub-issue candidates
-
-All ready-for-agent issues were either blocked, assigned, or had no claimable sub-issues.
-This may indicate a systemic bottleneck." > /dev/null
     exit 0
 fi
 

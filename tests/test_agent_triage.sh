@@ -24,12 +24,6 @@ if [ "$1" = "issue" ] && [ "$2" = "list" ]; then
     exit 0
 fi
 
-# issue create
-if [ "$1" = "issue" ] && [ "$2" = "create" ]; then
-    echo "https://github.com/owner/repo/issues/99"
-    exit 0
-fi
-
 # issue edit
 if [ "$1" = "issue" ] && [ "$2" = "edit" ]; then
     exit 0
@@ -501,7 +495,7 @@ test_leaf_without_label_skips_to_next() {
     echo "PASS: leaf without ready-for-agent label skips to next candidate"
 }
 
-test_no_viable_candidates_files_issue() {
+test_no_viable_candidates_exits_silently() {
     local test_dir; test_dir=$(mktemp -d)
     local mock_dir="$test_dir/mocks"
     local calls_file="$test_dir/gh_calls"
@@ -523,11 +517,11 @@ test_no_viable_candidates_files_issue() {
     local fail=0
     [ "$rc" -eq 0 ] || { echo "  FAIL: expected exit 0, got $rc"; fail=1; }
     grep -q "No viable candidates found" "$test_dir/stderr" || { echo "  FAIL: expected 'No viable candidates found' in stderr"; fail=1; }
-    grep -q "issue create" "$calls_file" || { echo "  FAIL: expected gh issue create"; fail=1; }
+    ! grep -q "issue create" "$calls_file" || { echo "  FAIL: expected no gh issue create"; fail=1; }
     [ ! -s "$test_dir/stdout" ] || { echo "  FAIL: expected no output on stdout"; fail=1; }
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
-    echo "PASS: no viable candidates files an issue"
+    echo "PASS: no viable candidates exits silently"
 }
 
 echo "=== agent-triage tests ==="
@@ -544,7 +538,7 @@ test_parent_with_no_claimable_subs_skips_to_next && PASS=$((PASS+1)) || FAIL=$((
 test_parent_skips_assigned_sub && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_parent_blocked_skips_to_next && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_leaf_without_label_skips_to_next && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
-test_no_viable_candidates_files_issue && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+test_no_viable_candidates_exits_silently && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 echo "=========================="
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] || exit 1
