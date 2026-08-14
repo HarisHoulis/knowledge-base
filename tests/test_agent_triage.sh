@@ -24,12 +24,6 @@ if [ "$1" = "issue" ] && [ "$2" = "list" ]; then
     exit 0
 fi
 
-# issue create
-if [ "$1" = "issue" ] && [ "$2" = "create" ]; then
-    echo "https://github.com/owner/repo/issues/99"
-    exit 0
-fi
-
 # issue edit
 if [ "$1" = "issue" ] && [ "$2" = "edit" ]; then
     exit 0
