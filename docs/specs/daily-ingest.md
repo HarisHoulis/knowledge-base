@@ -27,7 +27,7 @@ A scheduled GitHub Actions workflow runs the pipeline at 20:15 UTC daily, create
 
 - **Trigger**: `schedule` (cron: `15 20 * * *`, 20:15 UTC) plus `workflow_dispatch` with optional `dry_run` and `limit` inputs.
 - **State persistence**: `actions/cache@v4` with a static key (`kb-state-v1`) storing `~/.kb-pipeline/state.json`. Restore at start, save at end (even on failure via `if: always()`).
-- **Credentials**: `DEEPSEEK_API_KEY` stored as a GitHub Actions secret. The existing `config.py` reads it from the environment.
+- **Credentials**: `LLM_API_KEY` stored as a GitHub Actions secret; `LLM_API_URL` and `LLM_MODEL` set as non-sensitive repo variables. The existing `config.py` reads them from the environment.
 - **Wrapper script**: `scripts/daily-ingest.sh` — idempotent shell script that runs `python -m kb_pipeline`, checks `git status --porcelain`, and either creates a branch+PR or exits cleanly. The workflow calls this script.
 - **Branch naming**: `daily-ingest/YYYY-MM-DD` derived from the run date. Created only when `git status --porcelain` is non-empty after the pipeline run.
 - **PR creation**: Via `gh pr create --fill --base main` on the new branch, authenticated with the `PAT_AGENT` personal access token. The PR body includes the run date and a summary of domains touched (derived from `git diff --stat`). Authoring the PR with a PAT (rather than `GITHUB_TOKEN`) lets the `pull_request` CI runs execute without manual approval. The branch push itself uses the `GITHUB_TOKEN` credentials persisted by `actions/checkout`.

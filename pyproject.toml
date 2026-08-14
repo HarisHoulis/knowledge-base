@@ -28,7 +28,7 @@ dev = [
 
 [tool.pytest.ini_options]
 markers = [
-    "integration: marks tests that call the real LLM API and require DEEPSEEK_API_KEY",
+    "integration: marks tests that call the real LLM API and require LLM_API_KEY",
 ]
 addopts = "-m 'not integration'"
 

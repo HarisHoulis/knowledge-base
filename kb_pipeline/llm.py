@@ -5,9 +5,9 @@ from typing import Any, Optional
 import requests
 
 from .config import (
-    DEEPSEEK_API_KEY,
-    DEEPSEEK_API_URL,
-    DEEPSEEK_MODEL,
+    LLM_API_KEY,
+    LLM_API_URL,
+    LLM_MODEL,
     SYSTEM_PROMPT,
     VALID_DOMAINS,
 )
@@ -33,8 +33,8 @@ def classify_summarize(
     meta: dict[str, Any],
     audit_feedback: Optional[str] = None,
 ) -> Optional[dict[str, Any]]:
-    if not DEEPSEEK_API_KEY:
-        logger.warning("  [!] DEEPSEEK_API_KEY not set, skipping LLM")
+    if not LLM_API_KEY:
+        logger.warning("  [!] LLM_API_KEY not set, skipping LLM")
         return None
 
     prompt = (
@@ -51,10 +51,10 @@ def classify_summarize(
         )
     try:
         r = requests.post(
-            f"{DEEPSEEK_API_URL}/chat/completions",
-            headers={"Authorization": f"Bearer {DEEPSEEK_API_KEY}"},
+            f"{LLM_API_URL}/chat/completions",
+            headers={"Authorization": f"Bearer {LLM_API_KEY}"},
             json={
-                "model": DEEPSEEK_MODEL,
+                "model": LLM_MODEL,
                 "messages": [
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},

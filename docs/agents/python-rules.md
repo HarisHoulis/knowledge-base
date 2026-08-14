@@ -15,7 +15,7 @@ Language-specific conventions for Python code in this repo, mirroring the conven
    - *Rationale:* Injectable callables make unit tests deterministic, fast, and free of environment dependencies; mocks couple tests to library internals.
 
 5. **Integration gating** — Mark tests that hit the real LLM API `@pytest.mark.integration`; don't run integration tests automatically — notify the user of the command (`pytest -m integration`).
-   - *Rationale:* Integration tests need `DEEPSEEK_API_KEY` and real API access; gating keeps default runs fast and hermetic while preserving the deeper suite for CI.
+   - *Rationale:* Integration tests need `LLM_API_KEY` and real API access; gating keeps default runs fast and hermetic while preserving the deeper suite for CI.
 
 6. **Standard-library-first** — Prefer native framework / standard-library utilities over new third-party dependencies.
    - *Rationale:* Each added dependency is a maintenance and supply-chain cost; the standard library covers most needs without it.

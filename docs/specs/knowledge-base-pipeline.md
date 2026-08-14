@@ -6,7 +6,7 @@ A senior mobile tech lead needs to future-proof himself against the AI-driven re
 
 ## Solution
 
-An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted individuals daily, extracts article text, classifies and summarizes each piece via DeepSeek V4 Flash API into a `domain/subdomain/concept.md` concept, writes it to a local directory tree, and git-commits to a private GitHub repo. The user consumes the output as a reference library + weekly digest.
+An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted individuals daily, extracts article text, classifies and summarizes each piece via a configurable LLM API into a `domain/subdomain/concept.md` concept, writes it to a local directory tree, and git-commits to a private GitHub repo. The user consumes the output as a reference library + weekly digest.
 
 ## User Stories
 
@@ -28,7 +28,7 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 - **Pipeline architecture**: Multi-module Python package `kb_pipeline`. No external orchestrator (n8n/Make.com). No database — filesystem tree is the store.
 - **Content retrieval**: RSS polling via `feedparser` for all blog/Substack sources. YouTube RSS for video channels (Ousterhout, Matt Pocock). Transcripts via `yt-dlp --write-auto-subs`.
 - **Text extraction**: `trafilatura` with markdown output. Falls back to raw summary text if no HTML content available.
-- **LLM classification + summarization**: DeepSeek V4 Flash via OpenAI-compatible API. Single prompt requesting JSON output with `response_format: {"type": "json_object"}`. Temperature 0.3 for consistent classification. Max 2000 output tokens.
+- **LLM classification + summarization**: Configurable LLM (model and endpoint supplied via `LLM_API_KEY`/`LLM_API_URL`/`LLM_MODEL` env vars) via OpenAI-compatible API. Single prompt requesting JSON output with `response_format: {"type": "json_object"}`. Temperature 0.3 for consistent classification. Max 2000 output tokens.
 - **State management**: `~/.kb-pipeline/state.json` — tracks `processed_hashes[]` (SHA-256[:16] of source URL). Prevents re-processing.
 - **Deduplication**: By source URL hash. No embedding-based fuzzy matching (overkill for this volume).
 - **Entry format**: YAML frontmatter (domain, subdomain, concept, title, sources[]) + summary body + key points list.

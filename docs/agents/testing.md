@@ -11,7 +11,7 @@ This keeps tests deterministic, fast, and free of environment dependencies.
 | Suite | Location | Marker | Requires | Run with |
 |---|---|---|---|---|
 | Unit | `tests/` | — | nothing | `pytest` (default) |
-| Integration | `tests/integration/` | `@pytest.mark.integration` | `DEEPSEEK_API_KEY` | `pytest -m integration` |
+| Integration | `tests/integration/` | `@pytest.mark.integration` | `LLM_API_KEY` | `pytest -m integration` |
 
 Integration tests are excluded from the default `pytest` run via `addopts = "-m 'not integration'"` in `pyproject.toml`.
 
