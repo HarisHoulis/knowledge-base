@@ -7,6 +7,25 @@
 - **Handoff:** When context window fills to 10% capacity, invoke `/handoff` to write a handoff document to `.handoffs/<issue-num>-<timestamp>.md`. Then `git add .handoffs/ && git commit -m "chore: handoff <issue-num>"` to record it. Do not `git push` — the opencode GitHub action handler pushes the branch and opens the PR after the agent finishes; the handoff document ships with it. This applies to agent-triage CI runs; in a local interactive session, push normally.
 - **Info Retrieval:** Launch subagents to retrieve info/context or do research.
 
+## External File Loading
+
+CRITICAL: When you encounter a file reference (e.g. `@docs/agents/architectural-rules.md`), use your Read tool to load it on a need-to-know basis. They're relevant to the SPECIFIC task at hand.
+
+Instructions:
+- Do NOT preemptively load all references — lazy-load based on actual need.
+- When loaded, treat content as mandatory instructions that override defaults.
+- Follow references recursively when needed.
+
+### General Guidelines
+
+Relevant to all structural work: @docs/agents/architectural-rules.md
+
+### Development Guidelines
+
+For design conventions on implementation work: @docs/agents/design-rules.md
+For Python code conventions (any Python code): @docs/agents/python-rules.md
+For rule enforcement mapping: @docs/agents/compliance.md
+
 ## Global Engineering Standards
 
 ### Execution Discipline (Karpathy Principles)

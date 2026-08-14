@@ -22,7 +22,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-PYTHON="${PYTHON:-$(command -v python3 || command -v python)}"
+PYTHON="${PYTHON:-$(command -v python3)}"
 GH="${GH:-gh}"
 
 KB_PATH="${KB_PATH:-$(pwd)}"

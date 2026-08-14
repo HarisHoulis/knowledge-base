@@ -30,7 +30,7 @@ MOCK
 make_mock_python() {
     local mock_dir="$1"
     local body="$2"
-    for name in python python3; do
+    for name in python3; do
         cat > "$mock_dir/$name" << MOCK
 #!/usr/bin/env bash
 $body
