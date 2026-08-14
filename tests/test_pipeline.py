@@ -470,9 +470,7 @@ def _make_report_stub() -> tuple[list[list[Any]], Any]:
 
 
 def _make_failing_extract(error_type: str) -> Any:
-    def fake_extract(
-        html: str, *, extract_fn: Any = None, on_error: Any = None
-    ) -> str:
+    def fake_extract(html: str, *, extract_fn: Any = None, on_error: Any = None) -> str:
         if on_error is not None:
             on_error(error_type)
         return ""
