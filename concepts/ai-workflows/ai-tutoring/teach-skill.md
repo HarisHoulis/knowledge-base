@@ -12,9 +12,8 @@ sources:
 
 # My /teach skill is still insane
 
-Matt Pocock demonstrates his '/teach' skill, an AI-powered tool designed to help learners master complex topics through personalized, tailored instruction. The skill adapts to the user's needs, providing interactive explanations and quiz questions to reinforce understanding. Examples include land surveying, solving Rubik's Cubes, and development techniques, showing the versatility of the approach across diverse fields.
+The video demonstrates a /teach skill that enables personalized, tailored learning of new concepts. It claims the skill helps users understand complex topics like land surveying, Rubik's Cubes, and development techniques through interactive explanations and quiz questions. The approach appears to leverage AI to adapt teaching to the user's needs, making it a versatile tool for mastering unfamiliar subjects.
 
-- The /teach skill delivers personalized learning experiences tailored to the individual.
-- It uses interactive explanations and quiz questions to deepen understanding.
-- It can be applied to a wide range of topics, from land surveying to Rubik's Cubes and software development.
-- The skill is part of Matt Pocock's collection of AI workflow skills, available through aihero.dev.
+- The /teach skill provides personalized learning experiences.
+- It covers diverse topics, including land surveying, Rubik's Cubes, and development techniques.
+- Interactive explanations and quiz questions are used to reinforce understanding.

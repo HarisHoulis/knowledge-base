@@ -11,11 +11,9 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine is a library from Cash App for testing kotlinx.coroutines Flow and other push-based mechanisms. It changes push-based Flows into pull-based suspend functions, allowing testers to write straightforward sequential assertions using awaitItem(), awaitComplete(), and related methods. Each await call suspends until the expected event arrives; if a different event occurs or a timeout is reached, it throws an AssertionError to fail the test (source: 'Flow testing with Turbine').
+Turbine 1.0 is a library from Cash App for testing kotlinx.coroutines Flow. It converts push-based Flows into pull-based suspend functions, simplifying test code. The `test` function allows developers to await items, completion, errors, skip items, cancel the Flow, and more, with assertions failing on unexpected events or timeouts. Standalone Turbine instances can adapt other push-based mechanisms like callbacks for testing, offering the same API as the test function. The library includes utilities for handling multiple Turbines, multiple Flows, shared timeouts, and aggregated errors.
 
-Beyond Flows, Turbine can be used standalone to adapt other push-based mechanisms like callbacks. For example, a FakeLogger can add messages to a Turbine<String>, and tests can then pull those messages with the same API. As testing needs grow, Turbine provides utilities for handling multiple Turbines, multiple Flows, shared timeouts, and error aggregation.
-
-- Turbine converts push-based Flow events into pull-based suspend functions for easier testing.
-- awaitItem() and awaitComplete() suspend until the expected event or completion; mismatches and timeouts throw AssertionError.
-- Standalone Turbine instances can be used to test other push-based mechanisms, such as callbacks.
-- Utilities are available for more complex scenarios: multiple Flows, multiple Turbines, shared timeouts, and aggregated errors.
+- Turbine changes push-based Flow into pull-based suspend functions for easier testing.
+- Use `awaitItem()` and `awaitComplete()` to assert on Flow emissions and completion.
+- Standalone Turbines can adapt non-Flow push-based mechanisms like callbacks.
+- The library provides utilities for multiple turbines, timeouts, and error aggregation.

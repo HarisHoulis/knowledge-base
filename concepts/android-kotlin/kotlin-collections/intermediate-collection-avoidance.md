@@ -11,13 +11,9 @@ sources:
 
 # Intermediate collection avoidance
 
-The article, authored by Jake Wharton, discusses how Kotlin's collection extension functions, while concise, often create intermediate collections. The example of mapping users to names and joining into a string triggers an IDE warning suggesting a fused form: `users.joinToString() { it.name }`. This eliminates the intermediate collection and iterator from the `map` call, resulting in code that is both shorter and faster.
+Kotlin's collection extension functions like `map` are convenient but can create intermediate collections and extra iteration. Jake Wharton discusses how IDEs and manual refactoring can eliminate these overheads by fusing operations. For example, `users.map { it.name }.joinToString()` can be replaced with `users.joinToString() { it.name }`, which transforms each element during string construction, removing the intermediate list and iterator. Similarly, `users.map { it.name }.toTypedArray()` can be replaced with `Array(users.size) { users[it].name }`, and pre-sized lists can use `MutableList(users.size) { ... }` to avoid extra allocations. These approaches use indexed loops instead of iterators, resulting in significant performance improvements and lower memory allocation. However, the author cautions that random access is required for efficient indexed loops, making this technique best suited for internal use with known list implementations.
 
-The author then extends the principle to array and pre-sized list initialization. Instead of `users.map { it.name }.toTypedArray()`, you can use `Array(users.size) { users[it].name }`. Similarly, `IntArray` and `MutableList` variants exist. These forms use indexed loops rather than iterators and intermediate collections, making them more efficient.
-
-The article includes benchmark results comparing the two approaches for joining strings and converting to typed arrays. The fused lambda versions show significantly lower latency and allocations, e.g., `NamesJoinToString.lambda` at ~73.6 ns/op vs `map` at ~126.6 ns/op, and allocates 168 B/op vs 232 B/op. However, the author cautions that these techniques rely on random-access sources; using them on non-random-access collections like linked lists can degrade performance, so they are best used internally where you control the source list.
-
-- Kotlin's `map` followed by `joinToString` creates an intermediate collection; fusing via `joinToString { }` eliminates it.
-- Use `Array(size) { }` or `MutableList(size) { }` to initialize collections directly, avoiding intermediate collections.
-- Benchmarks show the lambda-based versions are faster and allocate less.
-- These fused operations require random-access sources to be efficient.
+- Fuse map with terminal operations like joinToString to avoid intermediate collections and extra iterations.
+- Use Array(size) and MutableList(size) initializers with a lambda to compute elements directly, reducing overhead.
+- Benchmarks show lambda initialization variants are faster and allocate fewer bytes due to indexed loops and no intermediate collection.
+- These techniques require random access; avoid using them on lists with non-random-access performance (e.g., linked lists).
