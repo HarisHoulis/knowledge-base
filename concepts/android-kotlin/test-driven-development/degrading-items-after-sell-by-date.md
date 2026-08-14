@@ -2,21 +2,22 @@
 domain: android-kotlin
 subdomain: test-driven-development
 concept: degrading-items-after-sell-by-date
-title: Kotlin TDD - More Degrading
+title: Kotlin TDD: More Degrading
 sources:
   - title: "Kotlin TDD - More Degrading"
     url: "https://www.youtube.com/watch?v=N_ArZ2yHEm8"
     author: "Pairing with Duncan"
-    date: "2022-03-29T21:59:23+00:00"
+    date: "2022-03-29"
 ---
 
-# Kotlin TDD - More Degrading
+# Kotlin TDD: More Degrading
 
-In this TDD session, the team implements a requirement that items degrade quality twice as fast after their sell-by date. They begin by refactoring existing tests that operate on lists of items to test a single item directly, simplifying the test suite and removing unnecessary complexity. This refactor aligns with the principle of testing behavior rather than implementation details, as the list mapping is already covered indirectly (Pairing with Duncan, 2022).
+In this Kotlin TDD session, Duncan and the Guilded Rose team refactor their existing tests for item quality degradation. They remove the list-based test wrapper to directly test the item's update method, avoiding unnecessary testing of the map function (source). This sets the stage for the new requirement: items should degrade twice as fast after their sell-by date.
 
-Next, they introduce a failing test for the new behavior: an item past its sell-by date should lose two quality points per day. To make the function testable without relying on the current time, they add a `LocalDate` parameter to the update method, defaulting to the item's sell-by date in production code. This makes the function deterministic and allows tests to control the date explicitly. They then implement the logic by iterating over each day and conditionally degrading by either one or two points depending on whether the current day is past the sell-by date. The change is minimal and passes all tests, demonstrating a straightforward TDD cycle of refactor, write failing test, implement, and verify (Pairing with Duncan, 2022).
+They add a failing test for the new behavior, which requires knowing when the update is being called. To support this, the update method now takes a LocalDate parameter. In production code, they temporarily pass the item's sellByDate to keep everything compiling while they implement the logic (source). The implementation uses a loop over the number of days, reducing quality by 1 each day normally, but by 2 if the date is after the sell-by date (source).
 
-- Refactor tests to operate on single items rather than lists to reduce complexity and focus on behavior.
-- Introduce a clock/date parameter to make functions deterministic and testable without global state.
-- Write a failing test first to drive the implementation of the new degradation rule.
-- Implement the rule by repeating daily degradation and choosing the degradation rate based on whether the item is past its sell-by date.
+- Refactor tests to focus on the item's update method instead of the list wrapper.
+- Introduce a LocalDate parameter to the update method to know when the update is happening.
+- Add a failing test for degrading quality by 2 after the sell-by date.
+- Implement daily degradation with a rate of 2 when after sell-by date, 1 otherwise.
+- Keep production code compiling by temporarily passing the item's sell-by date as the current date.

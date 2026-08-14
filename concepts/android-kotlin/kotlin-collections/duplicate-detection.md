@@ -11,10 +11,9 @@ sources:
 
 # Perils of duplicate finding
 
-Jake Wharton explores various Kotlin approaches to finding duplicate integers in an array, highlighting subtle pitfalls in collection operations. He initially used `groupBy`, which works but is memory-wasteful. Attempts to subtract a `Set` from a `List` using `toList() - toSet()` unexpectedly return an empty list because the `minus` operator removes all occurrences of each element, not just the first. Similarly, `MutableList.removeAll(ints.toSet())` also removes all occurrences, contradicting the behavior of `MutableList.remove`, which only removes the first occurrence. This asymmetry is inherited from Java's `Collection.removeAll` (Jake Wharton, "Perils of duplicate finding").
+After these failed attempts, the author resets with a partition-based approach using MutableSet.add, which returns false when an element is already in the set. This leads to a cleaner solution using `filterNot(HashSet<Int>()::add)`, which retains only elements already seen. The final refinement is `filterNotTo(HashSet(), HashSet<Int>()::add)`, which both reads well and avoids an extra toSet() call. Benchmark results show the filterNotTo variant is both the fastest and allocates the fewest bytes, offering a double win in performance.
 
-- The `minus` operator and `removeAll` remove all occurrences of each specified element, making them unsuitable for finding duplicates by removing first occurrences.
-- `MutableList.remove` removes only the first occurrence, but there is no convenient function to remove first occurrences of each element from a supplied collection.
-- A robust and readable solution uses `filterNot` with a bound reference to `HashSet::add`, keeping elements whose set addition returns false (i.e., already seen).
-- The `filterNotTo` variant, which supplies a destination set, is both the fastest and allocates the least memory in benchmarks.
-- When using collection operators, be aware of surprising semantics inherited from Java and choose functional alternatives like `filterNot` to avoid hidden bugs.
+- The map-based groupBy approach works but may be overkill for simple duplicate detection.
+- Kotlin's minus operator and MutableList.removeAll both remove all occurrences of each element in the collection, not just the first.
+- MutableSet.add returns false for duplicates, enabling a concise filterNot-based solution.
+- Using filterNotTo with a bound HashSet::add reference is the most performant and allocation-friendly method in benchmarks.

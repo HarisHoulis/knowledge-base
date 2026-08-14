@@ -12,10 +12,10 @@ sources:
 
 # Lecture 13: Spanner
 
-Spanner is Google's distributed database that supports distributed transactions over data spread across multiple data centers. The lecture highlights two key design ideas: running two-phase commit over Paxos-replicated participants to prevent a crashed coordinator from blocking everyone, and using synchronized time to enable efficient read-only transactions with external consistency (MIT 6.824 Lecture 13).
+Physically, Spanner shards data by key and replicates each shard across multiple data centers using a Paxos variant with leaders, similar to Raft. Clients are typically web servers within the data centers, and each Paxos group manages the replicas of a given shard [1].
 
-- Spanner combines two-phase commit with Paxos replication to make wide-area transactions fault-tolerant.
-- It uses synchronized time (TrueTime) to provide externally consistent read-only transactions efficiently.
-- Data is sharded by key and replicated across data centers, with each shard managed by a Paxos group.
-- The motivating workload was Google's advertising system, which was sharded across many MySQL/Bigtable databases and dominated by read-only transactions.
-- Spanner inspired other systems like CockroachDB.
+- Spanner provides distributed transactions and external consistency across globally distributed data.
+- Two-phase commit is made fault-tolerant by running participants on Paxos replicated groups.
+- Synchronized time (TrueTime) enables efficient, lock-free read-only transactions.
+- The motivating workload was Google's advertising system, dominated by read-only transactions.
+- Data is sharded by key and replicated across data centers via Paxos groups.

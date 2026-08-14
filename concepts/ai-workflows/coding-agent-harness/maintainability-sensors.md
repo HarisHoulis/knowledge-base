@@ -7,13 +7,14 @@ sources:
   - title: "Maintainability sensors for coding agents"
     url: "https://martinfowler.com/articles/sensors-for-coding-agents.html"
     author: "Martin Fowler"
+    date: "n.d."
 ---
 
 # Maintainability sensors for coding agents
 
-The article discusses the use of sensors to maintain codebase quality when working with coding agents. It references Birgitta Böckeler's mental model of a coding agent harness, which consists of guides and sensors that increase the probability of good agent outputs and enable self-correction before issues reach human eyes. This particular installment focuses on static analysis, specifically basic code linting, as a sensor for maintainability.
+Birgitta Böckeler introduces a mental model for coding agent harnesses, distinguishing between guides and sensors. Guides are proactive instructions that steer agent behavior, while sensors are reactive checks that detect issues before they reach human review. This article focuses on one type of sensor: static analysis through basic code linting. Linting acts as an early warning system, catching style inconsistencies, potential bugs, and maintainability red flags in generated code. The underlying principle is that automated feedback loops increase the probability of good agent outputs and enable self-correction during the development process. Fowler presents this as part of an ongoing series, emphasizing the practical value of integrating such sensors into agent workflows to keep codebases maintainable.
 
-- Coding agent harnesses benefit from guides and sensors to improve output quality.
-- Sensors enable self-correction of agent-generated code before human review.
-- Static analysis, such as basic code linting, serves as an important maintainability sensor.
-- The article is part of a series sharing hands-on experiences with sensor implementation.
+- Coding agent harnesses require both guides (proactive instructions) and sensors (reactive checks) to ensure quality.
+- Static analysis with basic code linting serves as an initial sensor for detecting maintainability issues.
+- Sensors enable self-correction before issues reach human reviewers, increasing output reliability.
+- The approach is part of a larger effort to systematically engineer agent workflows for code maintenance.
