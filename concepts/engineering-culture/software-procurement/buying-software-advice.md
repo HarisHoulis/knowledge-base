@@ -7,15 +7,16 @@ sources:
   - title: "Are you an experienced software buyer? I could use some help."
     url: "https://charity.wtf/p/are-you-an-experienced-software-buyer-i-could-use-some-help"
     author: "Charity Majors"
-    date: "Fri, 19 Sep 2025 18:12:45 GMT"
+    date: "2025-09-19"
 ---
 
 # Are you an experienced software buyer? I could use some help.
 
-Majors requests that advice be emailed to her with the subject line 'Buying Software' and provides assurances that she will not quote anyone without permission or name vendors, good or bad. She emphasizes that this is an O'Reilly writing project, not a Honeycomb marketing effort, and that the goal is to gather practical wisdom to share with engineers facing software-buying decisions.
+Charity Majors, co-author of Observability Engineering, is working on the second edition and has added a new section on Observability Governance. This section will include chapters on team staffing, org chart placement, tool purchasing, integration, cost management, and business case development. However, Majors admits she has no direct experience buying software at a large enterprise, so she is reaching out to the community for practical advice.
 
-- The second edition of 'Observability Engineering' will include a new 'Observability Governance' section covering software purchasing, team staffing, cost management, and more.
-- Majors openly acknowledges her lack of experience with large-scale software procurement and asks readers for practical advice to include in the book.
-- Key questions raised include vendor evaluation, change triggers, proof-of-concept best practices, stakeholder identification, and consensus-building.
-- Advice should be sent via email with the subject line 'Buying Software'; all contributions are treated confidentially and vendors will not be named.
-- This is an O'Reilly book project, not a Honeycomb sales initiative, so the focus is purely on helping engineers make better purchase decisions.
+She asks experienced engineers and VPs who have gone through software purchasing cycles to share their insights on evaluating options, running proof-of-concept tests, identifying when to change vendors, managing stakeholders, and building consensus for large financial commitments. She requests submissions via email and promises to keep all contributions confidential and to never mention vendors by name. This is explicitly not a Honeycomb project but an O'Reilly book-writing effort.
+
+- The author lacks direct experience buying enterprise software, limiting her ability to advise on vendor selection and procurement.
+- Specific topics sought include shopping for options, signs that a vendor change is needed, running good POCs, and gaining stakeholder consensus.
+- Submissions are confidential; no vendor names will be published, and permission will be requested before quoting.
+- The request is part of a new 'Observability Governance' section in the second edition of Observability Engineering.

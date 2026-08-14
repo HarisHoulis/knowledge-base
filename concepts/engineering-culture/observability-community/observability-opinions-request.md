@@ -12,12 +12,10 @@ sources:
 
 # Got opinions on observability? I could use your help (once more, with feeling)
 
-Charity Majors, drawing on responses to a previous plea for software-buying advice, is writing a second edition of her book and soliciting input on observability topics. She emphasizes that vendor engineering is a high-leverage skill for staff+ engineers, blending technical depth with executive strategy. She asks readers to share experiences on migrating observability vendors, building vs buying tools, using OpenTelemetry, managing costs, and organizing observability teams, among other questions.
+Charity Majors, writing on her blog, requests community input on observability and software purchasing practices to inform the second edition of her book. She emphasizes that vendor engineering and buying software is a high-leverage technical skill, allowing engineers to affect hundreds of engineers per year for minimal cost. She invites readers to answer a series of questions about observability vendor migrations, cost control, team structures, OpenTelemetry adoption, build-vs-buy decisions, and tool consolidation. She explicitly asks for feedback on areas where her perspective may have selection bias, particularly from those who use the traditional 'three pillars' model and are happy with it. The article includes practical details on how to submit responses and notes that suggestions received after a week may be too late to incorporate. Majors closes with a grammar discussion about 'opinions about' versus 'opinions on' observability, tying it to the Buffy musical reference in the title.
 
-The article lists detailed questions organized by themes: migrations, cost control, instrumentation, consolidation, open source, and team structure. Majors invites direct email responses with attribution only by name, not employer, and notes a one-week deadline. She also humorously addresses grammar, comparing "opinions about" vs "opinions on" observability, suggesting "on" implies more formal or detailed treatment.
-
-- Vendor engineering is a powerful practical application of engineering expertise and can shape companies beyond one's own.
-- The author is collecting community insights for a book chapter on buying software and observability practices.
-- Questions cover migrations, cost management, telemetry pipelines, build vs buy, OpenTelemetry decisions, instrumentation overhead, and tool consolidation.
-- Responses need be sent within a week; contributors can be named but not associated with employers.
-- The title references a Buffy musical and includes a grammar discussion on 'about' vs 'on'.
+- Vendor engineering and software purchasing are sophisticated applications of engineering expertise with outsized impact.
+- The author seeks diverse perspectives on observability, especially from users of traditional three-pillar tools like Datadog, Grafana, and Chronosphere.
+- Questions cover vendor migration, cost control, telemetry pipelines, OpenTelemetry adoption, and observability team size and structure.
+- Responses must be sent within a week to be usable for the second edition of the book.
+- Contributors' names may be credited, but employers will not be mentioned.

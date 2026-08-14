@@ -12,9 +12,10 @@ sources:
 
 # How LLMs Learn to Be Helpful: RLHF vs DPO
 
-The article explains how large language models are trained to be helpful through three stages: pretraining, supervised fine-tuning (SFT), and preference learning. Pretraining gives the model broad language capability, SFT teaches it to follow instructions by imitation, but neither captures the trade-offs involved in answering questions that have multiple valid responses (ByteByteGo, 2026). Preference learning uses human comparisons—where a prompt is paired with a preferred and a rejected response—to encode these trade-offs directly, because humans are better at judging between two responses than writing an ideal one from scratch.
+Language models are built in three stages: pretraining, supervised fine-tuning (SFT), and preference learning. SFT teaches instruction-following through imitation, but this fails when a prompt has many valid answers with trade-offs. Comparison data - where humans judge which of two responses is better - captures those trade-offs and forms the basis for preference learning. As ByteByteGo (2026) notes, this alignment stage can matter more than model size: a 1.3B parameter aligned model was preferred over the 175B GPT-3.
 
-- RLHF trains a separate reward model from comparison data, then uses PPO reinforcement learning to optimize the policy, while keeping a frozen reference model to penalize drift.
-- DPO folds the reward signal directly into a single training step, adjusting the model to increase the probability of preferred responses and decrease rejected ones, avoiding a separate reward model and RL loop.
-- Both methods rely on human preferences as a proxy; over-optimizing against this proxy can lead to Goodhart's law effects, such as sycophancy and longer but not better answers.
-- For tasks with checkable answers (e.g., math, code), verifiable rewards from a program can replace human-derived reward models, as demonstrated by DeepSeek's GRPO and R1 model.
+- Pretraining gives raw capability, SFT enables instruction following, and preference learning teaches trade-offs between multiple good answers.
+- RLHF trains a separate reward model and uses PPO to optimize the policy, with a KL penalty to prevent degenerate text; it is powerful but expensive and complex.
+- DPO folds the reward signal into a single supervised training step, making alignment simpler and more accessible; Zephyr 7B trained with DPO beat Llama 2 Chat 70B.
+- Both RLHF and DPO rely on human preference as a proxy signal, which can lead to sycophancy and quality degradation when optimized too hard (Goodhart's law).
+- For tasks with checkable answers, verifiable rewards (e.g., math/unit tests) replace human preference signals, as seen in DeepSeek's GRPO and R1, while subjective qualities still require preference learning.

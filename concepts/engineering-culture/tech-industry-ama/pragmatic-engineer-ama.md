@@ -12,10 +12,11 @@ sources:
 
 # The Pragmatic Engineer AMA
 
-In this Ask Me Anything episode, Gergely Orosz shares personal stories behind The Pragmatic Engineer, including how the COVID-19 pandemic and subsequent Uber layoffs led him to leave his engineering manager role and eventually start the newsletter. He planned to build a startup around platform engineering, but after writing several books and discovering his love for writing, he committed to the publication instead. He also recounts a pivotal moment when an engineer from the Middle East thanked Bunq for sponsoring his visa, which convinced Orosz not to publish a critical article about the company and to adopt a policy of writing about what works inside companies rather than what seems broken (Source: The Pragmatic Engineer AMA).
+In this AMA episode, Gergely Orosz shares how The Pragmatic Engineer nearly didn't exist: Uber's COVID-era layoffs eliminated a quarter of his team, prompting him to exit and finish writing a book. That pivot led him to discover a passion for writing and eventually build the newsletter. He also recounts a pivotal editorial decision: he killed a critical article about Dutch neobank Bunq after an engineer credited the company for sponsoring his visa and enabling his career, adopting a policy of writing about what works inside companies rather than what seems broken (Orosz, 2026).
 
-- The Pragmatic Engineer newsletter was born from pandemic-era layoffs; Orosz pivoted from a startup idea to writing after discovering his passion for it.
-- A personal story from a Bunq engineer changed Orosz's editorial policy to focus on what works inside companies rather than what seems broken.
-- LeetCode-style interviews likely persist because they filter for candidates willing to tolerate pointless work, even as AI may push companies back to in-person interviews.
-- MCP's success was partly due to Anthropic not being seen as a dominant threat at launch; Google's rival A2A failed for the opposite reason.
-- AI tools can cause skill atrophy; Orosz writes without AI to keep his writing sharp and advises intentionally preserving valued skills.
+- The Pragmatic Engineer's existence is tied to COVID-19 layoffs at Uber, which pushed Orosz to leave and focus on writing.
+- A message from a Bunq engineer changed Orosz's editorial policy: he now writes about what works, not what seems broken.
+- Orosz's only investigative piece on Pollen uncovered unpaid salaries, cancelled health insurance, and a $3.2M double charge, but he decided investigative journalism is not for him.
+- LeetCode-style interviews persist because they self-select for candidates who tolerate pointless work, a quality valued in Big Tech.
+- MCP became a standard partly because Anthropic wasn't a dominant lab at launch; a similar protocol from Google was ignored due to Google's perceived dominance.
+- AI doesn't necessarily make work easier; Orosz avoids AI in writing to prevent skill atrophy while accepting coding skill degradation.
