@@ -32,6 +32,9 @@ jobs:
             bash "$f" || exit 1
           done
 
+      - name: Rules compliance
+        run: bash scripts/check-rules.sh
+
       - name: Lint
         run: python3 -m ruff check .
 

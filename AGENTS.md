@@ -24,6 +24,7 @@ Relevant to all structural work: @docs/agents/architectural-rules.md
 
 For design conventions on implementation work: @docs/agents/design-rules.md
 For Python code conventions (any Python code): @docs/agents/python-rules.md
+For rule enforcement mapping: @docs/agents/compliance.md
 
 ## Global Engineering Standards
 
