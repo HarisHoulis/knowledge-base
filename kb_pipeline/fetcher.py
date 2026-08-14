@@ -23,10 +23,15 @@ ExtractionErrorCallback = Callable[[ExtractionErrorType], None]
 def verify_source_auth(
     source: Source, *, getenv: Callable[[str], Optional[str]] = os.getenv
 ) -> bool:
+    return bool(auth_headers(source, getenv=getenv))
+
+
+def auth_headers(
+    source: Source, *, getenv: Callable[[str], Optional[str]] = os.getenv
+) -> dict[str, str]:
     var = source.cookie_env_var
-    if not var:
-        return False
-    return bool(getenv(var))
+    value = getenv(var) if var else None
+    return {"Cookie": value} if value else {}
 
 
 def fetch_rss(source: Source) -> list[Any]:
