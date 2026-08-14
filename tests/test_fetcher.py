@@ -393,7 +393,9 @@ class TestAuthHeaders:
         assert auth_headers(source) == {}
 
     def test_returns_empty_dict_when_no_cookie_env_var_declared(self):
-        source = Source(id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml")
+        source = Source(
+            id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml"
+        )
         assert auth_headers(source) == {}
 
     def test_getenv_seam_is_injected(self):
