@@ -25,8 +25,8 @@ EXPECTED_KEYS = {
 @pytest.mark.integration
 class TestPipelineIntegration:
     def test_llm_returns_valid_json_from_fixture(self) -> None:
-        if not os.environ.get("DEEPSEEK_API_KEY"):
-            pytest.skip("DEEPSEEK_API_KEY not set")
+        if not os.environ.get("LLM_API_KEY"):
+            pytest.skip("LLM_API_KEY not set")
 
         source = Source(id="test", type="rss", url=str(FIXTURE))
         entries = fetch_rss(source)
@@ -49,8 +49,8 @@ class TestPipelineIntegration:
         assert isinstance(result["sources"], list)
 
     def test_dry_run_writes_no_files(self) -> None:
-        if not os.environ.get("DEEPSEEK_API_KEY"):
-            pytest.skip("DEEPSEEK_API_KEY not set")
+        if not os.environ.get("LLM_API_KEY"):
+            pytest.skip("LLM_API_KEY not set")
 
         source = Source(id="test", type="rss", url=str(FIXTURE))
 

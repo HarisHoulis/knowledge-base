@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Literal
 
-DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
-DEEPSEEK_API_URL = os.environ.get("DEEPSEEK_API_URL", "https://api.deepseek.com/v1")
-DEEPSEEK_MODEL = os.environ.get("DEEPSEEK_MODEL", "deepseek-v4-flash")
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
+LLM_API_URL = os.environ.get("LLM_API_URL", "")
+LLM_MODEL = os.environ.get("LLM_MODEL", "")
 
 KB_PATH = Path(os.environ.get("KB_PATH", str(Path.home() / "knowledge-base")))
 STATE_PATH = Path(

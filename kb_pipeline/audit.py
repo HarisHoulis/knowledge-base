@@ -4,7 +4,7 @@ from typing import Any, Callable, Optional
 
 import requests
 
-from .config import DEEPSEEK_API_KEY, DEEPSEEK_API_URL, DEEPSEEK_MODEL
+from .config import LLM_API_KEY, LLM_API_URL, LLM_MODEL
 
 logger = logging.getLogger(__name__)
 
@@ -58,10 +58,10 @@ or
 
 def _call_llm(prompt: str) -> str:
     r = requests.post(
-        f"{DEEPSEEK_API_URL}/chat/completions",
-        headers={"Authorization": f"Bearer {DEEPSEEK_API_KEY}"},
+        f"{LLM_API_URL}/chat/completions",
+        headers={"Authorization": f"Bearer {LLM_API_KEY}"},
         json={
-            "model": DEEPSEEK_MODEL,
+            "model": LLM_MODEL,
             "messages": [
                 {
                     "role": "system",

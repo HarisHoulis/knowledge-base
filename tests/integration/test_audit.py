@@ -71,18 +71,18 @@ INCORRECT_DATA = {
 
 @pytest.mark.integration
 def test_content_audit_known_correct():
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = os.environ.get("LLM_API_KEY")
     if not api_key:
-        pytest.skip("DEEPSEEK_API_KEY not set")
+        pytest.skip("LLM_API_KEY not set")
     result = content_audit(CORRECT_DATA, CORRECT_SOURCE)
     assert result == {"pass": True}
 
 
 @pytest.mark.integration
 def test_content_audit_known_incorrect():
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = os.environ.get("LLM_API_KEY")
     if not api_key:
-        pytest.skip("DEEPSEEK_API_KEY not set")
+        pytest.skip("LLM_API_KEY not set")
     result = content_audit(INCORRECT_DATA, INCORRECT_SOURCE)
     assert result["pass"] is False
     assert len(result["issues"]) >= 1
@@ -125,18 +125,18 @@ VALID_CLASSIFICATION_FIELDS = {"domain", "subdomain", "concept"}
 
 @pytest.mark.integration
 def test_classification_audit_known_correct():
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = os.environ.get("LLM_API_KEY")
     if not api_key:
-        pytest.skip("DEEPSEEK_API_KEY not set")
+        pytest.skip("LLM_API_KEY not set")
     result = classification_audit(CORRECT_CLASSIFICATION_DATA, COMPOSE_SOURCE)
     assert result == {"pass": True}
 
 
 @pytest.mark.integration
 def test_classification_audit_known_incorrect():
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = os.environ.get("LLM_API_KEY")
     if not api_key:
-        pytest.skip("DEEPSEEK_API_KEY not set")
+        pytest.skip("LLM_API_KEY not set")
     result = classification_audit(INCORRECT_CLASSIFICATION_DATA, COMPOSE_SOURCE)
     assert result["pass"] is False
     assert len(result["issues"]) >= 1
@@ -151,9 +151,9 @@ def test_classification_audit_known_incorrect():
 
 @pytest.mark.integration
 def test_audit_dry_run_leaves_no_drafts():
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    api_key = os.environ.get("LLM_API_KEY")
     if not api_key:
-        pytest.skip("DEEPSEEK_API_KEY not set")
+        pytest.skip("LLM_API_KEY not set")
 
     fixture = Path(__file__).parent.parent / "fixtures" / "simple-rss.xml"
     source = Source(id="test", type="rss", url=str(fixture))
