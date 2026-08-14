@@ -3,12 +3,15 @@ import logging
 import re
 import subprocess
 import time
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable, Optional
 
 from .audit import AuditResult, classification_audit, content_audit
 from .config import SOURCES, Source
 from .fetcher import (
+    ExtractionErrorType,
     extract_text,
     fetch_rss,
     fetch_url_text,
@@ -23,6 +26,40 @@ logger = logging.getLogger(__name__)
 
 
 MAX_RETRIES = 2
+
+
+@dataclass(frozen=True)
+class ExtractionFailure:
+    source_id: str
+    title: str
+    url: str
+    error_type: ExtractionErrorType
+
+
+def _create_gh_issue(title: str, body: str) -> bool:
+    try:
+        subprocess.run(
+            ["gh", "issue", "create", "--title", title, "--body", body],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=30,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        logger.warning("  escalation failed: %s", e)
+        return False
+
+
+def _report_extraction_failures(failures: list[ExtractionFailure]) -> None:
+    day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    title = f"Content extraction errors: {day} ({len(failures)} entries)"
+    body = "\n".join(
+        f"- **{f.source_id}** | {f.title} | {f.url} | `{f.error_type}`"
+        for f in failures
+    )
+    if _create_gh_issue(title, body):
+        logger.info("  extraction failures issue created (%d entries)", len(failures))
 
 
 def _build_audit_feedback_text(
@@ -49,17 +86,8 @@ def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
         f"- **URL:** {url}\n\n"
         f"### Combined audit feedback\n\n```\n{feedback}\n```"
     )
-    try:
-        subprocess.run(
-            ["gh", "issue", "create", "--title", title, "--body", body],
-            capture_output=True,
-            text=True,
-            check=True,
-            timeout=30,
-        )
+    if _create_gh_issue(title, body):
         logger.info("  escalation issue created for %s", entry_path)
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
-        logger.warning("  escalation failed: %s", e)
 
 
 def _extract_youtube_video_id(url: str) -> Optional[str]:
@@ -143,11 +171,13 @@ def run_pipeline(
     transcript_fn: Callable[[str], str] = transcript_youtube,
     fetch_url_text_fn: Callable[[str], str] = fetch_url_text,
     classify_fn: Callable[..., Optional[dict[str, Any]]] = classify_summarize,
+    report_fn: Callable[[list[ExtractionFailure]], None] = _report_extraction_failures,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
     processed: set[str] = set(state["processed_hashes"])
-    stats = {"sources": 0, "seen": 0, "written": 0, "skipped": 0}
+    stats = {"sources": 0, "seen": 0, "written": 0, "skipped": 0, "failed": 0}
+    failures: list[ExtractionFailure] = []
 
     for src in sources:
         logger.info("[%s]", src.id)
@@ -168,6 +198,12 @@ def run_pipeline(
                 continue
 
             text = ""
+            failure_type: Optional[ExtractionErrorType] = None
+
+            def record_failure_type(ftype: ExtractionErrorType) -> None:
+                nonlocal failure_type
+                failure_type = ftype
+
             if src.type == "youtube":
                 video_id = _extract_youtube_video_id(url)
                 if video_id:
@@ -185,7 +221,7 @@ def run_pipeline(
                     )
                     stats["skipped"] += 1
                     continue
-                text = extract_text(content)
+                text = extract_text(content, on_error=record_failure_type)
 
             if (not text or len(text) < 200) and src.type != "youtube":
                 link_url = entry.get("link", "")
@@ -193,7 +229,7 @@ def run_pipeline(
                     logger.info("  link fallback for: %s", entry.get("title", "")[:60])
                     fetched = fetch_url_text_fn(link_url)
                     if fetched:
-                        text = extract_text(fetched)
+                        text = extract_text(fetched, on_error=record_failure_type)
                     else:
                         logger.info(
                             "  link fallback failed for: %s",
@@ -201,6 +237,12 @@ def run_pipeline(
                         )
 
             if not text or len(text) < 200:
+                if not text and failure_type is not None:
+                    failures.append(
+                        ExtractionFailure(
+                            src.id, entry.get("title", ""), url, failure_type
+                        )
+                    )
                 logger.info("  skipping (too short): %s", entry.get("title", "")[:60])
                 stats["skipped"] += 1
                 continue
@@ -242,5 +284,9 @@ def run_pipeline(
     if not dry_run:
         state["processed_hashes"] = list(processed)
         save_state(state)
+
+    stats["failed"] = len(failures)
+    if not dry_run and failures:
+        report_fn(failures)
 
     return stats

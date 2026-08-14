@@ -1,5 +1,8 @@
+import re
+import subprocess
 from pathlib import Path
 from typing import Any, Optional
+from unittest.mock import MagicMock
 
 from kb_pipeline.audit import AuditResult
 from kb_pipeline.config import SOURCES, Source
@@ -438,3 +441,339 @@ def test_bytebytego_source_has_cookie_env_var() -> None:
     src = next((s for s in SOURCES if s.id == "bytebytego"), None)
     assert src is not None
     assert src.cookie_env_var == "BYTEBYTEGO_SUBSTACK_COOKIE"
+
+
+def _rss_entry(
+    link: str, title: str, content: str = "<p>some html</p>"
+) -> dict[str, Any]:
+    from feedparser import FeedParserDict
+
+    return FeedParserDict(
+        {"link": link, "title": title, "content": [{"value": content}]}
+    )
+
+
+def _make_rss_fetch_stub(entries: list[dict[str, Any]]) -> Any:
+    def mock_fetch(src: Source) -> list[Any]:
+        return entries
+
+    return mock_fetch
+
+
+def _make_report_stub() -> tuple[list[list[Any]], Any]:
+    reported: list[list[Any]] = []
+
+    def report_stub(failures: list[Any]) -> None:
+        reported.append(failures)
+
+    return reported, report_stub
+
+
+def _make_failing_extract(error_type: str) -> Any:
+    def fake_extract(html: str, *, extract_fn: Any = None, on_error: Any = None) -> str:
+        if on_error is not None:
+            on_error(error_type)
+        return ""
+
+    return fake_extract
+
+
+def _patch_live_run(monkeypatch: Any) -> None:
+    monkeypatch.setattr("kb_pipeline.pipeline.save_state", lambda state: None)
+    monkeypatch.setattr("kb_pipeline.pipeline.write_entry", lambda result, url: None)
+
+
+def _patch_gh_run(monkeypatch: Any, calls: list[list[str]]) -> None:
+    def fake_run(cmd: list[str], **kwargs: Any) -> MagicMock:
+        calls.append(cmd)
+        return MagicMock(stdout="", stderr="")
+
+    monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+
+class TestRunPipelineExtractionFailures:
+    def test_live_run_reports_all_failures_once(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.extract_text", _make_failing_extract("exception")
+        )
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub(
+                [
+                    _rss_entry("https://example.com/a", "Alpha"),
+                    _rss_entry("https://example.com/b", "Beta"),
+                ]
+            ),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert stats["failed"] == 2
+        assert len(reported) == 1
+        failures = reported[0]
+        assert len(failures) == 2
+        assert failures[0].source_id == "test"
+        assert failures[0].title == "Alpha"
+        assert failures[0].url == "https://example.com/a"
+        assert failures[0].error_type == "exception"
+        assert failures[1].title == "Beta"
+        assert failures[1].error_type == "exception"
+
+    def test_silent_empty_final_result_is_recorded_as_empty(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.extract_text", _make_failing_extract("empty")
+        )
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert stats["failed"] == 1
+        failures = reported[0]
+        assert failures[0].title == "Alpha"
+        assert failures[0].url == "https://example.com/a"
+        assert failures[0].error_type == "empty"
+
+    def test_transient_empty_recovered_by_fallback_not_recorded(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        calls: list[str] = []
+
+        def fake_extract(
+            html: str, *, extract_fn: Any = None, on_error: Any = None
+        ) -> str:
+            calls.append(html)
+            if on_error is not None:
+                on_error("empty")
+            if len(calls) == 1:
+                return ""
+            return SAMPLE_TEXT * 20
+
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "<p>recovered via link</p>",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert len(reported) == 0
+        assert stats["failed"] == 0
+        assert len(calls) == 2
+
+    def test_short_fallback_recovery_is_not_recorded_as_failure(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        calls: list[str] = []
+
+        def fake_extract(
+            html: str, *, extract_fn: Any = None, on_error: Any = None
+        ) -> str:
+            calls.append(html)
+            if on_error is not None:
+                on_error("empty")
+            if len(calls) == 1:
+                return ""
+            return "too short to ingest"
+
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr("kb_pipeline.pipeline.extract_text", fake_extract)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "<p>recovered via link</p>",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert reported == []
+        assert stats["failed"] == 0
+        assert stats["skipped"] >= 1
+
+    def test_live_run_with_zero_failures_creates_no_report(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        _patch_live_run(monkeypatch)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub(
+                [
+                    _rss_entry(
+                        "https://example.com/a",
+                        "Alpha",
+                        content="A plain text body that is long enough to be "
+                        "considered a usable extraction result without triggering "
+                        "the link fallback. " * 10,
+                    )
+                ]
+            ),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert reported == []
+        assert stats["failed"] == 0
+        assert stats["written"] == 1
+
+    def test_dry_run_collects_failures_but_creates_no_report(self, monkeypatch):
+        from kb_pipeline.pipeline import run_pipeline
+
+        reported, report_stub = _make_report_stub()
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.extract_text", _make_failing_extract("exception")
+        )
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
+        )
+
+        source = Source(id="test", type="rss", url="https://example.com/feed")
+
+        stats = run_pipeline(
+            dry_run=True,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=stub_classify_ok,
+            report_fn=report_stub,
+        )
+
+        assert reported == []
+        assert stats["failed"] == 1
+
+
+class TestReportExtractionFailures:
+    def _failure(self) -> Any:
+        from kb_pipeline.pipeline import ExtractionFailure
+
+        return ExtractionFailure(
+            "bytebytego", "The Paywalled Post", "https://example.com/1", "exception"
+        )
+
+    def test_issue_title_matches_format(self, monkeypatch):
+        from kb_pipeline.pipeline import _report_extraction_failures
+
+        calls: list[list[str]] = []
+        _patch_gh_run(monkeypatch, calls)
+
+        _report_extraction_failures([self._failure(), self._failure()])
+
+        assert len(calls) == 1
+        args = calls[0]
+        assert args[0] == "gh"
+        assert args[1] == "issue"
+        assert args[2] == "create"
+        title = args[args.index("--title") + 1]
+        assert re.fullmatch(
+            r"Content extraction errors: \d{4}-\d{2}-\d{2} \(2 entries\)", title
+        )
+
+    def test_issue_body_shows_source_title_url_and_failure_type(self, monkeypatch):
+        from kb_pipeline.pipeline import ExtractionFailure, _report_extraction_failures
+
+        calls: list[list[str]] = []
+        _patch_gh_run(monkeypatch, calls)
+
+        _report_extraction_failures(
+            [
+                ExtractionFailure(
+                    "bytebytego",
+                    "The Paywalled Post",
+                    "https://example.com/1",
+                    "exception",
+                ),
+                ExtractionFailure(
+                    "jake-wharton", "Kotlin Bits", "https://example.com/2", "empty"
+                ),
+            ]
+        )
+
+        body = calls[0][calls[0].index("--body") + 1]
+        lines = body.splitlines()
+        assert len(lines) == 2
+        assert "bytebytego" in lines[0]
+        assert "The Paywalled Post" in lines[0]
+        assert "https://example.com/1" in lines[0]
+        assert "exception" in lines[0]
+        assert "jake-wharton" in lines[1]
+        assert "Kotlin Bits" in lines[1]
+        assert "https://example.com/2" in lines[1]
+        assert "empty" in lines[1]
+
+    def test_gh_failure_is_logged_not_raised(self, monkeypatch, caplog):
+        from kb_pipeline.pipeline import _report_extraction_failures
+
+        def fake_run(cmd, **kwargs):
+            raise subprocess.CalledProcessError(1, cmd)
+
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+        caplog.set_level("WARNING")
+
+        _report_extraction_failures([self._failure()])
+
+        assert "escalation failed" in caplog.text
+
+    def test_gh_missing_is_logged_not_raised(self, monkeypatch, caplog):
+        from kb_pipeline.pipeline import _report_extraction_failures
+
+        def fake_run(cmd, **kwargs):
+            raise FileNotFoundError("gh not installed")
+
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+        caplog.set_level("WARNING")
+
+        _report_extraction_failures([self._failure()])
+
+        assert "escalation failed" in caplog.text
