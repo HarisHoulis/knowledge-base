@@ -7,15 +7,15 @@ sources:
   - title: "CI/CD with Robert Erez"
     url: "https://newsletter.pragmaticengineer.com/p/cicd-with-robert-erez"
     author: "Gergely Orosz"
-    date: "2026-06-17"
+    date: "Wed, 17 Jun 2026 16:41:01 GMT"
 ---
 
 # CI/CD with Robert Erez
 
-The conversation also distinguishes continuous deployment from continuous delivery, arguing that continuous delivery is often more practical because it validates the deployment process and allows teams to choose when to release. Feature flags are highlighted as a better safety net than rollbacks, though they require discipline to avoid accumulating obsolete toggles. At scale, a Git repository can become a bottleneck for thousands of Kubernetes clusters, and some major institutions remain on-premises for control. The episode also covers the rise of platform teams, the shift toward ephemeral environments, and how AI is changing CI/CD priorities from speed to risk reduction.
+In this Pragmatic Engineer episode, Gergely Orosz interviews Robert Erez, a principal engineer at Octopus Deploy and former Skype colleague, about deploying software safely and efficiently at scale. They discuss Kubernetes, GitOps, platform engineering, progressive delivery, feature flags, cloud development environments, and how AI is reshaping CI/CD workflows. The conversation draws on Rob's experience with large-scale deployments and release processes, offering practical tradeoffs rather than one-size-fits-all advice (source: CI/CD with Robert Erez, The Pragmatic Engineer).
 
-- Roll forward, not back: fixing a bad release with a new version is safer than reverting when schemas are involved.
-- GitOps isn't inherently Git: the four principles don't require Git, and forcing secrets into repos is harmful.
-- Continuous delivery beats continuous deployment for most teams: it validates the pipeline and retains release flexibility.
-- Feature flags stop bleeding faster than rollbacks, but toggles need regular cleanup to avoid technical debt.
-- AI shifts CI/CD from optimizing for developer time to optimizing for safety, favoring more thorough testing.
+- Roll forward, never backward: for stateful systems, a failed v2 should be followed by v3 with the fix, not a rollback to v1.
+- GitOps isn't actually about Git: its four pillars (declarative, versioned/immutable, pulled, continuously reconciled) don't require Git, yet the industry dogmatically crams everything into a repo.
+- Continuous delivery is often more practical than continuous deployment: shipping every change to prod is frequently overkill, and validating the deployment process itself has more value.
+- Feature flags are a better safety net than rollbacks, but they can become addictive and require regular cleanup to avoid a hygiene crisis.
+- AI shifts the CI/CD focus from speed to risk: when AI agents write most code, slower and more thorough tests become more valuable than shaving minutes off build times.

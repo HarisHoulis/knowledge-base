@@ -12,8 +12,9 @@ sources:
 
 # My /teach skill is still insane
 
-The video demonstrates a /teach skill that enables personalized, tailored learning of new concepts. It claims the skill helps users understand complex topics like land surveying, Rubik's Cubes, and development techniques through interactive explanations and quiz questions. The approach appears to leverage AI to adapt teaching to the user's needs, making it a versatile tool for mastering unfamiliar subjects.
+The /teach skill is an AI-powered tool designed to help users master new concepts through personalized, tailored learning experiences. It adapts to the learner's pace and style, offering interactive explanations and quiz questions to reinforce understanding. The skill can be applied to a wide range of topics, from technical fields like land surveying and software development to recreational challenges like solving a Rubik's Cube. By leveraging AI, the /teach skill makes complex subjects more accessible and engaging, providing a customized alternative to traditional learning methods.
 
-- The /teach skill provides personalized learning experiences.
-- It covers diverse topics, including land surveying, Rubik's Cubes, and development techniques.
-- Interactive explanations and quiz questions are used to reinforce understanding.
+- The /teach skill delivers personalized learning for any concept.
+- It uses interactive explanations and quiz questions to reinforce knowledge.
+- Examples include land surveying, Rubik's Cubes, and development techniques.
+- The skill is available via a link and updates are shared through a dedicated site.

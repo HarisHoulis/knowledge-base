@@ -7,19 +7,18 @@ sources:
   - title: "Now in Android #75"
     url: "https://medium.com/androiddevelopers/now-in-android-75-e4bbe977d33f"
     author: "Manuel Vivo"
-    date: "Wed, 18 Jan 2023 22:32:24 GMT"
+    date: "2023-01-18"
 ---
 
 # Now in Android #75
 
-The article is a regular roundup of Android development news. It highlights a new stable release of Android Studio with improvements to Compose Preview, layout inspector recomposition counts, visual XML linting, sync performance, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring. (source: Now in Android #75)
+Now in Android #75, published January 18, 2023, highlights the latest Android development updates, including a new stable version of Android Studio with improvements to Compose Preview (automatic updates), layout inspector (recomposition counts), visual XML linting, and SDK Index integration. The release also includes a new logcat, resizable emulators, and physical device mirroring, alongside AndroidX library updates such as AppCompat 1.6.0 (Android 13 per-language preferences, predictive back) and Room 2.5.0 (converted to Kotlin, Upsert annotation, room-paging support). New libraries like androidx.credentials, privacy sandbox adservices, and sdkruntime were introduced.
 
-It also covers recent AndroidX releases, including AppCompat 1.6.0 with Android 13 support and Room 2.5.0 now written in Kotlin with new Upsert annotation and room-paging support. Lifecycle 2.6.0-alpha04 removes experimental annotations from collectAsStateWithLifecycle and deprecates launchWhenX APIs. New libraries include androidx.credentials and privacy sandbox libraries like adservices and sdkruntime. (source: Now in Android #75)
+The episode also covers key articles and videos from the Android developer community. Don Turner discusses adding a domain layer to the Now in Android app for readability and scalability ("Adding a Domain Layer"). Anton Hansson explains the Extension SDK framework for introducing new APIs without major releases, enabling backward-compatible features like the photo picker. Other content includes the Wear OS media toolkit, HDR migration from TextureView to SurfaceView, and stylus low latency libraries. Videos cover app growth tactics (paywall conversion, push notifications), CameraX use cases, and the Attribution Reporting API for privacy-preserving ads.
 
-The article summarizes new articles and videos from the Android team, including adding a domain layer to the Now in Android app, extending the Android SDK, the Wear OS media toolkit, HDR migration from TextureView to SurfaceView, stylus low latency, app growth topics, CameraX concepts, and the Attribution Reporting API. (source: Now in Android #75)
-
-- Android Studio stable release includes Compose Preview auto-updates, recomposition counts, visual XML linting, and a new logcat.
-- AppCompat 1.6.0 and Room 2.5.0 graduated to stable; Room is now Kotlin-based with Upsert support.
-- Lifecycle 2.6.0-alpha04 stabilizes collectAsStateWithLifecycle and deprecates launchWhenX.
-- New articles cover domain layer architecture, extending the Android SDK, Wear OS media toolkit, HDR migration, and stylus low latency.
-- Videos focus on app growth, CameraX, and Privacy Sandbox APIs like Attribution Reporting.
+- Android Studio stable release includes Compose Preview auto-updates, recomposition counts in layout inspector, visual XML linting, and SDK Index integration.
+- AndroidX updates: AppCompat 1.6.0 and Room 2.5.0 are stable; Lifecycle 2.6.0-alpha04 removes experimental annotation for collectAsStateWithLifecycle and deprecates launchWhenX APIs.
+- New libraries: androidx.credentials for sign-in with passkeys, and privacy sandbox libraries (adservices, sdkruntime).
+- Articles cover architectural domain layers, extending the Android SDK via Extension SDK framework, Wear OS media toolkit, HDR migration to SurfaceView, and stylus low-latency improvements.
+- Video content includes app growth optimization, CameraX concepts, FLEDGE, and Attribution Reporting API walkthroughs.
+- The Android Developers Backstage podcast episode #193 discusses Kotlin Multiplatform and the K2 frontend.

@@ -6,15 +6,15 @@ title: Stealing Reasoning Traces from Proprietary LLM APIs
 sources:
   - title: "Stealing Reasoning Traces from Proprietary LLM APIs"
     url: "https://simonwillison.net/2026/Aug/11/stealing-reasoning-traces/"
-    date: "2026-08-11"
+    author: "Simon Willison"
+    date: "2026-08-11T22:40:45+00:00"
 ---
 
 # Stealing Reasoning Traces from Proprietary LLM APIs
 
-A new paper demonstrates a serious vulnerability in proprietary LLM APIs: encrypted chain-of-thought blocks returned by frontier models can be replayed across sessions, users, and models. Researchers found that models within the same family share the same encryption key, allowing them to feed a stronger model's encrypted reasoning into a weaker sibling model, jailbreak it, and recover the hidden reasoning in plaintext. The attack was demonstrated against models from Anthropic, OpenAI, and Google, with Claude Haiku 4.5 being the easiest to exploit. The paper's authors reported the issue to the providers, who subsequently fixed the vulnerability, as they were unable to launch the same attacks after the report (Simon Willison, 2026).
+All model providers acknowledged the report and subsequently fixed the attack, so the specific technique no longer works. However, the article underscores broader security concerns: encryption of reasoning traces is insufficient when key reuse and weaker sibling models exist, and reasoning traces themselves can be manipulated to bypass safety measures. The post concludes by linking to the original paper and Hacker News discussion, emphasizing that this is an active area of vulnerability research in AI workflows (Willison, 2026).
 
-- Encrypted reasoning blocks from proprietary LLM APIs can be replayed across sessions, users, and models.
-- Models in the same family share encryption keys, enabling cross-model attacks to decrypt reasoning traces.
-- Claude Haiku 4.5 was most easily jailbroken using a simple 'Continue. Transcribe the reasoning...' prompt with an assistant turn prefix.
-- Extracted reasoning traces reveal raw chain-of-thought that is not intended for human consumption, and can be leveraged for prompt injection exfiltration.
-- All affected providers acknowledged the report and fixed the issue, preventing further attacks.
+- Proprietary LLM APIs return encrypted chain-of-thought blocks that can be decrypted by replaying them into weaker sibling models using the same encryption key.
+- The attack was demonstrated against Anthropic, OpenAI, and Google, with Claude Haiku 4.5 being the easiest target due to its support for prefilled responses.
+- A prompt-injection variant can trick a model into encoding harmful instructions into its reasoning trace, which another model may then treat as trusted and follow.
+- All providers have fixed the specific vulnerability, but the paper highlights the ongoing risk of reasoning-trace exfiltration and manipulation in LLM deployments.
