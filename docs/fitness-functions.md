@@ -26,8 +26,8 @@ flowchart TD
     SIZE --> VIOLATIONS
     VIOLATIONS -->|any| FAIL[print fitness: messages<br/>exit 1 = build fails]
     VIOLATIONS -->|none| PASS[exit 0]
-    RUN -.--|human only, never CI| UM[--update-matrix<br/>re-seeds modules]
-    RUN -.--|human only, never CI| UB[--update-baseline<br/>re-seeds size_limits]
+    RUN -.->|"human only, never CI"| UM[--update-matrix<br/>re-seeds modules]
+    RUN -.->|"human only, never CI"| UB[--update-baseline<br/>re-seeds size_limits]
     UM -.-> LOAD
     UB -.-> LOAD
 ```
