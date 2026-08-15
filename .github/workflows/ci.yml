@@ -35,6 +35,9 @@ jobs:
       - name: Rules compliance
         run: bash scripts/check-rules.sh
 
+      - name: Fitness functions
+        run: python3 scripts/check-fitness.py
+
       - name: Lint
         run: python3 -m ruff check .
 
