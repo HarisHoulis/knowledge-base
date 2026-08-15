@@ -1,1 +1,78 @@
-{"pipeline.py_lines": 359}
+{
+  "allowed_edges": [
+    [
+      "audit",
+      "config"
+    ],
+    [
+      "fetcher",
+      "config"
+    ],
+    [
+      "llm",
+      "config"
+    ],
+    [
+      "state",
+      "config"
+    ],
+    [
+      "writer",
+      "config"
+    ],
+    [
+      "pipeline",
+      "audit"
+    ],
+    [
+      "pipeline",
+      "config"
+    ],
+    [
+      "pipeline",
+      "fetcher"
+    ],
+    [
+      "pipeline",
+      "llm"
+    ],
+    [
+      "pipeline",
+      "state"
+    ],
+    [
+      "pipeline",
+      "writer"
+    ],
+    [
+      "cli",
+      "pipeline"
+    ],
+    [
+      "__main__",
+      "cli"
+    ]
+  ],
+  "modules": [
+    "__main__",
+    "audit",
+    "cli",
+    "config",
+    "fetcher",
+    "llm",
+    "pipeline",
+    "state",
+    "writer"
+  ],
+  "size_limits": {
+    "config": 84,
+    "audit": 127,
+    "llm": 81,
+    "cli": 45,
+    "pipeline": 359,
+    "writer": 72,
+    "__main__": 3,
+    "fetcher": 243,
+    "state": 18
+  }
+}

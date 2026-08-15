@@ -25,7 +25,7 @@ Two tiers:
 | design #3 High cohesion, low coupling | Review | auto-code-review Standards axis |
 | design #4 Reusable + autonomous components | Review | auto-code-review Standards axis |
 | design #5 Prefer weaker connascence | Review | auto-code-review Standards axis |
-| design #6 Structural decay alert | CI + Review | `check-fitness.py` `pipeline.py` size baseline; auto-code-review Standards axis |
+| design #6 Structural decay alert | CI + Review | `check-fitness.py` per-module `size_limits`; auto-code-review Standards axis |
 | python #1 Interpreter | CI | `check-rules.sh` bare-`python` scan |
 | python #2 Typing | CI | `python3 -m mypy .` |
 | python #3 Lint defaults | CI | `python3 -m ruff check .` + `ruff format --check` |
@@ -37,7 +37,8 @@ Two tiers:
 
 ## Notes
 
-- **Fitness-function baselines** — `check-fitness.py` guards the `kb_pipeline/` intra-package dependency matrix (full allow-list, any unlisted edge fails) and a `pipeline.py` line-count baseline in `scripts/baselines.json` with a +10% tolerance; the baseline is bumped explicitly via `--update-baseline`. The matrix checks dependency direction only — cohesion, minimum public surface, and other structural decays stay on the Review axis.
+- **Fitness-function baselines** — `check-fitness.py` guards `kb_pipeline/` against `scripts/baselines.json` on three axes: the intra-package dependency matrix (`allowed_edges`, full allow-list, any unlisted edge fails), module-set coverage (the `*.py` modules minus `__init__.py` must equal `modules`; new/renamed/deleted modules fail), and per-module line counts (`size_limits`, +10% tolerance). The matrix checks dependency direction only — cohesion, minimum public surface, and other structural decays stay on the Review axis.
+- **Baseline rituals** — `--update-matrix` re-seeds only `modules`; `--update-baseline` re-seeds only `size_limits`; CI never passes either flag. Neither flag touches `allowed_edges`, so a run after a forbidden edge can never auto-approve it — a legitimate new edge is a hand-edited entry in `allowed_edges`, reviewed in the PR diff. New module workflow: write the module, let the check fail (coverage + edge), run `--update-matrix` (records the module, does not clear the edge), hand-add the edge to `allowed_edges`, commit `scripts/baselines.json` in the same change.
 - **AGENTS.md `@reference` resolution** — extra CI check in `check-rules.sh`: every `@path` under the External File Loading block must resolve to an existing file.
 - **python-rules #3's cited config values** are deliberately **not** CI-checked as values; the ruff gate itself enforces them.
 - **Bare-`python` scan scope** — scans executable/config text (`scripts/`, `tests/`, `.github/workflows/`, `AGENTS.md`, `pyproject.toml`), not `docs/` prose: the rules themselves and fenced code snippets describe bare `python` without invoking it.

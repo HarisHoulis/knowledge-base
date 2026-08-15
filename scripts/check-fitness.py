@@ -13,24 +13,6 @@ BASELINE_PATH = ROOT / "scripts" / "baselines.json"
 
 SIZE_TOLERANCE = 1.1
 
-ALLOWED_EDGES = frozenset(
-    {
-        ("audit", "config"),
-        ("fetcher", "config"),
-        ("llm", "config"),
-        ("state", "config"),
-        ("writer", "config"),
-        ("pipeline", "audit"),
-        ("pipeline", "config"),
-        ("pipeline", "fetcher"),
-        ("pipeline", "llm"),
-        ("pipeline", "state"),
-        ("pipeline", "writer"),
-        ("cli", "pipeline"),
-        ("__main__", "cli"),
-    }
-)
-
 
 def collect_edges(package_dir: Path) -> list[tuple[str, str]]:
     edges: list[tuple[str, str]] = []
@@ -46,51 +28,101 @@ def collect_edges(package_dir: Path) -> list[tuple[str, str]]:
     return edges
 
 
-def check_dependencies(edges: list[tuple[str, str]]) -> list[str]:
+def module_names(package_dir: Path) -> list[str]:
+    return sorted(
+        path.stem for path in package_dir.glob("*.py") if path.stem != "__init__"
+    )
+
+
+def line_counts(package_dir: Path) -> dict[str, int]:
+    return {
+        path.stem: path.read_text().count("\n")
+        for path in sorted(package_dir.glob("*.py"))
+        if path.stem != "__init__"
+    }
+
+
+def check_dependencies(
+    edges: list[tuple[str, str]], allowed_edges: set[tuple[str, str]]
+) -> list[str]:
     return [
-        f"forbidden edge: {source} -> {target}"
+        f"forbidden edge: {source} -> {target} - edit `allowed_edges` "
+        "in `scripts/baselines.json`"
         for source, target in edges
-        if (source, target) not in ALLOWED_EDGES
+        if (source, target) not in allowed_edges
     ]
 
 
-def pipeline_lines(package_dir: Path) -> int:
-    return (package_dir / "pipeline.py").read_text().count("\n")
+def check_coverage(modules: list[str], config_modules: list[str]) -> list[str]:
+    on_disk = set(modules)
+    recorded = set(config_modules)
+    messages = [
+        f"module `{name}` not in coverage set - run `--update-matrix`"
+        for name in sorted(on_disk - recorded)
+    ]
+    messages += [
+        f"module `{name}` in matrix but missing from package - run `--update-matrix`"
+        for name in sorted(recorded - on_disk)
+    ]
+    return messages
 
 
-def check_size(package_dir: Path, baseline_lines: int) -> list[str]:
-    lines = pipeline_lines(package_dir)
-    limit = baseline_lines * SIZE_TOLERANCE
-    if lines > limit:
-        return [
-            f"pipeline.py size regression: {lines} lines exceeds baseline "
-            f"{baseline_lines} x {SIZE_TOLERANCE} = {limit:.1f}"
-        ]
-    return []
+def check_size(counts: dict[str, int], size_limits: dict[str, int]) -> list[str]:
+    messages = []
+    for name, baseline in size_limits.items():
+        lines = counts.get(name, 0)
+        limit = baseline * SIZE_TOLERANCE
+        if lines > limit:
+            messages.append(
+                f"{name}.py size regression: {lines} lines exceeds baseline "
+                f"{baseline} x {SIZE_TOLERANCE} = {limit:.1f}"
+            )
+    return messages
 
 
 def run(
-    package_dir: Path, baseline_path: Path, *, update_baseline: bool = False
+    package_dir: Path,
+    baseline_path: Path,
+    *,
+    update_matrix: bool = False,
+    update_baseline: bool = False,
 ) -> list[str]:
-    violations = check_dependencies(collect_edges(package_dir))
+    config = json.loads(baseline_path.read_text())
+    violations = check_dependencies(
+        collect_edges(package_dir), {tuple(e) for e in config["allowed_edges"]}
+    )
+    if update_matrix:
+        config["modules"] = module_names(package_dir)
+    else:
+        violations += check_coverage(module_names(package_dir), config["modules"])
     if update_baseline:
-        baseline_path.write_text(
-            json.dumps({"pipeline.py_lines": pipeline_lines(package_dir)}) + "\n"
-        )
-        return violations
-    baseline = json.loads(baseline_path.read_text())
-    return violations + check_size(package_dir, baseline["pipeline.py_lines"])
+        config["size_limits"] = line_counts(package_dir)
+    else:
+        violations += check_size(line_counts(package_dir), config["size_limits"])
+    if update_matrix or update_baseline:
+        baseline_path.write_text(json.dumps(config, indent=2) + "\n")
+    return violations
 
 
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
+        "--update-matrix",
+        action="store_true",
+        help="record the current kb_pipeline module set as the coverage baseline",
+    )
+    parser.add_argument(
         "--update-baseline",
         action="store_true",
-        help="record the current pipeline.py line count as the new baseline",
+        help="record the current kb_pipeline line counts as the size baselines",
     )
     args = parser.parse_args(argv)
-    violations = run(PACKAGE_DIR, BASELINE_PATH, update_baseline=args.update_baseline)
+    violations = run(
+        PACKAGE_DIR,
+        BASELINE_PATH,
+        update_matrix=args.update_matrix,
+        update_baseline=args.update_baseline,
+    )
     for message in violations:
         print(f"fitness: {message}")
     return 1 if violations else 0
