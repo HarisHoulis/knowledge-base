@@ -1,0 +1,10 @@
+{
+  "name": "knowledge-base",
+  "private": true,
+  "scripts": {
+    "verify:mermaid": "mmdc -i docs/fitness-functions.md -o /tmp/mermaid-out/fitness.svg"
+  },
+  "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.16.0"
+  }
+}
