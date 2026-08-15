@@ -11,13 +11,14 @@ sources:
 
 # Intermediate collection avoidance
 
-Kotlin's collection extension functions make data transformation easy, but chaining functions like `map` and `joinToString` creates intermediate collections and extra iterators that waste memory and CPU. The article shows that IDE warnings can guide developers to fused operations, such as `users.joinToString() { it.name }`, which performs the mapping during string construction and eliminates the intermediate collection entirely.
+The article from Jake Wharton shows how to avoid intermediate collections in Kotlin collection chains. For example, `users.map { it.name }.joinToString()` can be replaced with `users.joinToString() { it.name }`, which is shorter and faster because the mapping happens during string construction, eliminating an extra iterator and intermediate list. The IntelliJ IDEA weak warning suggests this simplification.
 
-For array or pre-sized list creation, the same principle applies. Instead of `users.map { it.name }.toTypedArray()`, using `Array(users.size) { users[it].name }` substitutes an indexed loop for the iterator and intermediate collection. This pattern is also available for primitive arrays (e.g., `IntArray`, `DoubleArray`) and `MutableList` initializers, enabling efficient element derivation from a source with random access.
+Similar fused operations exist for arrays and pre-sized lists. Instead of `users.map { it.name }.toTypedArray()`, one can use `Array(users.size) { users[it].name }`, and for a list, `MutableList(users.size) { users[it].name }`. These use indexed loops instead of an iterator and intermediate collection, reducing overhead.
 
-Benchmarks included in the article show significant improvements: the fused lambda forms are faster and allocate fewer bytes. However, this technique relies on random-access sources; using a linked or persistent list would degrade performance. Therefore, it is most appropriate in internal library code where the source list is controlled.
+The author cautions that these techniques are only efficient when the source list supports random access; for linked or persistent lists, performance degrades. Therefore, they are best used in internal library code where the list type is controlled. Benchmarks in the article show significant speedups and reduced allocations for the lambda initializer variants compared to the `map`-based approaches.
 
-- Use `joinToString` with a transform lambda to avoid intermediate `map` collections.
-- Initialize arrays and pre-sized lists with lambda-based constructors like `Array(size) { ... }` to use indexed loops.
-- Only apply the indexed-loop pattern when the source supports random access, or performance will suffer.
-- The fused operations are both shorter and faster, and benchmarks show lower memory allocation.
+- Use `joinToString { }` with a transformation lambda instead of `map` then `joinToString()` to avoid an intermediate collection.
+- For arrays, use `Array(size) { ... }` or primitive variants (e.g., `IntArray`) instead of `map` and `toTypedArray()`.
+- For pre-sized lists, use `MutableList(size) { ... }` to initialize elements from an index or another random-access source.
+- These optimizations require random access to the source list; avoid them for linked or persistent structures.
+- Benchmarks show lambda initialization is faster and yields lower memory allocation than `map` followed by conversion.

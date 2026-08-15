@@ -2,7 +2,7 @@
 domain: ai-workflows
 subdomain: loop-engineering
 concept: loop-engineering
-title: What is Loop Engineering?
+title: What is “loop engineering?”
 sources:
   - title: "What is “loop engineering?”"
     url: "https://newsletter.pragmaticengineer.com/p/what-is-loop-engineering"
@@ -10,12 +10,16 @@ sources:
     date: "2026-07-14"
 ---
 
-# What is Loop Engineering?
+# What is “loop engineering?”
 
-Loop engineering is an emerging practice where developers design and run agent loops instead of writing individual prompts. The term gained traction after Boris Cherny of Anthropic stated, 'I don't prompt Claude anymore. I have loops running that prompt Claude and figuring out what to do. My job is to write loops.' Addy Osmani similarly described it as 'replacing yourself as the person who prompts the agent. You design the system that does it instead' (Orosz, 2026). The approach builds on the 'Ralph loop,' a technique named after a Simpsons character, where a Bash loop repeatedly feeds an agent a prompt until a goal is achieved. Geoffrey Huntley, who popularized Ralph loops, noted that senior engineering expertise is still required: 'There is no way this is possible without senior expertise guiding Ralph' (Orosz, 2026).
+Loop engineering is an emerging practice in AI-assisted development where engineers design and manage loops that automatically prompt AI agents, rather than writing individual prompts. The term gained prominence after Boris Cherny of Anthropic stated, “My job is to write loops,” and was popularized by the “Ralph loop” technique, a Bash loop that repeatedly feeds a prompt to an AI coding agent until a goal is achieved (Orosz, 2026). This approach abstracts the orchestration of repeated agent runs, allowing developers to set durable objectives and let the agent iterate autonomously.
 
-- Loop engineering replaces one-off prompting with designing persistent agent loops that work toward a goal.
-- The 'Ralph loop' — a Bash loop restarting an agent with a fresh context window — is the conceptual origin, driven by context-window limitations.
-- By mid-2026, major coding harnesses (Codex, Claude Code, Hermes) shipped /goal and /loop commands that automate the loop, making the technique a primitive.
-- Common developer use cases include triggers and cron jobs: opening PRs for new issues, fixing flaky tests, triaging outages, and running nightly end-to-end tests.
-- Critics point to high token costs, agent drift, and the possibility that looping was a temporary hack until tooling caught up.
+By mid-2026, major coding harnesses such as Codex, Hermes, and Claude Code had shipped native /goal commands that formalize the Ralph loop into a single persistent objective. These commands automatically keep the agent working until a completion condition is met, managing context, state, and subagents behind the scenes. This shift makes loop engineering accessible to a broader audience, reducing the need for custom scripting (Orosz, 2026).
+
+Real-world applications of loop engineering fall largely into two categories: event-driven triggers and scheduled cron jobs. Examples include automatically opening PRs for new Sentry issues, fixing flaky tests, triaging incidents, and babysitting nightly end-to-end test runs. However, some developers report disappointment, citing agent drift and high token costs. Distinguished engineer Max Kanat-Alexander suggests loops may have been a temporary hack while tooling caught up, and many engineers may find more value in understanding context windows than in deep loop engineering (Orosz, 2026).
+
+- Loop engineering shifts developers from prompting agents to designing systems of loops that prompt agents automatically.
+- The Ralph loop—a simple Bash loop re-running an agent with a goal—is the conceptual origin of the practice.
+- Major AI harnesses now support /goal commands that natively implement persistent, autonomous loops.
+- Common use cases include event-triggered automations and scheduled jobs, such as opening PRs or fixing flaky tests.
+- Critics note issues like agent drift, high token costs, and the possibility that loops are a temporary workaround for immature tooling.

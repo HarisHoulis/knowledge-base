@@ -12,10 +12,9 @@ sources:
 
 # Lecture 13: Spanner
 
-Physically, Spanner shards data by key and replicates each shard across multiple data centers using a Paxos variant with leaders, similar to Raft. Clients are typically web servers within the data centers, and each Paxos group manages the replicas of a given shard [1].
+Spanner is Google's distributed database that provides distributed transactions over data replicated across data centers, a rare capability in production systems. It uses two-phase commit over Paxos-replicated participants to avoid the classic problem of a crashed coordinator blocking all transactions, and it uses synchronized time (TrueTime) to enable external consistency and efficient read-only transactions. The system was motivated by the needs of Google's advertising business, which required sharding across many servers and transactions spanning multiple shards, with a workload dominated by read-only operations. Spanner's architecture shards data by key and replicates each shard across multiple data centers using a Paxos-based protocol similar to Raft with leaders, ensuring both fault tolerance and data locality.
 
-- Spanner provides distributed transactions and external consistency across globally distributed data.
-- Two-phase commit is made fault-tolerant by running participants on Paxos replicated groups.
-- Synchronized time (TrueTime) enables efficient, lock-free read-only transactions.
-- The motivating workload was Google's advertising system, dominated by read-only transactions.
-- Data is sharded by key and replicated across data centers via Paxos groups.
+- Two-phase commit is run over Paxos-replicated participants so that the coordinator is replicated and a single crash does not block distributed transactions.
+- TrueTime, a synchronized-clock mechanism with bounded uncertainty, is used to provide external consistency and support lock-free read-only transactions.
+- Spanner shards data by key and replicates each shard across multiple data centers using a Paxos-based replication protocol, balancing performance and fault tolerance.
+- The design was driven by Google's advertising database requirements, where cross-shard transactions and read-heavy workloads were common.

@@ -12,14 +12,10 @@ sources:
 
 # Thoughts on Motivation and My 40-Year Career
 
-Charity Majors recounts her unconventional journey from a sheltered fundamentalist upbringing in rural Idaho to a successful career in tech. Leaving home at 15, she forged her own path through university and into the early internet boom, eventually dropping out to work in San Francisco. This background shaped her view of work as a source of liberation and meaning, rather than mere drudgery (source: https://charity.wtf/p/thoughts-on-motivation-and-my-40-year-career).
+Charity Majors reflects on her unconventional path from a sheltered homeschooling upbringing in Idaho to a career in tech, emphasizing that work has always been a source of liberation and meaning for her. She describes leaving home at 15, self-teaching and working multiple jobs to put herself through university, and eventually finding success in the tech industry. Majors notes that while Will Larson's motivation of 'advancing the industry' resonates, her own deeper driver is about living a meaningful life, acting with integrity, and building things of enduring value (Majors, 2025).
 
-Her motivation differs from peers like Will Larson: while he aims to 'advance the industry,' Majors is driven by a desire to live meaningfully, act with integrity, and build enduring value. She acknowledges the current skepticism about loving one's job, but argues that work has brought her growth, community, and joy. She also shares her career arc from engineer to manager to founder/CEO at Honeycomb, noting that creation is much harder than critique and that running a company forces you to confront the messy reality of ethical trade-offs.
-
-Ultimately, Majors emphasizes the importance of trying to win in the marketplace while honoring your ideals. Ideals in a vacuum are uninteresting; what matters is the struggle to do hard things and build something worthwhile. Her personal history—overcoming poverty and a rigid belief system—fuels her relentless drive to create and to make the tech industry better for others (source: https://charity.wtf/p/thoughts-on-motivation-and-my-40-year-career).
-
-- Work can be a liberating force, providing meaning, growth, and community, even in a culture that often dismisses job devotion.
-- True motivation stems from building enduring value and acting with integrity, not just from advancing an industry.
-- Founding and running a company is far harder than critiquing one, and forces you to balance ethical ideals with the practical need to win.
-- Personal background—escaping poverty and a fundamentalist upbringing—shaped the author's pragmatic yet passionate approach to work.
-- Ideals without action are uninteresting; the real challenge lies in striving for success while staying true to your principles.
+- Career motivation can stem from a desire for meaningful work and integrity, not just industry advancement.
+- Personal background and hardships can shape one's relationship with work as a liberating force.
+- Creation is harder than critique, and running a company forces ideals to clash with reality.
+- Work can provide a sense of community and purpose even when it's challenging, and it's okay to find joy in it.
+- Ethical decisions in business are complex and must be balanced with the responsibility to succeed.
