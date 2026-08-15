@@ -1,6 +1,6 @@
 # Rules Compliance (Fitness Functions)
 
-Every rule in `architectural-rules.md`, `design-rules.md`, and `python-rules.md` carries a designated enforcement mechanism (architectural-rules #8, Ch. 6): unenforced decisions decay silently, so nothing in the three files is left to chance.
+Every rule in `architectural-rules.md`, `design-rules.md`, `python-rules.md`, `agentic-execution.md`, and `plan-execution.md` carries a designated enforcement mechanism (architectural-rules #8, Ch. 6): unenforced decisions decay silently, so nothing in the five files is left to chance.
 
 Two tiers:
 
@@ -32,6 +32,8 @@ Two tiers:
 | python #4 Injectable-callable seam | Review | auto-code-review Standards axis |
 | python #5 Integration gating | CI | pytest `addopts` in `pyproject.toml` |
 | python #6 Standard-library-first | Review | auto-code-review Standards axis |
+| agentic-execution #1–4 | Review | auto-code-review Standards axis |
+| plan-execution #1–4 | Review | auto-code-review Standards axis |
 
 ## Notes
 

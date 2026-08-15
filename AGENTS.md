@@ -26,6 +26,11 @@ For design conventions on implementation work: @docs/agents/design-rules.md
 For Python code conventions (any Python code): @docs/agents/python-rules.md
 For rule enforcement mapping: @docs/agents/compliance.md
 
+### Execution Guidelines
+
+For agent execution discipline on ticket work: @docs/agents/agentic-execution.md
+For plan verification on multi-step tasks: @docs/agents/plan-execution.md
+
 ## Global Engineering Standards
 
 ### Execution Discipline (Karpathy Principles)
