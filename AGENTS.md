@@ -4,7 +4,6 @@
 - **Surgical Diffs:** Touch only what you must. Do not "improve" or refactor adjacent code, formatting, or comments unless asked.
 - **Dead Code:** Remove variables, imports, or functions that YOUR changes make unused. Do not touch pre-existing dead code.
 - **Dependencies:** Prioritize native framework utilities over introducing new third-party packages.
-- **Handoff:** When context window fills to 10% capacity, invoke `/auto-handoff` to write a handoff document to `.handoffs/<issue-num>-<timestamp>.md`. Then `git add .handoffs/ && git commit -m "chore: handoff <issue-num>"` to record it. Do not `git push` — the opencode GitHub action handler pushes the branch and opens the PR after the agent finishes; the handoff document ships with it. This applies to agent-triage CI runs; in a local interactive session, push normally.
 - **Info Retrieval:** Launch subagents to retrieve info/context or do research.
 
 ## External File Loading
@@ -61,3 +60,12 @@ Single-context layout — root `CONTEXT.md` + ADRs in `docs/adr/`. See `docs/age
 
 1. Injectable callables for deterministic unit tests; integration tests gated by marker and excluded from default runs. See `docs/agents/testing.md`.
 2. Do not run integration tests automatically. Stop and notify the user which command to run.
+
+### Handoff (CI only)
+
+Applies only to agent-triage CI runs: when context window fills to 10% capacity,
+invoke `/auto-handoff` to write a handoff document to `.handoffs/<issue-num>-<timestamp>.md`,
+then `git add .handoffs/ && git commit -m "chore: handoff <issue-num>"` to record it. Do not
+`git push` — the opencode GitHub action handler pushes the branch and opens the PR after the
+agent finishes; the handoff document ships with it. In a local interactive session, use the
+global `/handoff` skill instead (saves to `~/Handoffs/`); the `/auto-*` skills are CI-only.
