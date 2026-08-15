@@ -64,6 +64,14 @@ A failure to extract article text from fetched content. Two distinct types:
 
 All errors collected during a single Pipeline run are surfaced as one cumulative GitHub issue, so the operator can triage failing Sources in one place.
 
+**Fitness Function**:
+A CI-gated check in `scripts/check-fitness.py` that mechanically enforces the `kb_pipeline/` architecture against versioned baselines. Three axes: dependency matrix, module-set coverage, per-module size limits.
+_Avoid_: Architecture check, quality gate
+
+**Baseline**:
+The versioned snapshot in `scripts/baselines.json` (`allowed_edges`, `modules`, `size_limits`) that the Fitness Functions compare the code against. Updated deliberately via `--update-matrix` / `--update-baseline`, never by CI.
+_Avoid_: Snapshot, threshold
+
 ## Agent Triage
 
 **ready-for-agent**:
