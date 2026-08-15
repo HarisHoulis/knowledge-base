@@ -15,7 +15,7 @@ def _load_check_fitness() -> Any:
     return module
 
 
-CHECK = _load_check_fitness()
+CHECK_FITNESS = _load_check_fitness()
 
 
 def _write_package(tmp_path: Path, modules: dict[str, str]) -> Path:
@@ -56,14 +56,14 @@ class TestDependencyMatrix:
     def test_clean_graph_passes(self, tmp_path):
         pkg = _write_package(tmp_path, CLEAN_MODULES)
         baseline = _write_baseline(tmp_path, 100)
-        assert CHECK.run(pkg, baseline) == []
+        assert CHECK_FITNESS.run(pkg, baseline) == []
 
     def test_forbidden_edge_fails(self, tmp_path):
         modules = dict(CLEAN_MODULES)
         modules["fetcher.py"] = "from .config import VALUE\nfrom .writer import w\n"
         pkg = _write_package(tmp_path, modules)
         baseline = _write_baseline(tmp_path, 100)
-        violations = CHECK.run(pkg, baseline)
+        violations = CHECK_FITNESS.run(pkg, baseline)
         assert "forbidden edge: fetcher -> writer" in violations
 
     def test_from_import_form_collected(self, tmp_path):
@@ -71,7 +71,7 @@ class TestDependencyMatrix:
         modules["state.py"] = "from . import config\n"
         pkg = _write_package(tmp_path, modules)
         baseline = _write_baseline(tmp_path, 100)
-        assert CHECK.run(pkg, baseline) == []
+        assert CHECK_FITNESS.run(pkg, baseline) == []
 
 
 class TestSizeGuard:
@@ -80,7 +80,7 @@ class TestSizeGuard:
         modules["pipeline.py"] = "# padded\n" * 100
         pkg = _write_package(tmp_path, modules)
         baseline = _write_baseline(tmp_path, 10)
-        violations = CHECK.run(pkg, baseline)
+        violations = CHECK_FITNESS.run(pkg, baseline)
         assert any("pipeline.py size regression" in v for v in violations)
 
     def test_growth_within_tolerance_passes(self, tmp_path):
@@ -88,7 +88,7 @@ class TestSizeGuard:
         modules["pipeline.py"] = "# padded\n" * 11
         pkg = _write_package(tmp_path, modules)
         baseline = _write_baseline(tmp_path, 10)
-        assert CHECK.run(pkg, baseline) == []
+        assert CHECK_FITNESS.run(pkg, baseline) == []
 
 
 class TestUpdateBaseline:
@@ -97,7 +97,7 @@ class TestUpdateBaseline:
         modules["pipeline.py"] = "# padded\n" * 100
         pkg = _write_package(tmp_path, modules)
         baseline = _write_baseline(tmp_path, 10)
-        assert CHECK.run(pkg, baseline, update_baseline=True) == []
+        assert CHECK_FITNESS.run(pkg, baseline, update_baseline=True) == []
         assert json.loads(baseline.read_text()) == {"pipeline.py_lines": 100}
 
 
@@ -109,14 +109,14 @@ class TestMain:
         modules["fetcher.py"] = "from .config import VALUE\nfrom .writer import w\n"
         pkg = _write_package(tmp_path, modules)
         baseline = _write_baseline(tmp_path, 100)
-        monkeypatch.setattr(CHECK, "PACKAGE_DIR", pkg)
-        monkeypatch.setattr(CHECK, "BASELINE_PATH", baseline)
-        assert CHECK.main([]) == 1
+        monkeypatch.setattr(CHECK_FITNESS, "PACKAGE_DIR", pkg)
+        monkeypatch.setattr(CHECK_FITNESS, "BASELINE_PATH", baseline)
+        assert CHECK_FITNESS.main([]) == 1
         assert "forbidden edge: fetcher -> writer" in capsys.readouterr().out
 
     def test_clean_graph_exits_zero(self, tmp_path, monkeypatch):
         pkg = _write_package(tmp_path, CLEAN_MODULES)
         baseline = _write_baseline(tmp_path, 100)
-        monkeypatch.setattr(CHECK, "PACKAGE_DIR", pkg)
-        monkeypatch.setattr(CHECK, "BASELINE_PATH", baseline)
-        assert CHECK.main([]) == 0
+        monkeypatch.setattr(CHECK_FITNESS, "PACKAGE_DIR", pkg)
+        monkeypatch.setattr(CHECK_FITNESS, "BASELINE_PATH", baseline)
+        assert CHECK_FITNESS.main([]) == 0

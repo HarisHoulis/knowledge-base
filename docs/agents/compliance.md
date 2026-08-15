@@ -11,9 +11,9 @@ Two tiers:
 
 | Rule | Tier | Vehicle |
 | --- | --- | --- |
-| architectural #1 Modularisation | CI | `check-fitness.py` dependency matrix |
+| architectural #1 Modularisation | CI + Review | `check-fitness.py` dependency matrix; auto-code-review Standards axis |
 | architectural #2 Extensibility over implementation | Review | auto-code-review Standards axis |
-| architectural #3 Expose only what's needed | CI | `check-fitness.py` dependency matrix |
+| architectural #3 Expose only what's needed | CI + Review | `check-fitness.py` dependency direction; auto-code-review Standards axis |
 | architectural #4 Trade-off awareness | Review | Standards axis; trade-off surfaced in PR review notes |
 | architectural #5 Why over how | Review | auto-code-review Standards axis |
 | architectural #6 Guidance, not prescription | Review | auto-code-review Standards axis |
@@ -25,7 +25,7 @@ Two tiers:
 | design #3 High cohesion, low coupling | Review | auto-code-review Standards axis |
 | design #4 Reusable + autonomous components | Review | auto-code-review Standards axis |
 | design #5 Prefer weaker connascence | Review | auto-code-review Standards axis |
-| design #6 Structural decay alert | CI | `check-fitness.py` `pipeline.py` size baseline |
+| design #6 Structural decay alert | CI + Review | `check-fitness.py` `pipeline.py` size baseline; auto-code-review Standards axis |
 | python #1 Interpreter | CI | `check-rules.sh` bare-`python` scan |
 | python #2 Typing | CI | `python3 -m mypy .` |
 | python #3 Lint defaults | CI | `python3 -m ruff check .` + `ruff format --check` |
@@ -37,7 +37,7 @@ Two tiers:
 
 ## Notes
 
-- **Fitness-function baselines** — `check-fitness.py` guards the `kb_pipeline/` intra-package dependency matrix (full allow-list, any unlisted edge fails) and a `pipeline.py` line-count baseline in `scripts/baselines.json` with a +10% tolerance; the baseline is bumped explicitly via `--update-baseline`.
+- **Fitness-function baselines** — `check-fitness.py` guards the `kb_pipeline/` intra-package dependency matrix (full allow-list, any unlisted edge fails) and a `pipeline.py` line-count baseline in `scripts/baselines.json` with a +10% tolerance; the baseline is bumped explicitly via `--update-baseline`. The matrix checks dependency direction only — cohesion, minimum public surface, and other structural decays stay on the Review axis.
 - **AGENTS.md `@reference` resolution** — extra CI check in `check-rules.sh`: every `@path` under the External File Loading block must resolve to an existing file.
 - **python-rules #3's cited config values** are deliberately **not** CI-checked as values; the ruff gate itself enforces them.
 - **Bare-`python` scan scope** — scans executable/config text (`scripts/`, `tests/`, `.github/workflows/`, `AGENTS.md`, `pyproject.toml`), not `docs/` prose: the rules themselves and fenced code snippets describe bare `python` without invoking it.
