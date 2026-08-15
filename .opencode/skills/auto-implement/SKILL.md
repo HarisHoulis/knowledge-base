@@ -25,7 +25,7 @@ At most **2 subagents** for code exploration or web research across the entire s
 
 ### Per-iteration steps
 
-1. **`/tdd`** — follow the TDD workflow (RED→GREEN→REFACTOR per tracer bullet). Exploration/research subagents count toward the budget of 2.
+1. **`/auto-tdd`** — follow the TDD workflow (RED→GREEN→REFACTOR per tracer bullet). Exploration/research subagents count toward the budget of 2.
 2. **Typecheck + run tests** — run typechecking and single test files regularly.
 3. **`/auto-code-review`** — point at `origin/main...HEAD`. Read the findings report.
 4. **Fix findings** — fix all:
@@ -35,7 +35,7 @@ At most **2 subagents** for code exploration or web research across the entire s
 
 ### After the loop
 
-- **Zero findings** → success. Run `/commit`, then finish.
+- **Zero findings** → success. Run `/auto-commit`, then finish.
 - **Findings remain** after 3 iterations → `gh issue comment <issue-number> -m "auto-implement failed: <summary of remaining issues>"`, then exit with error.
 
 Make sure:

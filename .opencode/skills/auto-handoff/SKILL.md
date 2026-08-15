@@ -1,5 +1,5 @@
 ---
-name: handoff
+name: auto-handoff
 description: Compact the current conversation into a handoff document when context nears capacity. Saves to `.handoffs/<issue-num>-<timestamp>.md` inside the repo so the file can be committed and pushed to the branch for headless CI resumption.
 argument-hint: "What will the next session be used for?"
 ---
