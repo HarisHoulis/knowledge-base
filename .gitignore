@@ -11,6 +11,7 @@ __pycache__/
 # Build & packaging
 build/
 dist/
+node_modules/
 
 # Environment & secrets
 .venv/
