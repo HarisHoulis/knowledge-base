@@ -1,5 +1,5 @@
 ---
-name: commit
+name: auto-commit
 description: Draft and commit changes following Conventional Commits. Use when the user mentions committing, staging, making a commit, or asks you to commit changes.
 ---
 
