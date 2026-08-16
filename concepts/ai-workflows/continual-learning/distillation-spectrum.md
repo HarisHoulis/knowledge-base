@@ -6,17 +6,17 @@ title: Bringing Continual Learning into Enterprises
 sources:
   - title: "Bringing Continual Learning into Enterprises — Samuel Denton, Applied Compute"
     url: "https://www.youtube.com/watch?v=ZTA0GwpAUak"
-    author: "AI Engineer"
+    author: "Samuel Denton"
     date: "2026-08-12T17:30:06+00:00"
 ---
 
 # Bringing Continual Learning into Enterprises
 
-Samuel Denton of Applied Compute discusses how enterprises can adopt continual learning through a spectrum of distillation approaches, ranging from offline batch learning from production traces to fully online unified inference-training engines. Most enterprises currently operate on the offline end, needing to improve agents from a static collection of traces, while the holy grail is a real-time flywheel where models learn continuously during serving. Applied Compute aims to meet enterprises wherever they are on this spectrum.
+In this talk, Samuel Denton of Applied Compute outlines a spectrum for distillation in continual learning, ranging from offline distillation—where a single batch of production traces is used to improve an agent—to fully online continual learning, where inference and training are unified in a continuous flywheel (Denton, 2026). He notes that most enterprises currently sit at the offline end, working with static trace batches, while the online end represents the 'holy grail' of continual learning. Applied Compute aims to meet enterprises wherever they are on this spectrum and provide value across both ends.
 
-A second axis is hinting, which defines where the privileged information for a teacher model comes from. In offline hinting, hints derive from static data such as known rubrics, general behavioral priors (e.g., a support agent giving too many refunds), or production loss reports. The interplay of the online-offline spectrum and the hinting axis provides a framework for designing distillation strategies in real-world settings.
+Denton also introduces a second orthogonal axis: hinting. The key question is where the privileged information for a teacher model comes from. Offline hinting derives hints from static or offline data, such as known rubrics or general behavioral priors (e.g., a customer support agent that is too willing to give refunds). Online hinting, in contrast, would come from the model's own on-policy rollouts. This framing helps enterprises decide how to approach self-distillation and continual learning based on their data availability and production maturity.
 
-- The distillation spectrum spans offline (single batch of traces), periodic (daily batches), and fully online (unified inference+training) learning.
-- Most enterprises today are on the offline end, looking to improve agents from a one-time set of production traces.
-- A second axis is hinting: where teacher knowledge comes from (static rubrics, priors, or reports), independent of the online/offline timing.
-- Applied Compute's goal is to deliver value across both ends of the spectrum, meeting enterprises where they are.
+- Distillation exists on a spectrum from offline one-time trace batches to fully online unified training/inference flywheels.
+- Most enterprises are currently at the offline end, using static production traces to improve agents.
+- Hinting is an orthogonal axis: privileged information for a teacher can come from static rubrics/priors or from on-policy rollouts.
+- Applied Compute's goal is to provide value across the entire distillation spectrum, not just at one end.

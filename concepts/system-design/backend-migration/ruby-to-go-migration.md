@@ -7,19 +7,19 @@ sources:
   - title: "How We Migrated the Parse API From Ruby to Golang (Resurrected)"
     url: "https://charity.wtf/p/how-we-migrated-the-parse-api-from-ruby-to-golang-resurrected"
     author: "Charity Majors"
-    date: "2025-07-24"
+    date: "Thu, 24 Jul 2025 02:14:45 GMT"
 ---
 
 # How We Migrated the Parse API From Ruby to Golang (Resurrected)
 
-This retrospective chronicles Parse's two-year rewrite of its core API from Ruby on Rails to Go, driven by the fundamental scaling limits of Rails' one-process-per-request model. As traffic and app count 10x'd, worker pools filled with slow requests, making the system fragile and operations burnout-inducing. The team realized an asynchronous model was essential and evaluated EventMachine, JRuby, C++, C#, and Go, ultimately choosing Go for its lightweight goroutines, excellent MongoDB driver, and developer enthusiasm (Charity Majors, 2025).
+The article recounts Parse's migration from a Ruby on Rails API to Golang. As traffic grew, the one-process-per-request model of Rails became a scaling bottleneck—slow requests could fill the worker pool faster than auto-scaling could react. The team decided on an asynchronous model and evaluated options like EventMachine, JRuby, C++, C#, and Go. They chose Go because of its lightweight goroutines, the excellent MongoDB Go driver, and team enthusiasm (Majors, 2025).
 
-The hardest part was preserving Rails' "liberal in what you accept" HTTP middleware behavior, which tolerated undocumented and non-RFC-compliant requests. To avoid breaking production, they built a live shadowing system that ran each request against both the Ruby and Go API servers and diffed the responses field-by-field using Scuba. This workflow not only exposed subtle incompatibilities but also demonstrated the power of rich, queryable comparison tools, which later influenced Honeycomb's founding (Majors, 2025).
+The migration was performed endpoint-by-endpoint using a live shadowing system: both Ruby and Go servers handled production traffic, and responses were diffed field-by-field using Scuba. This allowed them to catch behavioral mismatches. The hardest part was replicating Rails' liberal acceptance of non-RFC-compliant requests, such as doubly encoded URLs and weird headers, requiring careful porting of undocumented behaviors (Majors, 2025).
 
-The rewrite delivered dramatic improvements: reliability improved by an order of magnitude, the API server pool shrank by ~90%, full integration test time dropped from 25 minutes to 2 minutes, and deployments from 30 to 3 minutes. The new async model also enabled comprehensive instrumentation and simplified the architecture by removing isolated Rails server silos (Majors, 2025).
+The rewrite was highly successful: reliability improved by an order of magnitude, the API server pool shrank by 90%, deploy time dropped from 30 to 3 minutes, and integration test time dropped from 25 to 2 minutes. It also reduced operational burnout and made the codebase cleaner (Majors, 2025).
 
-- Rails' one-process-per-request model could not scale with Parse's hockey-stick growth, leading to the need for an asynchronous architecture.
-- Go was chosen over C#, Java, and C++ due to its built-in concurrency, superior MongoDB driver, and team excitement.
-- Replicating Rails' permissive request handling required a live shadowing system that diffed Ruby and Go responses for every production request.
-- The rewrite improved reliability by an order of magnitude, cut the API server fleet by ~90%, and drastically reduced test and deploy times.
-- The experience with diffing and querying response-level data directly inspired the creation of Honeycomb.
+- Rails' one-process-per-request model does not scale to high concurrency; an asynchronous model is necessary.
+- Go was chosen over C# for its lightweight goroutines, best-in-class MongoDB driver, and developer enthusiasm.
+- Live shadowing—running both old and new servers and diffing responses—enabled safe migration.
+- Replicating Rails' permissive HTTP handling was a major challenge, requiring porting undocumented behaviors.
+- The migration improved reliability by 10x and drastically reduced infrastructure and deployment times.

@@ -11,11 +11,9 @@ sources:
 
 # TDD inside the agent loop - theater or actual value?
 
-The article, authored by Martin Fowler, investigates whether instructing LLM-powered coding agents to follow Test-Driven Development (TDD) yields tangible benefits or simply adds ritualistic behavior. Fowler references experiments conducted by colleague Birgitta Böckeler, who set out to test the common industry assertion that TDD improves agent-generated code.
+This article by Martin Fowler explores whether test-driven development (TDD) genuinely improves outcomes when used with AI coding agents, or if it is merely ceremonial. The investigation, led by Birgitta Böckeler at Thoughtworks, involved a few experiments to evaluate the practical impact of instructing LLM agents to follow TDD practices. The key question is whether the discipline of writing tests first helps the agent produce better code, reduce bugs, or improve maintainability, or if it just adds overhead without tangible benefits. The article summarizes the experiments and their findings, discussing conditions under which TDD inside the agent loop might be valuable versus when it is not. It also considers how the nature of AI-generated code and the agent's ability to iterate quickly might change the traditional TDD calculus.
 
-The experiments explored how agent behavior and output quality change when TDD is explicitly required. Preliminary findings suggest that TDD can provide structure and verification checkpoints, but its value depends on the context and how rigorously the agent adheres to the cycle. Fowler frames the discussion around whether TDD in the agent loop is 'theater' (looking good without real impact) or 'actual value' (measurably improving outcomes), encouraging practitioners to critically evaluate their use of TDD with AI agents.
-
-- Many practitioners advocate telling LLM agents to use TDD, but empirical evidence is needed to validate this practice.
-- Birgitta Böckeler conducted experiments to test whether TDD truly makes a difference in agent-based software development.
-- The article questions whether TDD in the agent loop is performative theater or provides measurable value.
-- The value of TDD likely depends on how it is implemented and the specific context of the agent's task.
+- The article investigates whether TDD instructions to AI agents produce measurable benefits or are just for show.
+- Experiments were conducted to compare agent behavior with and without TDD requirements.
+- Findings suggest TDD can be valuable in certain contexts, but may be unnecessary or even counterproductive in others.
+- The value of TDD in the agent loop depends on task complexity, codebase maturity, and how strictly the agent follows the red-green-refactor cycle.
