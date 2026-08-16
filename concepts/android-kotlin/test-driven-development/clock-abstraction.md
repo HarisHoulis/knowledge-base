@@ -12,10 +12,10 @@ sources:
 
 # Kotlin TDD - To Production At Last
 
-In this video, the team integrates a previously developed stock update feature into production code using test-driven development. They start by re-enabling a disabled test that defines the expected behavior, then move the stock class from the test tree into the main source tree. The implementation requires passing a clock function into the stock logic so that the current time can be injected, making tests deterministic. They refactor the test fixture to use an Instant instead of a LocalDate to accurately capture time-based updates, and adjust all tests accordingly. After wiring everything together, they commit a work-in-progress checkpoint as a safe stopping point.
+In this video, the team integrates the stock update feature into the main application by moving the `Stock` class from the test tree to the main source set. They re-enable a previously disabled test that describes the expected behavior, and then wire up the routes to use the `Stock` class instead of directly loading items from the stock file. The initial integration fails because the code uses `Instant.now()` directly, which makes it untestable. To fix this, they introduce a `clock` functional parameter that returns an `Instant`, allowing tests to control time. They refactor the test fixture to include an `instant` property, and change the update logic to accept an `Instant` instead of a `LocalDate`, since time zone information is needed for correct updating. They derive the date and time from the same source to keep consistency, and make a work-in-progress commit before continuing.
 
-- Re-enable the failing test to guide production integration.
-- Move production code from test tree to main tree for actual use.
-- Introduce a clock function parameter to allow time control in tests.
-- Use Instant instead of LocalDate for precise time-based assertions.
-- Commit work-in-progress after completing a coherent step.
+- Move production code from test tree to main tree to make it usable.
+- Inject a clock function to control time in tests and make the system testable.
+- Replace `LocalDate` with `Instant` for time-aware stock updates.
+- Derive date and time from the same fixture value to avoid inconsistencies.
+- Use a disabled test as a specification to drive the integration.

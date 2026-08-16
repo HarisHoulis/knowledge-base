@@ -11,13 +11,13 @@ sources:
 
 # Bliki: Mythical Man Month
 
-Martin Fowler reflects on Fred Brooks' classic book 'The Mythical Man-Month', first published in 1975. Despite being decades old, the book retains many lessons relevant today, though some aspects are outdated. Fowler notes that Brooks's law — 'Adding manpower to a late software project makes it later' — highlights how communication overhead grows exponentially as team size increases, undermining productivity unless communication paths are carefully designed.
+Martin Fowler reflects on Fred Brooks's classic book 'The Mythical Man-Month', first published in 1975, and its enduring relevance to software development. While some aspects are outdated, the core lessons remain applicable. The most famous principle is Brooks's Law: 'Adding manpower to a late software project makes it later,' which highlights the exponential growth of communication paths as team size increases, potentially causing work to fall apart unless carefully managed.
 
-Fowler identifies conceptual integrity as the book's most enduring lesson. Brooks argued that a system with one set of coherent design ideas is better than one with many good but uncoordinated features. Conceptual integrity stems from simplicity and straightforwardness, where straightforwardness means how easily elements can be composed. This pursuit of conceptual integrity has strongly influenced Fowler's own work.
+Fowler emphasizes that his most durable takeaway is the importance of conceptual integrity in system design. Brooks argued that it is better for a system to omit certain features and improvements than to include many good but uncoordinated ideas. Conceptual integrity arises from simplicity and straightforwardness, where elements can be composed easily. This perspective has deeply influenced Fowler's own work, underpinning his pursuit of coherent design.
 
-Fowler recommends the anniversary edition, which includes Brooks' 1986 essay 'No Silver Bullet', considered even more influential than the original book. The essay further explores the difficulties inherent in software engineering and the limits of potential silver-bullet solutions.
+The anniversary edition of the book is recommended because it also includes Brooks's influential 1986 essay 'No Silver Bullet,' which further explores the challenges of software engineering.
 
-- Brooks's law warns that adding manpower to a late project makes it later due to exponential communication overhead.
-- Conceptual integrity is the most important consideration in system design, favoring a coherent set of ideas over many uncoordinated ones.
-- Conceptual integrity arises from simplicity and straightforwardness (ease of composition).
-- The anniversary edition includes the influential 1986 essay 'No Silver Bullet'.
+- Brooks's Law: Adding manpower to a late software project makes it later due to increased communication overhead.
+- Conceptual integrity is the most important consideration in system design; a coherent set of ideas beats a hodgepodge of good but uncoordinated ones.
+- Conceptual integrity comes from simplicity and straightforwardness, enabling effective composition of system elements.
+- The anniversary edition includes the influential essay 'No Silver Bullet.'

@@ -12,10 +12,13 @@ sources:
 
 # Lecture 14: Optimistic Concurrency Control
 
-The lecture introduces Farm, a research prototype for distributed transactions that leverages RDMA networking. Farm uses optimistic concurrency control as a core technique, achieving extremely fast transaction latencies—58 microseconds per simple transaction, about 100x faster than Spanner. Unlike Spanner, which targets geographic replication across data centers, Farm assumes all replicas are in the same data center, focusing on CPU and network latency within a single facility (MIT 6.824, 2020).
+Farm is a research prototype that explores the performance potential of RDMA networking. The lecture contrasts Farm with Spanner: Spanner focuses on geographic replication and uses synchronized time for read-only transactions, but its read-write transactions take 10-100 milliseconds. Farm instead assumes all replicas are in the same data center, eliminating wide-area network delays, and achieves a simple transaction in 58 microseconds—about 100x faster than Spanner (MIT 6.824, 2020).
 
-- Farm achieves 58-microsecond transactions using RDMA and optimistic concurrency control, about 100x faster than Spanner.
-- It targets single-datacenter deployments, unlike Spanner's geographic replication.
-- Data is sharded across primary-backup pairs; reads go to primary, writes replicate to all.
-- RDMA constraints force the use of optimistic concurrency control.
-- Farm is a research prototype exploring the performance potential of high-speed RDMA NICs.
+To exploit RDMA, Farm is forced to use optimistic concurrency control because RDMA severely restricts design options. Farm shards data across primary-backup pairs, with all reads going to the primary. Replicas are not maintained by Paxos or similar consensus protocols; they are updated on every change, and fault tolerance is limited to individual crashes, not whole data-center failures (MIT 6.824, 2020).
+
+The lecture emphasizes that Farm and Spanner target different bottlenecks: Spanner is concerned with the speed of light and network delays between data centers, while Farm focuses on CPU time on servers by assuming a same-data-center environment. This design choice yields much higher throughput but sacrifices geographic replication capabilities, making Farm unsuitable for scenarios where an entire data center may go down (MIT 6.824, 2020).
+
+- Farm is a research prototype, not a production system, aimed at exploring RDMA's performance potential.
+- It achieves 58-microsecond simple transactions, roughly 100x faster than Spanner's 10-millisecond read-write transactions.
+- Farm uses optimistic concurrency control because RDMA restricts design choices, and data is sharded across primary-backup pairs with reads from the primary.
+- It targets a single data center, not geographic replication, and does not use consensus for replication—making it less fault-tolerant than Spanner across data centers.

@@ -6,16 +6,16 @@ title: LLM Knowledge Bases: A Practical Guide
 sources:
   - title: "LLM Knowledge Bases: a practical guide — Ben Holmes, Warp"
     url: "https://www.youtube.com/watch?v=I3bpdgFJCUY"
-    author: "Ben Holmes"
+    author: "AI Engineer"
     date: "2026-08-12T17:00:22+00:00"
 ---
 
 # LLM Knowledge Bases: A Practical Guide
 
-In this talk, Ben Holmes, developer relations lead at Warp, presents a practical approach to building personal knowledge bases with LLM assistance. He starts from the problem of scattered, disorganized notes and demonstrates a workflow to transform them into an interconnected, navigable knowledge graph. The process begins with capturing raw thoughts efficiently using voice dictation tools, which he claims are the fastest method at approximately 200 words per minute (Ben Holmes, 2026-08-12).
+Ben Holmes presents a practical workflow for turning scattered raw thoughts into an organized, interconnected knowledge base using LLM-assisted tools. He emphasizes that capturing thoughts should be as frictionless as possible, advocating for voice dictation as the fastest input method, citing tools like Whisper Flow, Handy (open-source/local), and Voice Inc. The process starts with a folder of raw Markdown notes, then moves to enriching them with backlinks and tags so that both users and AI agents can navigate the content. Further steps include auto-generating wiki-style pages for people, concepts, and sources found across notes, and finally creating visualizations like a graph view to reveal connections and rediscover forgotten ideas.
 
-- Voice dictation tools like Handy and Voice Inc enable fast capture of thoughts directly into markdown, with local processing options available.
-- Raw notes can be enriched by LLMs to add backlinks, tags, and categories, making them discoverable by both humans and AI agents.
-- LLMs can automatically generate wiki-style pages for recurring people, concepts, and sources, creating a structured layer over raw notes.
-- Interactive graph visualizations of notes are easy to build with modern agent tooling and HTML, helping users see connections they might have forgotten.
-- The workflow can be implemented with existing tools like Obsidian or with custom apps like the speaker's 'Hubble'.
+- Voice dictation is the fastest way to capture thoughts, reaching ~200 words per minute, and local-model tools like Handy eliminate subscription costs.
+- Start with a raw Markdown folder; use any viewer (Warp, Obsidian, or custom apps like Hubble) to write and navigate.
+- Enrich notes with backlinks and tags to make them findable by users and LLM agents.
+- Generate wiki pages for recurring entities (people, concepts, sources) to build a navigable research area.
+- Visualizations like graph views help discover connections across notes and are now easy to build with agent-generated HTML.
