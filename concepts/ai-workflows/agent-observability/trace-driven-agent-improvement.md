@@ -6,20 +6,20 @@ title: Improving Agents is a Data Mining Problem
 sources:
   - title: "Improving Agents is a Data Mining Problem — Vivek Trivedy, LangChain"
     url: "https://www.youtube.com/watch?v=CvRngaQZQ3Y"
-    author: "Vivek Trivedy, LangChain"
+    author: "AI Engineer"
     date: "2026-08-12T19:00:01+00:00"
 ---
 
 # Improving Agents is a Data Mining Problem
 
-The talk argues that improving AI agents is fundamentally a data mining problem. Once an agent is shipped and operating in real environments, every action generates trace data—tool calls, output messages, API calls, and CLI usage. This trace data is essential for understanding agent behavior and enabling continual improvement. The speaker emphasizes a tight coupling between observability and continual learning: traces are the raw material for updating agent definitions, prompts, tools, and orchestration (Vivek Trivedy, LangChain, 2026).
+In this talk, Vivek Trivedy from LangChain argues that continuously improving AI agents is fundamentally a data mining problem. The proposed recipe is straightforward: ship agents into real-world environments, collect vast amounts of trace data from their operations, mine that data to surface patterns, and run data-driven experiments to validate improvements. He emphasizes that agents generate rich trace data—tool calls, output messages, API interactions, CLI usage—and that this data is the raw material for continual learning.
 
-Unlike traditional code, agents are difficult for humans to reason about directly. They involve prompts, tools, skills, hooks, middlewares, and even hierarchical agent swarms. A prompt change in the medical domain can have very different effects than in law. As the field trades determinism for autonomy, new systems are needed to interpret autonomous agent behavior. The speaker describes LangChain's practice of centralizing traces in a tracing project and using LLM agents to mine traces—querying for good/bad interactions, user satisfaction signals, and technical issues (Vivek Trivedy, LangChain, 2026).
+Trivedy highlights a tight coupling between observability and continual learning. Observability provides the trace data that makes improvement possible; without traces, there is no basis for understanding agent behavior or iterating on it. He also notes that agents are far harder for humans to reason about than traditional code, because behavior is shaped by prompts, tools, skills, hooks, and orchestration, and it varies across domains. Consequently, trace mining becomes essential for identifying both successful and problematic interactions.
 
-The overall recipe is: ship the agent, collect a large volume of traces (potentially gigabytes or terabytes), mine that data using agents, then use curated insights to run data-driven experiments—evaluating whether a new prompt, tool, or orchestration loop genuinely improves performance compared to baseline traces. This closes the loop between production data and development (Vivek Trivedy, LangChain, 2026).
+The talk concludes by describing how LangChain applies this approach in practice: centralizing trace data into projects, using agents to read other agents' traces, and asking targeted questions to find good and bad interactions. This data-driven methodology enables teams to make informed changes to prompts, tools, or orchestration logic and verify their impact through experiments.
 
-- Agent improvement is a data mining loop: ship, collect traces, mine, experiment.
-- Traces include tool calls, messages, API calls, and CLI usage; centralize them in a tracing project.
-- Observability and continual learning are tightly coupled—traces are necessary for learning.
-- Agents are hard to reason about like code; use agents to read traces and surface patterns and errors.
-- Validate changes (prompt, tool, orchestration) via data-driven experiments against historical traces.
+- Ship agents first and collect trace data from real-world operation to enable improvement.
+- Trace data includes tool calls, messages, API calls, and CLI usage—store all of it.
+- Data mining over traces helps surface good and bad interactions, guiding iteration.
+- Observability and continual learning are tightly coupled: traces are the foundation for both.
+- Agent behavior is hard to reason about statically, so trace-based experiments are essential for improvements.

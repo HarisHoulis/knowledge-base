@@ -12,12 +12,10 @@ sources:
 
 # From RL to IRL — Gaurav Mishra, Amazon AGI Lab
 
-Gaurav Mishra from Amazon AGI Lab discusses the challenges of deploying reinforcement learning (RL) trained agents in real-world environments. He explains that RL is highly effective when tasks can be easily generated but demonstrations are hard to collect, when multiple correct solutions exist with verifiable outcomes, and in reasoning-heavy domains like coding. The key components of RL are the task, the environment, and the verifier, which produces the training signal (e.g., string equality, unit tests, or LLM judges).
+In this talk, Gaurav Mishra of the Amazon AGI Lab examines why reinforcement learning (RL) agents that perform well in training often fail when deployed in real-world environments. He begins with a lightning review of RL: the agent (policy) samples generations, a reward is computed on the entire generation (unlike token-level loss in SFT), and algorithms like PPO and GRPO update the weights. RL becomes the preferred method when tasks are easy to generate but difficult to demonstrate, when multiple correct solutions exist and outcomes are verifiable, and in reasoning-heavy domains where only the outcome is judged. Coding is a perfect fit, which is why RL-trained coding agents have become highly capable.
 
-However, applying RL-trained coding agents to real-world computer use reveals failures when the reward function meets actual scenarios. Mishra shows early trajectory examples where agents, facing a login screen after session expiry, attempt to guess passwords and eventually block the account. In another example, an agent clicks a deceptive ad that looks like the real submit button. These cases illustrate that real-life deployment introduces unpredictable states and adversarial UI patterns that the verifiable reward functions used in training do not account for, causing agents to fall into common traps.
-
-- RL is most effective for tasks with verifiable outcomes, many correct solutions, or reasoning-heavy domains like coding.
-- Core RL components are the task (verifiable, targeted, right difficulty), safe execution environments, and a robust verifier.
-- Coding agents can be repurposed for computer use via APIs, MCP, and browser automation, but real-world deployment breaks.
-- Common failures include agents guessing passwords when credentials expire and clicking visually similar ad buttons instead of the real submit button.
-- The mismatch between simulated training environments and messy real-world states requires new approaches beyond simple verifiable rewards.
+- RL differs from SFT by computing a reward over the whole generation rather than per-token prediction loss, enabling learning from outcome-based signals.
+- RL is most effective when tasks are easy to generate but hard to demonstrate, have multiple valid solutions with verifiable outcomes, or require heavy reasoning.
+- A full RL system has three components: task, environment, and verifier—the verifier can range from string equality or unit tests to LLM-based judges with rubrics.
+- Coding agents generalize to everyday computer use because emails, chats, and web browsing can be reduced to code via MCP/API calls and browser automation.
+- Real-world deployment breaks RL agents: they may hallucinate passwords on login screens, click misleading ads that resemble submit buttons, and fail to recover from unexpected states—revealing gaps between reward optimization and practical safety.

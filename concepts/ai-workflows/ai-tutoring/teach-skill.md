@@ -12,9 +12,11 @@ sources:
 
 # My /teach skill is still insane
 
-The /teach skill is an AI-powered tool designed to help users master new concepts through personalized, tailored learning experiences. It adapts to the learner's pace and style, offering interactive explanations and quiz questions to reinforce understanding. The skill can be applied to a wide range of topics, from technical fields like land surveying and software development to recreational challenges like solving a Rubik's Cube. By leveraging AI, the /teach skill makes complex subjects more accessible and engaging, providing a customized alternative to traditional learning methods.
+Matt Pocock demonstrates a custom AI skill called "/teach" that provides personalized, tailored learning experiences. The skill is designed to help users master new concepts across a wide range of topics, including land surveying, Rubik's Cubes, and development techniques (Pocock, 2026). It emphasizes interactive explanations and quiz questions to make learning engaging and effective.
 
-- The /teach skill delivers personalized learning for any concept.
-- It uses interactive explanations and quiz questions to reinforce knowledge.
-- Examples include land surveying, Rubik's Cubes, and development techniques.
-- The skill is available via a link and updates are shared through a dedicated site.
+The /teach skill is positioned as a versatile tool for learning anything. Pocock shares the skill via aihero.dev, along with links to stay updated on his other skills and to join a community Discord. The approach highlights how AI can act as a personalized tutor, adapting content to the learner's needs and facilitating deeper understanding through active questioning.
+
+- The /teach skill delivers personalized, tailored learning experiences.
+- It can be applied to diverse subjects, from land surveying to coding and Rubik's Cubes.
+- Interactive explanations and quiz questions are core components of the learning method.
+- The skill is freely shared by Matt Pocock via aihero.dev.

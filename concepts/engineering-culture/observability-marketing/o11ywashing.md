@@ -12,14 +12,10 @@ sources:
 
 # From Cloudwashing to O11ywashing
 
-Charity Majors argues that the term "observability" has been co-opted by vendors and executives in a manner analogous to "cloudwashing"—where marketing paints traditional monitoring tools as true observability. She recounts a panel where an executive described traditional observability as merely detecting uptime/downtime, missing that the real goal is understanding the quality of service from each customer's perspective. Majors contends that this is the original definition of observability, and that standard metrics, logs, and traces are not sufficient; true observability requires unifying app, business, and system telemetry, sliced by customer ID or device. [1]
+Charity Majors critiques how industry executives are misusing the term 'observability,' conflating it with traditional monitoring and failing to understand its true purpose: understanding system and product quality from each customer's perspective. She recounts a panel where an executive proudly described building a custom solution for measuring customer workflows, unaware that this is exactly what observability was originally meant to provide. Majors argues that vendors are 'o11ywashing' their products, just as IBM 'cloudwashed' mainframes in 2008, by slapping the observability label on legacy monitoring tools that cannot deliver unified telemetry across app, business, and system contexts. The article emphasizes that observability is a systems problem, not merely an operational one, and calls on practitioners to better communicate its business value to engineering executives rather than focusing solely on technical details. Majors concludes that if a tool cannot help you understand the product from each customer's perspective, it is not observability—just monitoring dressed up in marketing dollars.
 
-The article draws a parallel to IBM's 2008 "cloudwashing" of its mainframe, and warns that observability is now facing the same fate because it is a large budget item. Majors emphasizes that the problem is not going away, and that Gartner-type analysts will only help after the industry wins the market. She calls for engineers to tell the story of observability to executives in terms of business outcomes, not technical details like cardinality. [1]
-
-Ultimately, Majors states bluntly: if your tooling doesn't help you understand the product from each customer's perspective, "it isn't fucking observability." It is just monitoring dressed up in marketing dollars, or "o11ywashing." [1]
-
-- Traditional observability tools (metrics, logs, traces) are monitoring, not true observability.
-- Observability means understanding quality of service from each customer's perspective, requiring unified telemetry.
-- O11ywashing is the new cloudwashing: vendors rebranding monitoring as observability.
-- Engineers must communicate observability value to executives in terms of outcomes, not technical structures.
-- A litmus test: if tooling can't slice by customer ID and show experience, it's not observability.
+- Traditional observability tools are actually monitoring tools; they only answer 'are we up or down' and cannot solve the problem of understanding each customer's experience.
+- The term 'observability' is being co-opted by vendors in a process analogous to 'cloudwashing'—rebranding legacy products without delivering real unified telemetry.
+- Observability is a systems problem that combines app, business, and system telemetry; it requires slicing data by customer ID, device, and location.
+- Practitioners must tell outcome-focused stories to engineering executives, not just technical explanations, to counter the wave of o11ywashing.
+- A true observability tool must enable understanding of product quality from each customer's perspective; otherwise, it's just monitoring.
