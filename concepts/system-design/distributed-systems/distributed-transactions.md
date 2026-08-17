@@ -12,11 +12,9 @@ sources:
 
 # Lecture 12: Distributed Transactions
 
-Distributed transactions are necessary when data is sharded across multiple servers, such as bank balances split across servers to balance load and storage. A transaction allows a programmer to group multiple read and write operations into a single logical unit, marked with begin and end, so that operations like a bank transfer affecting records on different servers are handled atomically and in isolation from other concurrent activities (MIT 6.824, 2020).
+Distributed transactions are necessary when data is sharded across multiple servers and a single logical operation must read or write data on more than one server. As discussed in MIT 6.824 Lecture 12, they consist of two main implementation pieces: concurrency control and atomic commit. The lecture motivates the need with a bank transfer example, where moving money between accounts requires atomically modifying balances that may reside on different servers. The transaction abstraction hides this complexity from the programmer by marking the beginning and end of a sequence of operations, with the system providing guarantees about correctness despite concurrency and failures. The standard correctness notion is ACID—atomicity, consistency, isolation, and durability—which ensures that transactions execute as if they were serialized and are not split by failures or other concurrent activity.
 
-The lecture breaks distributed transactions into two core implementation pieces: concurrency control and atomic commit. Correctness is defined in terms of ACID properties, with atomicity ensuring all-or-nothing execution and concurrency control managing isolation between transactions. Using an example of a transfer transaction and an audit transaction reading both balances, the lecture illustrates how the system must produce only legal outcomes despite concurrency and failures (MIT 6.824, 2020).
-
-- Distributed transactions handle operations that span data sharded across multiple servers.
-- Transactions are built from two main pieces: concurrency control and atomic commit.
-- ACID properties, especially atomicity and isolation, define correctness for distributed transactions.
-- The transaction abstraction hides sharding complexity from application programmers by using begin/end markers.
+- Distributed transactions combine concurrency control and atomic commit to manage operations that span multiple servers.
+- Sharding data for load or space requires transactions when operations touch multiple shards (e.g., bank transfers).
+- The transaction abstraction lets programmers mark begin/end, and the system guarantees ACID properties.
+- Concurrency control ensures isolation; atomic commit ensures all servers agree on the final outcome even under failures.

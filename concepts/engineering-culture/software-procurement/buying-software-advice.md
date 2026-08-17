@@ -7,19 +7,17 @@ sources:
   - title: "Are you an experienced software buyer? I could use some help."
     url: "https://charity.wtf/p/are-you-an-experienced-software-buyer-i-could-use-some-help"
     author: "Charity Majors"
-    date: "2025-09-19"
+    date: "Fri, 19 Sep 2025 18:12:45 GMT"
 ---
 
 # Are you an experienced software buyer? I could use some help.
 
-Charity Majors, co-author of the second edition of "Observability Engineering," is adding a new section on "Observability Governance" covering how to staff observability teams, buy tools, manage costs, and make business cases. She notes the industry has changed dramatically since the first edition, where the phrase "observability engineering teams" didn't even appear. The new section aims to address the rise of dedicated observability teams in modern organizations.
+Charity Majors is working on the second edition of "Observability Engineering" and is adding a substantial new section on "Observability Governance." This section will cover topics like staffing observability teams, organizational placement, tool procurement, integration, cost management, and making business cases to executives. To write this effectively, she acknowledges that she has never bought software at scale or worked in a large enterprise tech company, so she is reaching out to experienced software buyers for practical guidance.
 
-Majors admits she has never bought software at the scale of large enterprises and lacks experience in vendor selection, proof-of-concept evaluation, stakeholder alignment, and driving consensus for multi-million-dollar decisions. She is reaching out to readers for practical advice that a principal engineer or VP would give to someone doing this for the first time, specifically asking for tips on shopping for options, recognizing when to switch vendors, conducting good POCs, identifying stakeholders, and understanding primary versus secondary considerations.
+She poses specific questions about vendor evaluation, signs that it's time to change vendors, what a good proof of concept looks like, stakeholder concerns, and how to drive consensus for large financial and engineering decisions. She requests advice via email with context about company size and the reader's role, and promises not to quote anyone without permission or mention vendors by name. This is explicitly an O'Reilly writing project, not a Honeycomb promotion.
 
-She requests emails with subject "Buying Software," promising not to quote anyone without permission, and states the effort is an O'Reilly writing project, not a Honeycomb marketing initiative. She will not mention vendor names, good or bad.
-
-- Second edition of 'Observability Engineering' will include a large 'Observability Governance' section covering team structure, tool buying, cost governance, and executive communication.
-- Author admits she has no firsthand experience buying software at large enterprises, so she's asking readers for guidance.
-- Specific questions include how to shop for options, recognize vendor change triggers, run good POCs, manage stakeholders, and drive consensus.
-- Responses are private; no quotes without permission, and no vendor names will be mentioned.
-- This is an O'Reilly book project, not a Honeycomb vendor pitch.
+- The second edition of Observability Engineering will include a new 'Observability Governance' section covering team staffing, tool buying, cost management, and executive communication.
+- Charity Majors openly states she lacks personal experience in large-scale software purchasing and asks readers for practical advice.
+- Key questions include how to shop for options, run POCs, align stakeholders, and achieve consensus on multi-million dollar decisions.
+- Submissions are confidential and will not be quoted without permission; no vendors will be named.
+- This is an O'Reilly book project, not a Honeycomb marketing effort.

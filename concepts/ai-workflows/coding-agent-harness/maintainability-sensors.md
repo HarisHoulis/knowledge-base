@@ -11,9 +11,13 @@ sources:
 
 # Maintainability sensors for coding agents
 
-The article introduces the concept of maintainability sensors for coding agents, drawing on Birgitta Böckeler's mental model of a coding agent harness. This harness consists of guides and sensors that increase the probability of good agent outputs and enable self-correction before issues reach human eyes. The focus of this part is on static analysis, specifically basic code linting, as an initial sensor for keeping a codebase maintainable (Martin Fowler, https://martinfowler.com/articles/sensors-for-coding-agents.html).
+In this article, Martin Fowler discusses the use of sensors in coding agent harnesses, building on Birgitta Böckeler's mental model that describes a system of guides and sensors. The purpose of this system is to increase the probability of good agent outputs and enable self-correction before issues reach human eyes. Fowler highlights that Birgitta has started publishing an article about her experiences using sensors to keep a codebase maintainable.
 
-- Coding agent harnesses use sensors to monitor and improve agent outputs.
-- Sensors enable self-correction before issues are seen by humans.
-- Static analysis, starting with basic code linting, is a foundational sensor for maintainability.
-- The approach is part of a broader series on practical experiences with sensors.
+The specific focus of this installment is static analysis, particularly basic code linting, as a sensor for maintainability. By incorporating linting into the coding agent harness, teams can automatically detect potential style issues, bugs, and other problems in agent-generated code. This approach is part of a broader effort to maintain code quality as AI agents become more involved in software development.
+
+Overall, the article emphasizes the importance of feedback loops in AI-assisted coding, where sensors like linters provide immediate signals that allow the agent to correct course proactively, reducing the burden on human reviewers and helping preserve long-term codebase maintainability.
+
+- Coding agent harnesses use a combination of guides and sensors to improve agent output quality.
+- Sensors enable self-correction before issues reach human eyes.
+- Static analysis, especially basic code linting, serves as a key sensor for maintainability.
+- Integrating linting into the harness helps keep codebases maintainable as AI agents contribute code.

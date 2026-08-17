@@ -11,10 +11,10 @@ sources:
 
 # The VibeSec Reckoning
 
-Vibe coding accelerates software prototyping but AI agents often recommend insecure configurations, creating security risks. The authors from Thoughtworks's global marketing share their experience building applications with AI assistance, highlighting the need for deliberate security practices. They propose a four-part approach: writing a security context file to guide AI behavior, being cautious with AI permission requests, creating a daily security intelligence feed, and providing builders with secure-by-default harnesses and templates.
+Vibe coding has accelerated software prototyping, but AI agents often recommend insecure configurations, creating security risks. The authors, Gautam Koul, Lucian Moss, Neil Drew-Lopez, and Daberechi Ruth Edeokoh, share their experience building applications for Thoughtworks' global marketing. They found that to mitigate these risks, teams should write a security context file to guide AI agents, be cautious with AI permission requests, and maintain a daily security intelligence feed to stay informed of emerging threats. Additionally, providing builders with secure-by-default harnesses and templates helps reduce the likelihood of insecure deployments.
 
-- AI agents frequently recommend insecure configurations, posing security challenges in vibe coding workflows.
-- Write a security context file to steer AI agents toward secure practices.
-- Exercise caution with AI permission requests to avoid unintended access or actions.
-- Create a daily security intelligence feed to stay ahead of evolving threats.
-- Provide builders with secure-by-default harnesses and templates to minimize risks.
+- AI agents frequently recommend insecure configurations during vibe coding.
+- A security context file helps align AI recommendations with security best practices.
+- Builders should carefully review and limit AI permission requests to reduce risk.
+- A daily security intelligence feed keeps developers aware of current threats.
+- Secure-by-default templates and harnesses enable safer prototyping.
