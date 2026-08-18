@@ -12,10 +12,9 @@ sources:
 
 # Are you an experienced software buyer? I could use some help.
 
-Charity Majors announces work on the second edition of Observability Engineering, adding a substantial new section on Observability Governance. This section will cover staffing, org placement, tool buying, integration, cost management, business cases, and schema management. Majors admits she lacks hands-on experience buying software at scale and asks readers for practical advice on vendor selection, POCs, stakeholder consensus, and decision-making.
+Charity Majors, co-author of 'Observability Engineering', is working on the second edition of the book and has noticed a major shift since the first edition: observability engineering teams are now common, not rare. To address this, she and her co-authors are adding a substantial new section called 'Observability Governance' covering topics like staffing, org placement, tool purchasing, cost management, and making business cases to executives. However, Majors admits she has no personal experience buying software at large enterprises, so she is soliciting advice from experienced principals, VPs, and directors on how to do it well.
 
-- The second edition of Observability Engineering includes a new section on Observability Governance, covering topics like team staffing and tool procurement.
-- Majors openly seeks advice from engineers and VPs who have experience buying software, acknowledging her own gaps in this area.
-- She outlines specific questions: how to shop for options, when to change vendors, what a good POC looks like, and how to drive consensus with millions on the line.
-- She requests email responses and promises not to quote without permission or mention vendors by name.
-- This is an O'Reilly writing project, not a Honeycomb customer solicitation.
+- The second edition of 'Observability Engineering' will include a new 'Observability Governance' section with chapters on team staffing, tooling integration, cost management, and executive buy-in.
+- Majors is explicitly seeking real-world advice on software buying from experienced engineers and leaders, as she lacks firsthand experience in large enterprise procurement.
+- She asks specific questions about vendor evaluation, POC best practices, stakeholder identification, and driving consensus for large financial commitments.
+- She promises to keep all submissions anonymous and will not name any vendors, good or bad, in the book.

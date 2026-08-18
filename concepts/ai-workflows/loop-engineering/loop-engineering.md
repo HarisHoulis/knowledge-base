@@ -7,19 +7,15 @@ sources:
   - title: "What is “loop engineering?”"
     url: "https://newsletter.pragmaticengineer.com/p/what-is-loop-engineering"
     author: "Gergely Orosz"
-    date: "2026-07-14"
+    date: "Tue, 14 Jul 2026"
 ---
 
 # What is “loop engineering?”
 
-Loop engineering is an emerging practice in AI-assisted development where engineers design and manage loops that automatically prompt AI agents, rather than writing individual prompts. The term gained prominence after Boris Cherny of Anthropic stated, “My job is to write loops,” and was popularized by the “Ralph loop” technique, a Bash loop that repeatedly feeds a prompt to an AI coding agent until a goal is achieved (Orosz, 2026). This approach abstracts the orchestration of repeated agent runs, allowing developers to set durable objectives and let the agent iterate autonomously.
+Loop engineering is an emerging practice where engineers design systems that run AI agents in iterative loops, rather than writing individual prompts. The term gained traction after Boris Cherny of Anthropic and Peter Steinberger of OpenClaw described their work as writing loops that prompt AI agents, with Cherny stating, “My job is to write loops.” The approach is abstract to many, but the article gathers developer examples to clarify how it works in practice (Orosz, 2026).
 
-By mid-2026, major coding harnesses such as Codex, Hermes, and Claude Code had shipped native /goal commands that formalize the Ralph loop into a single persistent objective. These commands automatically keep the agent working until a completion condition is met, managing context, state, and subagents behind the scenes. This shift makes loop engineering accessible to a broader audience, reducing the need for custom scripting (Orosz, 2026).
-
-Real-world applications of loop engineering fall largely into two categories: event-driven triggers and scheduled cron jobs. Examples include automatically opening PRs for new Sentry issues, fixing flaky tests, triaging incidents, and babysitting nightly end-to-end test runs. However, some developers report disappointment, citing agent drift and high token costs. Distinguished engineer Max Kanat-Alexander suggests loops may have been a temporary hack while tooling caught up, and many engineers may find more value in understanding context windows than in deep loop engineering (Orosz, 2026).
-
-- Loop engineering shifts developers from prompting agents to designing systems of loops that prompt agents automatically.
-- The Ralph loop—a simple Bash loop re-running an agent with a goal—is the conceptual origin of the practice.
-- Major AI harnesses now support /goal commands that natively implement persistent, autonomous loops.
-- Common use cases include event-triggered automations and scheduled jobs, such as opening PRs or fixing flaky tests.
-- Critics note issues like agent drift, high token costs, and the possibility that loops are a temporary workaround for immature tooling.
+- Loop engineering replaces the role of a human prompter with a designed system that runs agents repeatedly toward a goal.
+- The technique originated from Geoffrey Huntley's 'Ralph Wiggum' method, a Bash loop that continuously feeds a prompt to Claude Code with a state tracker.
+- By May 2026, major coding harnesses like Codex, Hermes, and Claude Code shipped a /goal command that compresses the Ralph loop into a single persistent objective.
+- Common real-world loops include event-driven triggers and cron jobs: opening PRs for Sentry issues, fixing flaky tests, triaging outages, and babysitting nightly E2E tests.
+- Some developers report disappointment due to agent drift, high token costs, and the need for human-in-the-loop review; Max Kanat-Alexander suggests loops may be a temporary hack while tooling catches up.

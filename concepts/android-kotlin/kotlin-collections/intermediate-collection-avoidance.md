@@ -11,12 +11,9 @@ sources:
 
 # Intermediate collection avoidance
 
-The article highlights how Kotlin's collection extension functions, while convenient, can create intermediate collections and iterators that hurt performance. For example, `users.map { it.name }.joinToString()` allocates an intermediate mapped list before joining, whereas `users.joinToString() { it.name }` performs the mapping during the join operation, eliminating the extra collection and iterator. Similarly, converting a collection to an array using `map().toTypedArray()` can be replaced with `Array(users.size) { users[it].name }`, and for primitive arrays `IntArray(users.size) { users[it].age }` is available. Pre-sized lists can also be initialized with `MutableList(users.size) { ... }` to avoid intermediate allocations.
+Kotlin's collection extension functions like `map` create intermediate collections that can be avoided by fusing operations. For example, `users.map { it.name }.joinToString()` can be rewritten as `users.joinToString() { it.name }`, which eliminates the extra iterator and intermediate collection, making the code both shorter and faster (Jake Wharton, Intermediate collection avoidance). Similarly, converting a mapped list to an array with `users.map { it.name }.toTypedArray()` can be replaced by `Array(users.size) { users[it].name }`, which uses an indexed loop instead of an iterator and intermediate collection. Primitive variants like `IntArray` are also available for performance-sensitive code (Jake Wharton, Intermediate collection avoidance).
 
-The article presents benchmarks showing these lambda-initialization variants are both faster and allocate fewer bytes than the `map`-based alternatives. However, it cautions that this technique relies on random-access source lists; for linked or persistent lists, the indexed access can be abysmal. It recommends using this approach primarily when you control the source list and need efficiency, echoing the strategy used by Compose UI's similarly named 'fast' collection functions.
-
-- Fuse operations: `joinToString(mapping)` instead of `map().joinToString()` to remove intermediate collections.
-- Use `Array(size) { ... }` or `IntArray(size) { ... }` for converting collections to arrays without intermediate maps.
-- Initialize pre-sized mutable lists with `MutableList(size) { ... }` for efficient element computation.
-- Only apply these techniques when the source supports random access; otherwise performance deteriorates.
-- Benchmarks confirm lower allocation and faster execution for the lambda-initialized variants.
+- Use fused operations like `joinToString { transform }` to avoid intermediate collections from `map`.
+- Initialize arrays and pre-sized lists with lambda-accepting constructors (`Array(size) { ... }`, `MutableList(size) { ... }`) to compute elements efficiently.
+- The technique relies on random access to the source; avoid it if the source is a linked or persistent list.
+- Benchmarks demonstrate significant speed improvements and reduced memory allocation compared to manual `map` chains.

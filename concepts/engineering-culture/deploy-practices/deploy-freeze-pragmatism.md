@@ -7,16 +7,24 @@ sources:
   - title: "On Friday Deploys: Sometimes that Puppy Needs Murdering"
     url: "https://charity.wtf/p/on-friday-deploys-sometimes-that"
     author: "Charity Majors"
-    date: "2025-12-24"
+    date: "Wed, 24 Dec 2025 00:54:45 GMT"
+  - title: "Friday Deploy Freezes are Exactly Like Murdering Puppies"
+    url: "https://substack.com/home/post/p-181561576"
+    author: "Charity Majors"
+    date: "May 1, 2019"
+  - title: "LinkedIn thread by Michael Davis on Friday Deploy Freezes"
+    url: "https://www.linkedin.com/posts/michael-davis-7033548_friday-deploy-freezes-are-exactly-like-murdering-activity-7408181339444707328-8GjS?utm_source=share&utm_medium=member_desktop&rcm=ACoAAAEP-B4Bn1IFS4Br7okfkI7z81XqQEOEKro"
+    author: "Michael Davis"
+    date: "unknown"
 ---
 
 # On Friday Deploys: Sometimes that Puppy Needs Murdering
 
-Charity Majors clarifies her stance on Friday deploy freezes, emphasizing that she is not an extremist. She acknowledges that deploy freezes are sensible for teams that lack the observability and confidence to move swiftly, meaning they cannot find problems before customers do. She criticizes the moral posturing around freezes, calling them a 'hack' rather than a virtuous practice, and encourages teams to be pragmatic and sheepish about them instead of self-congratulatory (Majors, 2025).
+Charity Majors clarifies her stance on deploy freezes, which she feels is often misunderstood as extremism. She acknowledges that freezes are a sensible workaround when teams lack the ability to move swiftly with confidence—specifically due to poor observability and inability to explore high cardinality dimensions in real time. She points to a LinkedIn thread where commenters discuss pragmatic approaches like 'icing' and 'defrosting' periods, and she agrees with those insights. Her main criticism is not the freeze itself, but the moral posturing that treats it as a virtuous act rather than a practical hack. She emphasizes that there is no shame in using freezes as a workaround, but one should be honest about it.
 
-Majors advises that if you need to freeze deploys, you should freeze merges instead to avoid a snowdrift of changes accumulating and exploding later. She also warns against completely stopping the deploy process, as systemic issues can arise from inaction. Her mitigation is to keep running the deploy pipeline every day or two without shipping new code, allowing for stability and peace during holidays while avoiding terrifying January recoveries (Majors, 2025).
+She advises two key practices for managing freezes effectively. First, if you freeze deploys, you should also freeze merges; otherwise, unreleased changes accumulate and cause difficult problems when finally deployed after the freeze. Second, rather than completely stopping the deploy process, teams should run deploys regularly without shipping new code, to avoid triggering hidden systemic issues that would otherwise surface during a long inactivity period. She bets that something will break when teams that deploy frequently suddenly stop for weeks, and recommends keeping the deployment engine running to avoid such surprises.
 
-- Deploy freezes are acceptable when you lack observability or confidence, but they are hacks, not moral achievements.
-- Freeze merges, not deploys, to prevent a buildup of unreleased changes that can cause major issues later.
-- If you do freeze deploys, continue running the deploy process without new code to uncover systemic issues.
-- Pragmatism is key: acknowledge the limitations of your systems and do the best you can with the hand you're dealt.
+- Deploy freezes are acceptable and necessary when teams lack the observability and confidence to move quickly; they are a workaround, not a moral virtue.
+- If you freeze deploys, freeze merges too, preventing unshipped changes from piling up and creating a painful recovery.
+- Continue running deploy processes without new code during a freeze to avoid hidden systemic issues caused by inactivity.
+- Embrace pragmatic approaches like 'icing' and 'defrosting' periods to ease into and out of freezes.

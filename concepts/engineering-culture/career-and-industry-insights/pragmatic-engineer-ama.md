@@ -8,18 +8,14 @@ sources:
     url: "https://newsletter.pragmaticengineer.com/p/the-pragmatic-engineer-ama"
     author: "Gergely Orosz"
     date: "Wed, 08 Jul 2026 16:38:49 GMT"
-  - title: "Inside Pollen’s Collapse: “$200M Raised” but Staff Unpaid - Exclusive"
-    url: "https://blog.pragmaticengineer.com/pollen/"
-    author: "Gergely Orosz"
-    date: "unknown"
 ---
 
 # The Pragmatic Engineer AMA
 
-In this ask-me-anything episode, Gergely Orosz shares origin stories and personal lessons from his career. He explains that the COVID-19 pandemic and Uber layoffs unexpectedly led him to pivot from engineering leadership to writing, eventually producing books and the Pragmatic Engineer newsletter. He also recounts nearly publishing a critical article about Dutch neobank Bunq, but chose not to after an engineer credited Bunq for giving them a first chance in European tech, which shaped his editorial policy to focus on what works rather than what seems broken. A separate encounter with Pollen's CEO, who dismissed him as a 'nobody,' prompted his sole investigative piece, uncovering unpaid salaries and a deliberate $3.2M double charge; the experience convinced him investigative journalism is not his path.
+In this Ask Me Anything episode, Gergely Orosz shares personal stories behind The Pragmatic Engineer: how pandemic-era Uber layoffs led him to writing, why he chose not to publish a critical article about Bunq after hearing from an immigrant engineer who credited Bunq for giving him a chance, and how being called a 'nobody' by Pollen's CEO prompted his only investigative piece—which uncovered unpaid salaries and a $3.2M double charge (https://blog.pragmaticengineer.com/pollen/). He explains that investigative journalism is not for him and that he now writes about what works inside companies (https://newsletter.pragmaticengineer.com/p/the-pragmatic-engineer-ama).
 
-- LeetCode interviews remain common because they filter for tolerance of pointless work, not because DSA skills are used on the job.
-- MCP's adoption was aided by Anthropic's non-dominant position at launch; today's leading labs would face lock-in concerns if they released a similar protocol.
-- AI should be used deliberately: avoid using it for skills you want to preserve, and accept degradation in areas where you choose to rely on it.
-- Editorial policy at Pragmatic Engineer focuses on what works inside companies, shaped by a personal story about Bunq giving an immigrant engineer a chance.
-- Investigative journalism exposed serious issues at Pollen, but reinforced that it is not a sustainable focus for the publication.
+- Career pivots can be catalyzed by external shocks: Uber layoffs during COVID-19 gave Orosz the push to leave and become a full-time writer.
+- Editorial choices matter: a single engineer's story convinced Orosz to abandon a critical Bunq piece and adopt a 'write about what works' policy.
+- Investigative journalism can have real impact—Pollen's collapse was exposed—but it wasn't a sustainable path for Orosz.
+- LeetCode interviews may persist because they filter for tolerance of corporate absurdity, not because they measure job-relevant skills.
+- Standards like MCP succeed partly due to timing and competitive positioning; AI use requires conscious tradeoffs to avoid skill atrophy.

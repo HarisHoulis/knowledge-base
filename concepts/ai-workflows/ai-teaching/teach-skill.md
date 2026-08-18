@@ -12,12 +12,9 @@ sources:
 
 # My /teach skill is still insane
 
-The video introduces a custom AI skill called '/teach' that provides personalized, tailored learning experiences. It demonstrates how the skill can help users master complex topics such as land surveying, Rubik's Cubes, and development techniques through interactive explanations and quiz questions. The approach leverages AI to adapt to the learner's pace and style, making education more engaging and effective.
+Matt Pocock demonstrates a custom '/teach' skill that enables AI to deliver personalized, tailored learning experiences. The skill helps users master new concepts by breaking down complex topics such as land surveying, Rubik's Cubes, and development techniques. It uses interactive explanations and quiz questions to reinforce understanding, making it adaptable to individual learning needs. The approach highlights how AI can act as a dynamic tutor, providing on-demand education across diverse domains.
 
-The skill is part of a broader collection of AI skills shared by the author, Matt Pocock, who encourages viewers to explore and adopt them. The video highlights the potential of AI as a personalized tutor, capable of breaking down difficult subjects into digestible, interactive lessons. By using the /teach skill, learners can receive custom guidance and assessments, which can accelerate understanding and retention.
-
-- The /teach skill offers personalized, tailored learning experiences via AI.
-- It covers diverse topics including land surveying, Rubik's Cubes, and development.
-- Interactive explanations and quiz questions help reinforce understanding.
-- The skill is available for free from the author's site, with updates shared via his newsletter.
-- AI can act as a virtual tutor, adapting to individual learning needs.
+- The /teach skill creates personalized learning paths for any topic.
+- It explains complex subjects like land surveying and Rubik's Cubes interactively.
+- Quiz questions are used to reinforce understanding and retention.
+- The skill demonstrates AI's potential as an adaptable teaching tool.
