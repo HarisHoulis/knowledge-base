@@ -7,14 +7,19 @@ sources:
   - title: "How many pillars of observability can you fit on the head of a pin?"
     url: "https://charity.wtf/p/the-pillar-is-a-lie"
     author: "Charity Majors"
-    date: "Thu, 30 Oct 2025 05:27:38 GMT"
+    date: "2025-10-30"
 ---
 
 # How many pillars of observability can you fit on the head of a pin?
 
-Charity Majors argues that the concept of observability 'pillars' is a marketing term, not a technical one. The technical term is 'signal', as defined by OpenTelemetry. Vendors label features like profiling as a 'fourth pillar' to justify higher prices, but this has no technical meaning. The real distinction is between two architectural models: the multiple pillars model (each signal type in siloed storage) and the unified storage model (all signals in one database). The pillars model causes data duplication, high costs, and a poor debugging experience where engineers must 'hop' between tools. Unified storage allows zooming from SLOs down to individual events without switching contexts. OpenTelemetry does not mandate the three-pillar approach; it actually unifies signals through shared context. Profiling, while a valid signal, is often not what engineers need—most need better tracing. Ultimately, pillars are a lie; data is data.
+Charity Majors argues that "pillar" is a marketing term, not a technical one. The technical term is "signal," as defined by OpenTelemetry, which currently supports traces, metrics, logs, and baggage, with events and profiles proposed or in development. Therefore, asking whether profiling is a "pillar" is a marketing question, not a technical one, and the proliferation of so-called "fourth pillars" reflects vendor positioning rather than engineering reality (Majors, 2025).
 
-- Pillar is a marketing term; signal is the technical term, and profiling is a valid signal type.
-- The multiple pillars architecture leads to data duplication and high costs; unified storage is the modern alternative.
-- Unified storage lets you zoom from metrics to traces to logs seamlessly, reducing cognitive load.
-- OpenTelemetry does not enforce the pillars model; it treats everything as unified data with shared context.
+Majors contrasts two observability architectures: the "multiple pillars" model, where each signal type is stored in a separate siloed database, and the "unified storage" model (o11y 2.0), where all signals are stored together in one database preserving context and relationships. The pillars model leads to data duplication, high costs, and a debugging experience of "bunny hopping" between metrics, logs, and traces. The unified model enables users to zoom in and out from SLOs to events to traces without copying IDs or lining up timestamps, because it's "the same f***ing data" (Majors, 2025).
+
+Majors also clarifies that OpenTelemetry is not inherently a "three pillars" framework. Citing Austin Parker, she explains that OTel unifies telemetry signals through shared, distributed context, even though it can be used to feed traditional pillar-based systems if vendors choose that path. In a unified world, profiling becomes just another level of zoom, down to syscalls if needed, but most teams likely need better tracing rather than profiling (Majors, 2025).
+
+- Pillar is a marketing term; signal is the technical term used by OpenTelemetry.
+- The multiple pillars architecture silos signals into separate stores, causing data duplication, high cost, and 'bunny hopping' during debugging.
+- Unified storage (o11y 2.0) stores all signals together, enabling seamless zooming from metrics to traces to logs.
+- OpenTelemetry unifies signals through shared context and does not require a three-pillars architecture.
+- Profiling is a signal in development, but many teams need good tracing more than profiling.
