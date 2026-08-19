@@ -11,9 +11,9 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine 1.0 is a library from Cash App for testing kotlinx.coroutines Flow. It converts push-based Flows into pull-based suspend functions, simplifying test code. The `test` function allows developers to await items, completion, errors, skip items, cancel the Flow, and more, with assertions failing on unexpected events or timeouts. Standalone Turbine instances can adapt other push-based mechanisms like callbacks for testing, offering the same API as the test function. The library includes utilities for handling multiple Turbines, multiple Flows, shared timeouts, and aggregated errors.
+Turbine is a library by Cash App for testing kotlinx.coroutines Flow. It transforms push-based Flows into pull-based suspend functions, simplifying tests by allowing developers to await specific items, completion, or errors with methods like `awaitItem()`, `awaitComplete()`, and `awaitError()`. This approach makes Flow tests more deterministic and readable. The library also provides standalone `Turbine` instances that can adapt other push-based mechanisms, such as callbacks, to the same testing API. For example, a `FakeLogger` can collect log messages into a `Turbine` and assert them sequentially. Additionally, Turbine offers utilities for managing multiple Turbines, multiple Flows, shared timeouts, and error aggregation to support more complex testing scenarios.
 
-- Turbine changes push-based Flow into pull-based suspend functions for easier testing.
-- Use `awaitItem()` and `awaitComplete()` to assert on Flow emissions and completion.
-- Standalone Turbines can adapt non-Flow push-based mechanisms like callbacks.
-- The library provides utilities for multiple turbines, timeouts, and error aggregation.
+- Turbine converts push-based Flow events into pull-based suspend functions, enabling straightforward assertion of each emitted value.
+- The `test` function allows awaiting items, completion, and errors; mismatches or timeouts throw `AssertionError`.
+- Standalone `Turbine` objects can adapt other callback-driven APIs for testing.
+- Utilities exist for handling multiple Flows/Turbines, sharing timeouts, and aggregating errors.

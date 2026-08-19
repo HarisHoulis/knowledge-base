@@ -12,10 +12,10 @@ sources:
 
 # Now in Android #75
 
-Now in Android #75, by Manuel Vivo, recaps the latest Android development updates as of January 2023. The stable release of Android Studio introduces several improvements, including automatic Compose Preview updates, layout inspector recomposition counts, visual XML linting for Views, parallel project imports for faster sync, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring. These features aim to streamline the development workflow across design, build, emulator, and IntelliJ integration.
+The Now in Android #75 roundup covers the latest Android Studio stable release, which introduces Compose Preview auto-updates, layout inspector recomposition counts, visual XML linting for Views, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring (Now in Android #75).
 
-- Android Studio stable release includes Compose Preview auto-updates, recomposition counts, and a new logcat.
-- AndroidX stable releases: AppCompat 1.6.0 (Android 13, per-language preferences, predictive back) and Room 2.5.0 (Kotlin runtime, Upsert, room-paging).
-- New libraries: androidx.credentials (sign-in with passkeys), adservices, and sdkruntime for Privacy Sandbox.
-- Articles cover domain layer, extending Android SDK, Wear OS media toolkit, HDR migration, and stylus low latency.
-- Videos and podcasts feature CameraX, FLEDGE, Attribution Reporting, and Kotlin Multiplatform/K2.
+- Android Studio stable includes Compose Preview automatic updates, recomposition counts, visual XML linting, SDK Index integration, new logcat, resizable emulators, and physical device mirroring.
+- AppCompat 1.6.0 and Room 2.5.0 are now stable; Room was rewritten in Kotlin and adds Upsert and room-paging support.
+- Lifecycle 2.6.0-alpha04 removes experimental status from collectAsStateWithLifecycle and deprecates launchWhenX/pausing dispatcher.
+- New libraries include androidx.credentials for sign-in and privacy sandbox libraries adservices and sdkruntime.
+- Articles cover adding a domain layer to Now in Android, extending the Android SDK for photo picker, Wear OS media toolkit, HDR migration to SurfaceView, and stylus low latency libraries.
