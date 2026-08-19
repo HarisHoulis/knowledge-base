@@ -12,11 +12,12 @@ sources:
 
 # Thoughts on Motivation and My 40-Year Career
 
-Charity Majors reflects on her unconventional journey from a fundamentalist homeschooling upbringing in Idaho to a successful career in tech. She left home at 15, forged her own path through university and self-taught skills, and eventually became a founder and CTO. She describes work as a source of liberation and personal growth, contrasting her own drive with those who view work merely as a paycheck. She emphasizes that her motivation goes beyond advancing the industry; it is about living with integrity and building enduring value, even as running a company forces hard trade-offs between ideals and market realities.
+Charity Majors reflects on her unconventional path from a fundamentalist homeschooled childhood in rural Idaho to a career as a tech founder and CTO. She describes leaving home at 15, cobbling together a university education, and discovering computers and the internet just as the industry was taking off. Her early career was driven by a fierce desire to escape poverty and achieve power, money, and autonomy, but she initially compartmentalized her beliefs, leading to a personal crisis that eventually resolved through intense study and an atheist epiphany (Majors, 2025).
 
-Majors argues that creation is harder than critique, and that leading a company means making peace with multiple narratives and sometimes learning the hard way why certain practices exist. She acknowledges the joy she now finds in building Honeycomb, after years of feeling it was merely worth doing. Ultimately, she believes work is one of the last places where people with different ideologies can find common purpose, and that striving to win while honoring one's values is what makes work meaningful.
+Majors argues that her deepest motivation is not simply advancing the industry (though that matters) but living a meaningful life and building things of enduring value. She emphasizes that creation is harder than critique, and that running a company forces ideals to collide with reality. While she acknowledges the recent cultural skepticism toward loving work, she sees work as a source of liberation and growth, and contends that meaningful work—work worth doing—can provide purpose even when it is not always happy or easy (Majors, 2025).
 
-- Work has been a source of liberation and meaning for Majors, enabling her to escape poverty and support her family.
-- Her motivation is less about 'advancing the industry' and more about acting with integrity and building enduring value.
-- Creation is harder than critique; running a company forces reconciling strong ideals with the practical demands of winning in a marketplace.
-- Work is one of the few arenas where people with opposing beliefs can collaborate, making it inherently meaningful.
+- Work can be a source of liberation and personal growth, not just a paycheck.
+- Ideals must be tested against reality; creation is harder than critique.
+- Career success can be driven by a need to build enduring value and act with integrity.
+- Personal evolution—from religious fundamentalism to atheism—can parallel professional development.
+- Even when work is hard, it can feel worth doing if it aligns with one's values.
