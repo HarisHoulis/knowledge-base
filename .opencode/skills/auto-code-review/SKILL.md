@@ -35,6 +35,8 @@ Look for the originating spec, in this order:
 
 Anything in the repo that documents how code should be written, such as `CODING_STANDARDS.md` or `CONTRIBUTING.md`. This repo documents its standards in `docs/agents/architectural-rules.md`, `docs/agents/design-rules.md`, `docs/agents/python-rules.md`, `docs/agents/agentic-execution.md`, `docs/agents/plan-execution.md`, and the enforcement map in `docs/agents/compliance.md` — include all of them.
 
+Also read `docs/agents/implement-ledger.md` for the **severity rubric** (blocker/major/minor thresholds) and the **per-finding root-cause taxonomy** — every finding is graded against them, and both are pasted into the sub-agent prompts below.
+
 On top of whatever the repo documents, the Standards axis always carries the **smell baseline** below — a fixed set of Fowler code smells (_Refactoring_, ch.3) that applies even when a repo documents nothing. Two rules bind it:
 
 - **The repo overrides.** A documented repo standard always wins; where it endorses something the baseline would flag, suppress the smell.
@@ -63,13 +65,15 @@ Send a single message with two `Agent` tool calls. Use the `general-purpose` sub
 
 - The full diff command and commit list.
 - The list of standards-source files you found in step 3, **plus the smell baseline from step 3** pasted in full — the sub-agent has no other access to it.
-- The brief: "Report — per file/hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls — documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Enforce the rules in `docs/agents/architectural-rules.md`, `docs/agents/design-rules.md`, `docs/agents/python-rules.md`, `docs/agents/agentic-execution.md`, `docs/agents/plan-execution.md`, and `docs/agents/compliance.md` as documented standards, but skip anything tooling enforces — including the CI-tier rules listed in `docs/agents/compliance.md`. Under 400 words."
+- The severity rubric and root-cause taxonomy from `docs/agents/implement-ledger.md`.
+- The brief: "Report — per file/hunk where relevant — (a) every place the diff violates a documented standard: cite the standard (file + the rule); and (b) any baseline smell you spot: name it and quote the hunk. Distinguish hard violations from judgement calls — documented-standard breaches can be hard, but baseline smells are always judgement calls, and a documented repo standard overrides the baseline. Enforce the rules in `docs/agents/architectural-rules.md`, `docs/agents/design-rules.md`, `docs/agents/python-rules.md`, `docs/agents/agentic-execution.md`, `docs/agents/plan-execution.md`, and `docs/agents/compliance.md` as documented standards, but skip anything tooling enforces — including the CI-tier rules listed in `docs/agents/compliance.md`. Emit each finding as `severity | category | root-cause | quote` using the rubric and taxonomy above. Under 400 words."
 
 **Spec sub-agent prompt** — include:
 
 - The diff command and commit list.
 - The path or fetched contents of the spec.
-- The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong. Quote the spec line for each finding. Under 400 words."
+- The severity rubric and root-cause taxonomy from `docs/agents/implement-ledger.md`.
+- The brief: "Report: (a) requirements the spec asked for that are missing or partial; (b) behaviour in the diff that wasn't asked for (scope creep); (c) requirements that look implemented but where the implementation looks wrong; (d) bypassed seams or polluted layers — code crossing the architectural boundary the spec's State & Seams named; (e) temporary mocks left in production code; (f) hallucinated or tautological tests — tests asserting the implementation's own computation, or covering behaviour the spec never claimed; (g) architectural regression — the change making the module structure worse than before the diff; (h) requirement drift — the implementation deviating from the spec's stated behaviour; (i) decisions the fix needs that neither the spec nor the Pre-flight block's assumptions covered (root-cause `unstated decision`). Quote the spec line for each finding. Emit each finding as `severity | category | root-cause | quote` using the rubric and taxonomy above. Under 400 words."
 
 If the spec is missing, skip the Spec sub-agent and note this in the final report.
 
@@ -78,6 +82,15 @@ If the spec is missing, skip the Spec sub-agent and note this in the final repor
 Present the two reports under `## Standards` and `## Spec` headings, verbatim or lightly cleaned. Do **not** merge or rerank findings — the two axes are deliberately separate (see _Why two axes_).
 
 End with a one-line summary: total findings per axis, and the worst issue _within each axis_ (if any). Don't pick a single winner across axes — that's the reranking the separation exists to prevent.
+
+### 6. Persist to the ledger and the ticket
+
+1. Extract the process signals from the PR body's Pre-flight block (labels `Seam`, `Bounds`, `Assumptions`, `Gaps`): Pre-flight present, seam named, bounds stated, number of assumptions, number of escalations.
+2. Tally the aggregated findings: category counts, severity counts, root-cause counts per class.
+3. Append **one ledger row** per ticket — ticket #, date, the process signals, category counts, severity counts, root-cause counts, and a link to the PR. Do not append a second row for the same ticket; roll rows into a dated archive past ~50.
+4. Post the **full findings** (both axes, verbatim) to the originating ticket issue via `gh issue comment <ticket-number> --body "..."`.
+
+These are the only two writes this skill makes; the ledger is the aggregation surface, the ticket is the single writer's native loop.
 
 ## Why two axes
 
