@@ -12,9 +12,9 @@ sources:
 
 # My /teach skill is still insane
 
-Matt Pocock demonstrates a custom AI 'teach' skill designed to help users master new concepts through personalized, tailored learning. The skill leverages AI to break down complex topics such as land surveying, Rubik's Cubes, and development techniques using interactive explanations and quiz questions. This approach adapts to the learner's pace and style, making abstract or technical subjects more accessible and engaging. The video serves as a promotional walkthrough, highlighting the skill's utility and directing viewers to resources for accessing and keeping up to date with the skill.
+The video demonstrates a '/teach' skill that enables personalized, tailored learning of new concepts with AI. It claims the skill can help users understand complex topics such as land surveying, Rubik's Cubes, and development techniques through interactive explanations and quiz questions. The skill is distributed via aihero.dev, and the creator encourages following along on social media and Discord for updates.
 
-- The /teach skill provides personalized, tailored learning for new concepts.
-- It can explain complex topics like land surveying, Rubik's Cubes, and development techniques.
-- Interactive explanations and quiz questions are core features that enhance understanding.
-- The skill is available via a dedicated link, with updates shared through a community page.
+- The /teach skill provides personalized learning experiences for mastering new concepts.
+- It covers diverse topics including land surveying, Rubik's Cubes, and development techniques.
+- Learning is interactive, incorporating explanations and quiz questions.
+- The skill is available for use and updates are shared through aihero.dev and Discord.

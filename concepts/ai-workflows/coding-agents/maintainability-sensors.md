@@ -11,10 +11,11 @@ sources:
 
 # Maintainability sensors for coding agents
 
-The article introduces a mental model for coding agent harnesses, drawing on Birgitta Böckeler's concept of guides and sensors that improve agent outputs and enable self-correction before issues reach humans. The focus is on using static analysis, such as basic code linting, as a sensor to maintain codebase quality. This approach aims to increase the probability of good agent outputs by catching issues early. The article is part of a series exploring practical experiences with sensors for maintainability, highlighting the role of automated checks in the agent workflow.
+The article introduces Birgitta Böckeler's mental model of harness engineering for coding agent users. A harness consists of guides and sensors that increase the probability of good agent outputs and enable self-correction before issues reach human eyes. This framework is intended to help developers manage AI-assisted coding workflows more reliably.
 
-- Coding agent harnesses benefit from guides and sensors to improve output quality.
-- Sensors enable self-correction of agent outputs before human review.
-- Static analysis and code linting are initial sensor types for maintainability.
-- The approach increases the probability of good agent outputs.
-- This article is part of an ongoing series on sensor experiences.
+Birgitta has begun publishing a follow-up article detailing her experiences using sensors to keep a codebase maintainable. The first part focuses on static analysis with basic code linting as an initial sensor. This approach is part of a broader effort to build automated feedback loops that preserve code quality when working with coding agents.
+
+- Harness engineering combines guides and sensors to steer coding agents toward better outputs.
+- Sensors allow self-correction before problems are reviewed by humans.
+- Static analysis with code linting serves as a fundamental maintainability sensor.
+- The work is based on Birgitta Böckeler's practical experiences with coding agents.

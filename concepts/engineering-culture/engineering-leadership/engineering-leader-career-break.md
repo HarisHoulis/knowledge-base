@@ -12,10 +12,10 @@ sources:
 
 # Headed for the Exit: the Great Engineering Leader Career Break
 
-Gergely Orosz reports an unprecedented wave of engineering leaders—CTOs, VPs of Engineering, and heads of engineering—opting out of high-status roles or taking prolonged career breaks. Based on interviews with nearly 20 leaders, he identifies ten common reasons: the job deteriorating, startup equity becoming worthless, the pressure to be AI-native, predecessor flight, long hours (rarely decisive), shrinking team sizes, preference for fractional roles, AI startups paying ICs more than executives, launching personal ventures, and burnout. The article also highlights how "founder mode" and "AI psychosis" are making leadership roles harder, with unrealistic founder expectations and sloppy AI-generated code causing quality and accountability issues.
+Gergely Orosz reports an unusual wave of senior engineering leaders—CTOs, VPs of Engineering, heads of engineering—opting out or taking prolonged career breaks. Drawing on conversations with nearly 20 leaders, he identifies ten common reasons, including the job getting much worse, startups losing value, feeling not AI-native enough, smaller teams reducing the need for leaders, and burnout (Orosz, 2026).
 
-- A majority of CTO-level leaders are considering or actively taking career breaks, driven by burnout, unrealistic AI expectations, and worthless equity.
-- Equity structures with liquidation preferences can make leader compensation worthless unless a startup achieves a massive exit, removing the financial incentive to stay.
-- AI-native experience is becoming mandatory for senior engineering leaders; some quit to gain it through IC roles, consulting, or academia.
-- "Founder mode" and "AI psychosis" are deteriorating leadership roles, as founders ship low-quality AI code and pressure leaders to cut costs while shipping more.
-- Most VPEs and CTOs lack the change-management skills needed to transform organizations into AI-native cultures, creating a leadership vacuum.
+- Engineering leaders are exiting at unprecedented rates, with 6/10 CTO-level contacts considering or taking breaks.
+- AI-driven founder expectations and 'AI psychosis' are making leadership roles significantly harder.
+- Equity often becomes worthless due to liquidation preferences, removing a financial reason to stay.
+- Leaders feel they must get AI experience to stay relevant, sometimes via IC roles or career breaks.
+- Many VPEs/CTOs lack the change-management skills to transform orgs into AI-native, leading to a deadlock.

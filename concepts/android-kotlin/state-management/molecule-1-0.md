@@ -11,10 +11,12 @@ sources:
 
 # A stable, multiplatform Molecule 1.0
 
-Cash App has released Molecule 1.0, the first stable version of its Compose-based library for managing application state. The release adds Kotlin multiplatform support for JVM, JS, and native targets, and introduces an immediate recomposition mode that triggers recomposition whenever new state changes are available, without requiring a frame clock. These features extend Molecule's utility beyond Android and enable state-producing composables to be reused across platforms and test environments.
+Molecule 1.0 is a stable release of Cash App's Compose-based library for managing application state. The article highlights two major features added since the initial announcement: Kotlin multiplatform support (JVM, JS, native) and an immediate recomposition mode that removes the need for a frame clock. These features enable state-producing composables to be used outside of Compose UI, such as in Views, notifications, or widgets, by exposing state as a StateFlow or Flow.
 
-- Molecule 1.0 supports Kotlin multiplatform targets (JVM, JS, native) in addition to Android.
-- Immediate recomposition mode allows state to be produced as a Flow without needing a UI frame clock.
-- State logic written in Compose can be exposed as StateFlow for use with Views, notifications, widgets, and other non-UI targets.
-- The library simplifies testing by allowing state flows to be unit tested with Turbine on the JVM.
-- The article demonstrates using Molecule for a counter example that works in pure Compose UI, with View-based Android, and on web via Kotlin/JS.
+The article demonstrates how a simple counter composable can be migrated to a StateFlow using launchMolecule with ContextClock mode, or to a Flow using moleculeFlow with Immediate mode. This allows state logic to be unit tested with Turbine on the JVM, and run on platforms like iOS or web. Molecule is positioned as a tool for managing state using Compose across multiplatform projects.
+
+- Molecule 1.0 supports Kotlin multiplatform targets including JVM, JS, and native.
+- Immediate recomposition mode allows state production without relying on a frame clock.
+- State-producing composables can be exposed as StateFlow for use in non-Compose contexts.
+- Flow-based state can be unit tested with Turbine on the JVM.
+- Molecule enables state reuse across platforms like iOS and web.
