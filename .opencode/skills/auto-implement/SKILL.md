@@ -21,6 +21,17 @@ This skill runs in headless CI. Rules:
 
 At most **2 subagents** for code exploration or web research across the entire session. Use them sparingly. Sub-agents spawned by `/auto-code-review` (Standards + Spec axes) are **exempt** from this cap.
 
+## Pre-flight (mandatory, before any code)
+
+Before writing any code, on the current branch, name the contract in a machine-extractable block for the PR body, with these fixed labels:
+
+- **Seam:** the named seam this ticket implements at (from the ticket's Seam / the spec's State & Seams).
+- **Bounds:** the bounding box this work stays inside (the ticket's allow-list).
+- **Assumptions:** every design decision the ticket left implicit that you had to fill.
+- **Gaps:** anything the ticket or spec doesn't cover that you needed to resolve.
+
+If you cannot name the seam or state the bounds, **stop — do not silently infer**. Headless CI has no HITL channel, so the escalation path is the AFK one only: `gh issue comment <issue-number> -m "needs-info: <what's missing>"`, apply the `needs-info` label, then exit with error. Record every escalation.
+
 ## Loop (max 3 iterations)
 
 ### Per-iteration steps

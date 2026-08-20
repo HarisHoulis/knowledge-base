@@ -84,6 +84,10 @@ An issue that an agent run has claimed by atomically replacing its labels with t
 **needs-triage**:
 Applied to an issue when the agent failed to implement it. Signals a human must act.
 
+**needs-info**:
+Applied to an issue when the implementer's Pre-flight could not name the Seam or bounds and stopped — the AFK/CI escalation path. Signals the ticket is underspecified and must return for clarification.
+_Avoid_: needs-clarification, blocked-on-question
+
 **Claimability gate**:
 The predicate an issue must satisfy for the triage script to pick it: open, unassigned, unblocked, and labeled `ready-for-agent`. Applied to both top-level candidates and sub-issues.
 
@@ -92,6 +96,32 @@ An issue that passes the **Claimability gate**.
 
 **Parent / Sub-issue**:
 A GitHub parent issue and its native sub-issues. A parent with sub-issues is never implemented directly by the agent — it descends into sub-issues and claims the first claimable one. If none are claimable, the parent is skipped.
+
+## Agentic Development
+
+**Agentic Ticket**:
+A vertical-slice task specification written for an autonomous coding agent, not for a human. Carries What to build, Bounding Box, Seam, Behaviors to cover, Acceptance Criteria, Never list, Size cap, and Blocked by.
+_Avoid_: user story, task, ticket-in-human-terms
+
+**Acceptance Criterion**:
+A single, independently verifiable behavior at a named Seam, with a "how verified" pointer (the test seam that asserts it) and, where relevant, an explicit negative.
+_Avoid_: checklist item, done condition
+
+**Bounding Box**:
+The hard ceiling on what a ticket may read and touch — an allow-list of dependencies to read and modules to create/modify, not a shopping list. Derived from the spec's State & Seams.
+_Avoid_: scope, files-touched description
+
+**Findings Ledger**:
+The append-only Markdown record in `docs/agents/implement-ledger.md` — one compact row per implemented ticket carrying process signals (Pre-flight present, seam named, bounds stated, # assumptions, # escalations), category counts, severity counts, and per-class root-cause counts. Severity thresholds and the root-cause taxonomy are defined in the ledger doc itself. The aggregation surface for evaluating implementer performance.
+_Avoid_: dashboard, report, scorecard
+
+**Pre-flight**:
+The mandatory step before any implementation where the agent names the Seam, states the Bounding Box, and records Assumptions & Gaps it had to fill; if it cannot, it stops — asks in a live session, escalates `needs-info` in CI.
+_Avoid_: planning, scoping
+
+**Phase Model**:
+The canonical six-phase sequence the agentic workflow follows — Discovery → Spec → Tickets → Execute → Open PR → Verify — a naming layer over existing skills (`/grill-with-docs`, `/to-spec`, `/to-tickets`, `/implement`, `/push`, `/code-review`), not an orchestrator. `/triage` sits outside it as the upstream gate for issues and PRs.
+_Avoid_: pipeline stages, workflow engine, orchestrator
 
 ## Trusted Sources
 

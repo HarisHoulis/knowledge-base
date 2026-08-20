@@ -1,0 +1,43 @@
+# Implementer Findings Ledger
+
+The append-only record of code-review findings on implemented tickets — the aggregation surface for evaluating implementer performance. One compact row per ticket. Full findings text lives in the originating ticket's issue comment and the code-review output, never here.
+
+Roll rows into a dated archive (`.archive/` or a dated section) once the table passes ~50 rows.
+
+## Severity rubric
+
+| Severity | Threshold |
+| --- | --- |
+| **blocker** | A finding whose fix requires a decision the ticket didn't cover and the Pre-flight didn't list as an assumption (root-cause `unstated decision`); an out-of-bounds edit; a wrong-seam implementation; a missing requirement the ticket explicitly asked for. |
+| **major** | A defect or scope creep that is objectively wrong against the ticket or spec, but fixable within the ticket's bounds and assumptions — a broken behavior, a bypassed seam, a missing-but-recoverable requirement. |
+| **minor** | A judgement call: a Fowler smell, a disputed style point, or a partial requirement whose intent is ambiguous and was reasonably inferred. |
+
+Every finding is graded blocker/major/minor; nothing is left ungraded.
+
+## Categories
+
+A finding's category is its review axis:
+
+- **Spec types** — (a) missing/partial requirement, (b) scope creep, (c) wrong implementation, (d) bypassed seam / polluted layer, (e) temp mock left in prod, (f) hallucinated or tautological test, (g) architectural regression, (h) requirement drift, (i) unstated decision needed.
+- **Standards (Fowler smells)** — Mysterious Name, Duplicated Code, Feature Envy, Data Clumps, Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change, Speculative Generality, Message Chains, Middle Man, Refused Bequest.
+
+A documented-standard breach is a category of its own ("doc-standard") when no smell name fits.
+
+## Root-cause taxonomy
+
+Each finding is attributed to one class — the fix's root cause, not the surface symptom:
+
+| Class | Meaning |
+| --- | --- |
+| **spec gap** | The ticket/spec didn't specify the behavior, so the implementer inferred it. |
+| **seam gap** | The ticket didn't name a seam, or the implementer worked at the wrong one. |
+| **bounding-box gap** | The ticket's bounds didn't contain the edit — the implementer touched something outside them. |
+| **unstated decision** | The fix needs a decision the ticket didn't cover and the Pre-flight didn't list as an assumption. |
+
+## Ledger
+
+| # | Date | Signals | Categories | Severity | Root causes | Link |
+| --- | --- | --- | --- | --- | --- | --- |
+|  |  |  |  |  |  |  |
+
+**Signals** columns, per ticket: Pre-flight present (✓/✗), seam named (✓/✗), bounds stated (✓/✗), # assumptions, # escalations.
