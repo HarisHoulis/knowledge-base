@@ -85,9 +85,11 @@ End with a one-line summary: total findings per axis, and the worst issue _withi
 
 ### 6. Persist to the ledger and the ticket
 
-1. Extract the process signals from the PR body's Pre-flight block (labels `Seam`, `Bounds`, `Assumptions`, `Gaps`): Pre-flight present, seam named, bounds stated, number of assumptions, number of escalations.
+If `docs/agents/implement-ledger.md` exists and the originating spec is a ticket (found in step 2). This skill runs up to 3× per auto-implement run, so persist **once per ticket**, not once per invocation. Check the ledger first: if a row for this ticket already exists (matched on ticket #), **skip** — the first review's row stands. Otherwise:
+
+1. Extract the process signals from the PR body's Pre-flight block (labels `Seam`, `Bounds`, `Assumptions`, `Gaps`): Pre-flight present, seam named, bounds stated, number of assumptions, number of escalations (from the recorded `needs-info` comments on the ticket).
 2. Tally the aggregated findings: category counts, severity counts, root-cause counts per class.
-3. Append **one ledger row** per ticket — ticket #, date, the process signals, category counts, severity counts, root-cause counts, and a link to the PR. Do not append a second row for the same ticket; roll rows into a dated archive past ~50.
+3. Append **one ledger row** per ticket — ticket #, date, the process signals, category counts, severity counts, root-cause counts, and a link to the PR. Roll rows into a dated archive past ~50.
 4. Post the **full findings** (both axes, verbatim) to the originating ticket issue via `gh issue comment <ticket-number> --body "..."`.
 
 These are the only two writes this skill makes; the ledger is the aggregation surface, the ticket is the single writer's native loop.

@@ -84,6 +84,10 @@ An issue that an agent run has claimed by atomically replacing its labels with t
 **needs-triage**:
 Applied to an issue when the agent failed to implement it. Signals a human must act.
 
+**needs-info**:
+Applied to an issue when the implementer's Pre-flight could not name the Seam or bounds and stopped — the AFK/CI escalation path. Signals the ticket is underspecified and must return for clarification.
+_Avoid_: needs-clarification, blocked-on-question
+
 **Claimability gate**:
 The predicate an issue must satisfy for the triage script to pick it: open, unassigned, unblocked, and labeled `ready-for-agent`. Applied to both top-level candidates and sub-issues.
 

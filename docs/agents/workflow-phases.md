@@ -11,10 +11,10 @@ The agentic development workflow is a six-phase sequence: **Discovery → Spec �
 | 4 | Open PR | `/push` |
 | 5 | Verify | `/code-review` — feeds the Findings Ledger |
 
-`/triage` sits **outside** the model: it is the upstream gate for issues and PRs, not Phase 0. Issues enter the workflow only after triage marks them claimable.
+The phases are numbered in authoring order. In **execution**, Verify runs immediately before Open PR — `/code-review` runs on the branch before `/push` opens the PR. `/triage` sits **outside** the model: it is the upstream gate for issues and PRs, not Phase 0. Issues enter the workflow only after triage marks them claimable.
 
 ## Boundary decisions
 
-- **Verify-then-merge** — `/code-review` (Verify) runs *before* `/push` (Open PR). The review feeds the Findings Ledger and its findings are resolved before the PR ships.
+- **Verify-then-merge** — `/code-review` (Verify) runs *before* `/push` (Open PR), even though Open PR is numbered earlier. The review feeds the Findings Ledger and its findings are resolved before the PR ships.
 - **Triage is a gate, not a phase** — `/triage` decides whether an issue is claimable; it never produces spec or implementation work.
 - **No orchestrator** — the phases invoke existing skills in sequence. Nothing auto-chains them; nothing gates a phase on a prior phase's formal artifact beyond what the skills already require.
