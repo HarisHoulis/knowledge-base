@@ -11,10 +11,9 @@ sources:
 
 # Kotlin's JDK release compatibility flag
 
-The article describes a crash caused by `NoSuchMethodError` when calling `removeFirst()` on a `List`. The code was written in Kotlin and appeared to use the Kotlin extension function `removeFirst`, but after upgrading the build JDK to 21, the `List` interface gained a new member method `removeFirst()` as part of sequenced collections. Because member functions always win over extension functions, the Kotlin extension was shadowed, and the compiled code attempted to invoke the JDK 21 interface method at runtime, which does not exist on older Android or JVM versions.
+Kotlin's `jvmTarget` sets the Java bytecode version that the compiler emits, but it does not restrict the JDK APIs that can be referenced. This allows the compiler to accidentally use newer JDK methods, causing `NoSuchMethodError` at runtime on older platforms. The article illustrates this with a crash caused by JDK 21's new `List.removeFirst()` method taking precedence over Kotlin's extension function of the same name, because member functions always win over extensions.
 
-- Kotlin's `jvmTarget` only controls the bytecode version, not the set of JDK APIs the compiled code can reference, so it does not prevent accidental usage of newer JDK methods.
-- The `-Xjdk-release` flag for `kotlinc` behaves like `javac`'s `--release`, restricting the JDK API surface to the specified version and preventing such compatibility issues.
-- Using `-Xjdk-release` makes Kotlin resolve `removeFirst` to the stdlib extension function instead of the JDK 21 member method.
-- Android Kotlin users generally do not need this flag because `android.jar` already limits the available `java.*` APIs to the `compileSdk` and Android Lint enforces minSdk compatibility.
-- There is no Gradle DSL for `-Xjdk-release` yet; it is tracked in issue KT-49746.
+- `jvmTarget` only affects bytecode version, not JDK API accessibility.
+- JDK 21's `List.removeFirst()` overrides Kotlin's extension function due to member precedence.
+- `-Xjdk-release` flag restricts the compiler to a specific JDK API level, avoiding accidental references to newer methods.
+- The flag is available in Kotlin 1.7+ and is essential for cross-compilation, though not yet in Gradle DSL.

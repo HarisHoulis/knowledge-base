@@ -11,9 +11,9 @@ sources:
 
 # Practitioner Voice: The Writing Category Nobody has Named Yet
 
-The article introduces a distinct writing style called 'practitioner voice,' a term coined by Jim Highsmith. This style is recognized as different from academic writing and thought-leadership content, emphasizing practical, experience-based insights from practitioners. Martin Fowler advocates for this style and notes that his contributors predominantly follow it. The article underscores the importance of naming and defining this category to better understand and promote effective practitioner communication in the software engineering field.
+The article highlights a distinct style of writing called 'practitioner voice,' which is neither academic writing nor typical thought-leadership content. This style is rooted in practical experience and is advocated by the author, Martin Fowler, and followed by his contributors. The recognition of this category emerged from Jim Highsmith, who saw the need to name and define what makes practitioner writing unique. By giving it a name, Highsmith and Fowler aim to legitimize and clarify this mode of expression, which prioritizes actionable insights over abstract theory or promotional messaging. The practitioner voice is characterized by directness, authenticity, and a grounding in real-world engineering challenges, making it valuable for knowledge sharing within the software community.
 
-- Practitioner voice is a unique writing style distinct from academic writing and thought leadership.
-- Jim Highsmith gave this style a formal name and identified its distinctive characteristics.
-- Martin Fowler advocates for practitioner voice and applies it in his contributions.
-- Naming this category is important for recognizing and fostering effective practitioner writing.
+- Practitioner voice is a distinct writing style separate from academic and thought-leadership writing.
+- The style is based on practical experience and is advocated by Martin Fowler and his contributors.
+- Jim Highsmith named this category and identified its defining qualities.
+- Naming the category helps recognize and promote this form of writing within the engineering culture.

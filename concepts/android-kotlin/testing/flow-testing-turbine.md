@@ -11,9 +11,11 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine is a library by Cash App for testing kotlinx.coroutines Flow. It transforms push-based Flows into pull-based suspend functions, simplifying tests by allowing developers to await specific items, completion, or errors with methods like `awaitItem()`, `awaitComplete()`, and `awaitError()`. This approach makes Flow tests more deterministic and readable. The library also provides standalone `Turbine` instances that can adapt other push-based mechanisms, such as callbacks, to the same testing API. For example, a `FakeLogger` can collect log messages into a `Turbine` and assert them sequentially. Additionally, Turbine offers utilities for managing multiple Turbines, multiple Flows, shared timeouts, and error aggregation to support more complex testing scenarios.
+Turbine 1.0 is a library from Cash App for testing kotlinx.coroutines Flow and other push-based mechanisms. It transforms push-based Flows into pull-based suspend functions, allowing tests to await specific items or completion using functions like awaitItem() and awaitComplete(). These functions suspend until the desired event arrives, throwing AssertionError if a different event occurs or a timeout is reached, which makes Flow tests more deterministic and readable.
 
-- Turbine converts push-based Flow events into pull-based suspend functions, enabling straightforward assertion of each emitted value.
-- The `test` function allows awaiting items, completion, and errors; mismatches or timeouts throw `AssertionError`.
-- Standalone `Turbine` objects can adapt other callback-driven APIs for testing.
-- Utilities exist for handling multiple Flows/Turbines, sharing timeouts, and aggregating errors.
+The library also provides standalone Turbines that can adapt other push-based mechanisms such as callbacks for testing. For example, a custom logger can push messages into a Turbine, and tests can then pull those messages with the same API as the Flow test function. Turbine includes additional utilities for managing multiple Turbines, multiple Flows, shared timeouts, and error aggregation, making it a comprehensive solution for event-stream testing.
+
+- Turbine converts push-based Flows into pull-based suspend functions for easier testing.
+- awaitItem() and awaitComplete() suspend until the expected event, throwing AssertionError on mismatch or timeout.
+- Standalone Turbines can adapt callbacks and other push sources for testing.
+- The library offers utilities for multiple Turbines, multiple Flows, shared timeouts, and error aggregation.
