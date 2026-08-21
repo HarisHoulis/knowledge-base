@@ -2,7 +2,7 @@
 domain: android-kotlin
 subdomain: test-driven-development
 concept: clock-abstraction
-title: Kotlin TDD - To Production At Last
+title: Kotlin TDD: To Production At Last
 sources:
   - title: "Kotlin TDD - To Production At Last"
     url: "https://www.youtube.com/watch?v=UH7_kYAG-TE"
@@ -10,12 +10,14 @@ sources:
     date: "2022-03-05T20:10:25+00:00"
 ---
 
-# Kotlin TDD - To Production At Last
+# Kotlin TDD: To Production At Last
 
-In this video, the team integrates the stock update feature into the main application by moving the `Stock` class from the test tree to the main source set. They re-enable a previously disabled test that describes the expected behavior, and then wire up the routes to use the `Stock` class instead of directly loading items from the stock file. The initial integration fails because the code uses `Instant.now()` directly, which makes it untestable. To fix this, they introduce a `clock` functional parameter that returns an `Instant`, allowing tests to control time. They refactor the test fixture to include an `instant` property, and change the update logic to accept an `Instant` instead of a `LocalDate`, since time zone information is needed for correct updating. They derive the date and time from the same source to keep consistency, and make a work-in-progress commit before continuing.
+In this session, the team integrates a stock update feature into production, guided by a previously disabled test. They re-enable the test, confirm it fails, and then move the Stock class from the test tree into the main source tree. Dependencies such as time zone and update strategy are wired into the main routes, enabling the stock list to be resolved through the new Stock object (Pairing with Duncan, 2022).
 
-- Move production code from test tree to main tree to make it usable.
-- Inject a clock function to control time in tests and make the system testable.
-- Replace `LocalDate` with `Instant` for time-aware stock updates.
-- Derive date and time from the same fixture value to avoid inconsistencies.
-- Use a disabled test as a specification to drive the integration.
+To make the feature testable, the team replaces direct calls to Instant.now() with a clock strategy—a function parameter that returns an Instant. This requires updating test fixtures to pass an Instant rather than a LocalDate, and adjusting the update logic to derive the current date from this clock. They also rename a variable from 'now' to 'today' for clarity, and later plan to derive one from the other to keep test data consistent (Pairing with Duncan, 2022).
+
+- Re-enable the disabled test to drive the integration work.
+- Move production code from test tree to main tree for reusability.
+- Abstract time behind a clock function to control instants in tests.
+- Replace LocalDate with Instant in fixtures to capture precise timing.
+- Derive test dates from the clock to maintain consistency.
