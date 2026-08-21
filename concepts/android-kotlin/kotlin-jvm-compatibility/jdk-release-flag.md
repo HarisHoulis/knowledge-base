@@ -11,9 +11,14 @@ sources:
 
 # Kotlin's JDK release compatibility flag
 
-Kotlin's `jvmTarget` sets the Java bytecode version that the compiler emits, but it does not restrict the JDK APIs that can be referenced. This allows the compiler to accidentally use newer JDK methods, causing `NoSuchMethodError` at runtime on older platforms. The article illustrates this with a crash caused by JDK 21's new `List.removeFirst()` method taking precedence over Kotlin's extension function of the same name, because member functions always win over extensions.
+The article describes a production crash caused by a `NoSuchMethodError` when calling `removeFirst()` on a `List`. The issue arose after upgrading the build JDK to 21, which added `removeFirst()` as a member function to the `List` interface. In Kotlin, member functions take precedence over extension functions, so the previously resolved Kotlin extension function `kotlin.collections.removeFirst` was silently replaced by the JDK 21 member method, breaking compatibility with older Android versions ([source](https://jakewharton.com/kotlins-jdk-release-compatibility-flag/)).
 
-- `jvmTarget` only affects bytecode version, not JDK API accessibility.
-- JDK 21's `List.removeFirst()` overrides Kotlin's extension function due to member precedence.
-- `-Xjdk-release` flag restricts the compiler to a specific JDK API level, avoiding accidental references to newer methods.
-- The flag is available in Kotlin 1.7+ and is essential for cross-compilation, though not yet in Gradle DSL.
+Setting `jvmTarget` to 1.8 only controls the bytecode version, not the JDK API surface used during compilation. The article demonstrates with `javap` that the classfile version was 52 (Java 8) but the bytecode still referenced `java/util/List.removeFirst()`. This mirrors `javac`'s behavior, where `-target` alone does not restrict API usage; `javac` uses `--release` to properly bind against the older JDK APIs. Kotlin's equivalent is `-Xjdk-release`, introduced in Kotlin 1.7, which should be set to the minimum supported Java version ([source](https://jakewharton.com/kotlins-jdk-release-compatibility-flag/)).
+
+The article shows how adding `-Xjdk-release=1.8` to Kotlin compiler arguments changes the bytecode to call the static extension helper `CollectionsKt.removeFirst` instead of the interface method. Users of the Kotlin Android plugin or Android multiplatform targets do not need this flag because `android.jar` already restricts `java.*` APIs to the `compileSdk` level. The flag has no official Gradle DSL yet, but progress is tracked in [KT-49746](https://youtrack.jetbrains.com/issue/KT-49746/Support-Xjdk-release-in-gradle-toolchain).
+
+- Kotlin extension functions are overridden by same-signature member functions added in newer JDKs, causing binary incompatibility.
+- `jvmTarget` only sets bytecode version, not the JDK API level; `-Xjdk-release` is needed for proper cross-compilation.
+- `-Xjdk-release` behaves like `javac`'s `--release`, combining source/target compatibility with a restricted bootclasspath.
+- Android developers using `android.jar` already have API restriction, so they don't need this flag.
+- No Gradle DSL yet; use `kotlinOptions.freeCompilerArgs` to add `-Xjdk-release`.

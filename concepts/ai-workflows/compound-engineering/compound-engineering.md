@@ -2,24 +2,23 @@
 domain: ai-workflows
 subdomain: compound-engineering
 concept: compound-engineering
-title: The Era of Compound Engineering — Kieran Klaassen, Every/Cora
+title: The Era of Compound Engineering
 sources:
   - title: "The Era of Compound Engineering — Kieran Klaassen, Every/Cora"
     url: "https://www.youtube.com/watch?v=_ehJyfHg1Vk"
     author: "AI Engineer"
-    date: "2026-08-20"
+    date: "2026-08-20T15:00:06+00:00"
 ---
 
-# The Era of Compound Engineering — Kieran Klaassen, Every/Cora
+# The Era of Compound Engineering
 
-Kieran Klaassen, an AI engineer at Every/Cora, argues that the most important shift for AI-assisted developers is moving from writing code to extracting and compounding their judgment. He describes how, over two years of building the Cora email client alone, he saw the bottleneck evolve from code quality to planning to deciding what to build, and finally to knowledge management. Once he built a memory system to capture recurring thinking, the AI began incorporating that knowledge automatically, allowing him to tackle larger problems (Klaassen, 2026).
+Kieran Klaassen, an engineer at Every and creator of Cora, an AI-native email inbox, describes 'compound engineering' as a workflow that accumulates knowledge, taste, and judgment into a system so that each AI-assisted task builds on prior decisions. He notes he hasn't written code this year yet ships a product used by thousands, crediting this approach (Klaassen, 2026).
 
-Klaassen's core loop is brainstorming, planning, working, reviewing, polishing, compounding, and repeating. The key is to externalize taste and decisions into a system so the model never repeats from scratch. He claims that one engineer with a compounding system can outperform teams using AI without such a system, because the model's output already contains the engineer's accumulated judgment. He also emphasizes that implementation is mostly solved; the remaining human edge is judgment and taste (Klaassen, 2026).
+Klaassen traces how the bottleneck in AI-assisted development shifted over two years: first code quality, then planning, then product decisions. To stop repeating himself, he built a memory system that stores recurring thinking, so future AI interactions include that context (Klaassen, 2026). This frees him to focus on higher-level judgment and taste, which he argues are now the real bottleneck.
 
-The talk is a practical argument for building a personal knowledge loop rather than relying on the latest orchestration tools. Klaassen's approach is to store every repeated thought or lesson into a structured memory, enabling the AI to instantly apply past insights to new problems. This shifts the engineer's role from typing toward making high-level decisions and adding taste, which compounds over time and makes each subsequent project faster (Klaassen, 2026).
+His core loop is brainstorming, planning, working, reviewing, polishing, compounding, and repeating. By extracting his judgment into the system, each cycle starts from a richer baseline. He claims that a single engineer with such a compounding system can beat full teams that use AI without it (Klaassen, 2026).
 
-- The bottleneck in AI-assisted engineering shifted from code to planning to product scoping to knowledge compounding.
-- Building a memory system is essential: whenever Klaassen repeats himself, he asks the AI to store that knowledge.
-- Compound engineering means extracting your judgment and taste into a system so future model outputs include it.
-- A single engineer with a compounding system can beat larger teams that don't use one.
-- The main loop is brainstorm, plan, work, review, polish, compound, repeat.
+- The primary bottleneck in AI engineering is no longer code generation but human judgment and product taste.
+- Compound engineering requires a persistent memory system that captures repeated decisions and knowledge.
+- Klaassen's loop: brainstorm → plan → work → review → polish → compound → repeat.
+- One engineer with a compounding system can outperform larger AI-using teams without one.

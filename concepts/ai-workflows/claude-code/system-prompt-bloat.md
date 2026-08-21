@@ -12,8 +12,9 @@ sources:
 
 # Claude Code's system tools are SO BLOATED
 
-Matt Pocock demonstrates that Claude Code's default system prompt contains excessive bloat, totaling around 25,000 tokens. This bloat stems from unused tools and features that are enabled by default, consuming valuable context and potentially degrading performance or increasing costs. By customizing the global settings.json file, users can disable these unnecessary components, drastically reducing the system prompt size to just 8,000 tokens.
+Matt Pocock demonstrates that Claude Code's default system prompt is unnecessarily bloated, containing around 25,000 tokens. This bloat comes from enabling many features and tools that most users don't need, which can slow down responses and increase costs. By customizing the global settings.json file, users can disable unused tools and features, dramatically reducing the prompt to just 8,000 tokens. This optimization improves efficiency without losing functionality for typical workflows. The video points to a detailed guide for implementing these changes, and encourages joining the community for further tips.
 
-- Claude Code's default system prompt includes many unused tools and features, causing bloat.
-- The system prompt can be reduced from 25,000 to 8,000 tokens via settings.json customization.
-- Disabling unused features improves efficiency and reduces token consumption.
+- Claude Code's default system prompt is about 25,000 tokens due to enabled tools and features.
+- Customizing the global settings.json allows disabling unused tools and features.
+- System prompt size can be reduced to approximately 8,000 tokens, a 68% decrease.
+- Reducing bloat improves performance and cost-efficiency for AI-assisted coding workflows.

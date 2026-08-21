@@ -11,10 +11,9 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine is a testing library from Cash App for kotlinx.coroutines Flow, designed to simplify verification of asynchronous data streams. Instead of using push-based collectors that require manual synchronization, Turbine transforms a Flow into a pull-based sequence of suspend functions, making tests more sequential and readable. The core API is the `test` extension, which provides suspend functions like `awaitItem()` and `awaitComplete()` to assert emissions and completion events, throwing `AssertionError` on unexpected events or timeouts. This approach allows developers to write straightforward, failure-safe tests for reactive code. One key example from the article shows a flow of meals (Breakfast, Lunch, Dinner) being asserted in order, demonstrating the intuitive syntax that Turbine enables.
+Turbine is a library from Cash App for testing kotlinx.coroutines Flow and other push-based mechanisms. It transforms push-based flows into pull-based suspend functions, allowing testers to await specific events like items, completion, or errors in a sequential manner. The example demonstrates awaiting meal items and completion, with failures thrown as AssertionError if events don't match or time out. Turbine also supports standalone instances for adapting callbacks and other push-based APIs, as shown with a FakeLogger that receives log messages into a Turbine.
 
-- Turbine converts push-based Flows into pull-based suspend functions, simplifying Flow testing.
-- The `test` function provides `awaitItem()`, `awaitComplete()`, and other functions that suspend until the desired event arrives or throw an `AssertionError`.
-- Standalone `Turbine` instances can adapt non-Flow push-based mechanisms like callbacks for testing.
-- Turbine includes utilities for managing multiple Turbines, multiple Flows, shared timeouts, and aggregated errors.
-- Turbine is part of Cash App's Summer of Kotlin Multiplatform series.
+- Turbine converts Flow emissions into awaitable suspend functions, simplifying sequential assertions.
+- Await functions throw AssertionError on unexpected events or timeouts, aiding deterministic tests.
+- Standalone Turbines can adapt any push-based mechanism, such as callbacks, for testing.
+- The library provides additional utilities for multiple flows, shared timeouts, and error aggregation.
