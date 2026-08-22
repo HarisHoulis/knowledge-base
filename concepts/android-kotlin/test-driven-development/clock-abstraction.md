@@ -2,7 +2,7 @@
 domain: android-kotlin
 subdomain: test-driven-development
 concept: clock-abstraction
-title: Kotlin TDD: To Production At Last
+title: Kotlin TDD - To Production At Last
 sources:
   - title: "Kotlin TDD - To Production At Last"
     url: "https://www.youtube.com/watch?v=UH7_kYAG-TE"
@@ -10,14 +10,14 @@ sources:
     date: "2022-03-05T20:10:25+00:00"
 ---
 
-# Kotlin TDD: To Production At Last
+# Kotlin TDD - To Production At Last
 
-In this session, the team integrates a stock update feature into production, guided by a previously disabled test. They re-enable the test, confirm it fails, and then move the Stock class from the test tree into the main source tree. Dependencies such as time zone and update strategy are wired into the main routes, enabling the stock list to be resolved through the new Stock object (Pairing with Duncan, 2022).
+In this session, the team integrates a stock updating feature by moving a previously test-only class into the main source tree and wiring it into the application's routes. They re-enable a failing test that describes the expected behavior, then adapt the production code to use the new Stock class, which requires a zone and an update strategy. To make the code testable, they introduce a clock abstraction: a function parameter that returns an Instant, replacing direct calls to Instant.now() in production. This allows tests to control time precisely.
 
-To make the feature testable, the team replaces direct calls to Instant.now() with a clock strategy—a function parameter that returns an Instant. This requires updating test fixtures to pass an Instant rather than a LocalDate, and adjusting the update logic to derive the current date from this clock. They also rename a variable from 'now' to 'today' for clarity, and later plan to derive one from the other to keep test data consistent (Pairing with Duncan, 2022).
+The team then refactors their test fixtures to provide an Instant instead of a LocalDate, aligning the tests with the new clock-based design. They parse specific instants for the end of the day and the start of the next day to validate the update logic. After adjusting all test call sites and ensuring they compile, they run the tests successfully and commit the changes as work in progress. This demonstrates a TDD workflow where testability concerns drive the introduction of a dependency injection point for time.
 
-- Re-enable the disabled test to drive the integration work.
-- Move production code from test tree to main tree for reusability.
-- Abstract time behind a clock function to control instants in tests.
-- Replace LocalDate with Instant in fixtures to capture precise timing.
-- Derive test dates from the clock to maintain consistency.
+- Move production code from test tree to main source set to integrate features.
+- Introduce a clock function parameter (returns Instant) to control time in tests.
+- Replace LocalDate with Instant in test fixtures to match the new clock abstraction.
+- Use dependency injection to make time-dependent code testable.
+- Commit WIP after tests pass, acknowledging issues may remain.

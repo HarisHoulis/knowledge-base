@@ -12,9 +12,10 @@ sources:
 
 # On Friday Deploys: Sometimes that Puppy Needs Murdering
 
-In this article, Charity Majors clarifies that she is not as extreme as her earlier post 'Friday Deploy Freezes are Exactly Like Murdering Puppies' might suggest. She acknowledges that deploy freezes are sensible when teams lack the observability and tooling to move swiftly with confidence. The key is honesty: freezes are pragmatic hacks, not moral victories. She argues that the worst approach is to keep merging changes during a freeze, creating a snowdrift of unreleased code that will explode when deploys resume. Instead, if you must freeze deploys, freeze merges too, and use the quiet time for other valuable work. She also warns that stopping deploys entirely can trigger outages from inaction; if you normally deploy frequently, run deploys with no new code to keep the system exercised. The article emphasizes that holiday calm and stability are achievable without dangerous freezes.
+Charity Majors clarifies that she is not categorically opposed to deploy freezes, including on Fridays or holidays. She acknowledges that if a team lacks the ability to move swiftly with confidence—especially due to poor observability or inability to explore high-cardinality data in real time—then freezes are a sensible workaround. Her objection is to moralizing the practice; deploy freezes are pragmatic hacks, not grand moral gestures.
 
-- Deploy freezes are acceptable when teams lack confidence or observability, but they should be seen as workarounds, not moral achievements.
-- Freezing merges while letting developers keep merging creates a buildup of unreleased changes that will likely cause a painful January recovery.
-- If you freeze deploys, also freeze merges, and have developers work on other tasks instead.
-- If you are accustomed to frequent deploys, continue running deploy processes without shipping new code to avoid outages caused by inaction.
+- Deploy freezes are acceptable when teams lack observability and confidence; the key is not to pretend they are virtuous.
+- If you freeze deploys, you should also freeze merges. Continuing to merge while withholding deployment creates a snowdrift of risky changes that all surface at once.
+- Freezing deploys when a team is used to frequent deploys can itself cause instability. Run the deploy process regularly, but ship no new code.
+- Ideally, merging to main and deploying to production should feel atomic; developers should not merge unless they are prepared for immediate production exposure.
+- Holidays can still be a quiet, productive period if you intentionally reduce change rate without locking everyone down.

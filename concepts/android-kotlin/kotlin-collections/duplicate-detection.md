@@ -11,9 +11,9 @@ sources:
 
 # Perils of duplicate finding
 
-The article ultimately recommends a more idiomatic and efficient solution using `filterNotTo` with a bound `HashSet::add` reference. This approach correctly collects duplicates in one pass, is visually concise, and benchmarks fastest with lowest allocation (39.9 ns/op, 432 B/op). The key insight is that `MutableSet.add` returns false for already-seen elements, making it a natural predicate for filtering duplicates.
+The article explores different Kotlin approaches to finding duplicate integers in an array, highlighting subtle pitfalls in collection operations. The naive approach of subtracting a set from a list (`ints.toList() - ints.toSet()`) yields an empty list because Kotlin's `minus` operator removes all occurrences of each element in the collection, not just the first. Similarly, `MutableList.removeAll` also removes all occurrences, contrary to what `remove` does, leading to unexpected results. The author eventually arrives at a concise and efficient solution using `filterNotTo` with a bound `HashSet::add` reference, which keeps elements that were already seen. The article also notes that these behaviors are inherited from Java and emphasizes the importance of understanding collection semantics.
 
-- Kotlin's `minus` and `removeAll` remove all occurrences of elements, not just the first, which can break duplicate-finding logic.
-- Use `MutableSet.add` as a predicate: it returns true the first time a value is seen and false for subsequent duplicates.
-- `filterNot` with a bound `HashSet::add` provides a readable one-liner for finding duplicates.
-- `filterNotTo` is the most efficient variant, minimizing both time and memory allocations.
+- Kotlin's `minus` operator and `MutableList.removeAll` remove all occurrences, not just the first, causing naive duplicate-finding attempts to fail.
+- A correct approach uses a `HashSet` to track seen elements: `filterNotTo(HashSet(), HashSet<Int>()::add)` keeps only duplicates.
+- Bound function references like `HashSet<Int>()::add` allow concise inline stateful predicates.
+- The `filterNotTo` variant is both the fastest and most memory-efficient among the tested alternatives.
