@@ -1,8 +1,4 @@
-rootProject.name = "kb-app"
-
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-
-includeBuild("build-logic")
+rootProject.name = "build-logic"
 
 pluginManagement {
     repositories {
@@ -29,7 +25,9 @@ dependencyResolutionManagement {
         }
         mavenCentral()
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
-
-include(":shared")
-include(":androidApp")
