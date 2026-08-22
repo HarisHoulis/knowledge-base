@@ -11,10 +11,10 @@ sources:
 
 # Citizens Build, Agents Execute, Experts Govern
 
-Rachel Laycock discusses the widening gap between hobbyist AI-assisted app building and enterprise software engineering. While AI enables non-engineers to create working software quickly, enterprise production demands more: data protection, dependency failure handling, long-term maintainability, auditability, scalability, and early problem detection. These concerns only surface when an experienced engineer is involved, making their judgment critical (Laycock, 'Citizens Build, Agents Execute, Experts Govern').
+Rachel Laycock observes a growing gap between what non-technical people and experienced engineers think software engineering is, especially as AI enables more people to build working apps over a weekend. While celebrating this democratization, she argues that building software is not the same as engineering it for enterprise production. Questions about data protection, dependency failures, maintainability, audits, scalability, and observability only emerge when software must be trusted in a real business environment (Laycock, https://martinfowler.com/rachels-ramblings/citizens-agents-experts.html).
 
-- Building software is not the same as software engineering; enterprise software requires trust, security, resilience, and operability.
-- AI increases the number of people who can turn ideas into software, but experienced engineers remain essential for judgment and governance.
-- At FOSE, teams found that when agents generate code quickly, good design matters even more, not less.
-- The phrase 'Citizens build, agents execute, experts govern' captures where value moves: citizens express ideas, agents handle execution, and experts ensure safe production readiness.
-- Engineering expertise becomes leveraged by creating guardrails, platforms, and feedback loops so others can build safely at scale.
+- AI allows anyone to create real software quickly, but enterprise-grade engineering involves critical concerns like security, resilience, operability, compliance, and cost that don't appear in demos.
+- Experienced engineers become more valuable, not less, because their judgment determines whether a working system can be trusted in production.
+- At FOSE, teams designed specifications, let agents work overnight, and spent their time reviewing results, making trade-offs, and defining what "good" looks like—highlighting that design matters more when code generation is fast.
+- The phrase 'Citizens build, agents execute, experts govern' captures a shift: value moves from writing code to ensuring safe, trustworthy operation in production.
+- The future organization will let many people create software, use agents to execute, and rely on engineers to design guardrails, platforms, practices, and feedback loops that enable safe scaling.

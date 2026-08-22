@@ -11,10 +11,9 @@ sources:
 
 # The VibeSec Reckoning
 
-Vibe coding has accelerated software prototyping, but AI agents often recommend insecure configurations, creating security risks. The authors, Gautam Koul, Lucian Moss, Neil Drew-Lopez, and Daberechi Ruth Edeokoh, share their experience building applications for Thoughtworks' global marketing. They found that to mitigate these risks, teams should write a security context file to guide AI agents, be cautious with AI permission requests, and maintain a daily security intelligence feed to stay informed of emerging threats. Additionally, providing builders with secure-by-default harnesses and templates helps reduce the likelihood of insecure deployments.
+Vibe coding accelerates software prototyping, but AI agents frequently recommend insecure configurations, creating security vulnerabilities. Drawing on experience building applications for Thoughtworks' global marketing, the authors identify a critical gap: AI assistants lack security context and often suggest default or permissive settings. To mitigate these risks, they propose a multi-layered approach: writing a security context file that explicitly guides AI behavior, carefully reviewing AI permission requests, establishing a daily security intelligence feed to keep models updated on emerging threats, and providing builders with secure-by-default harnesses and templates. These practices shift security from an afterthought to an integrated part of the AI-assisted development workflow.
 
-- AI agents frequently recommend insecure configurations during vibe coding.
-- A security context file helps align AI recommendations with security best practices.
-- Builders should carefully review and limit AI permission requests to reduce risk.
-- A daily security intelligence feed keeps developers aware of current threats.
-- Secure-by-default templates and harnesses enable safer prototyping.
+- AI agents often recommend insecure configurations, leading to security problems in vibe-coded applications.
+- A security context file can guide AI assistants to make safer choices during code generation.
+- Developers should be cautious with AI permission requests to avoid excessive access or unintended actions.
+- A daily security intelligence feed and secure-by-default templates help operationalize security in AI-driven development.

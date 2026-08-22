@@ -12,11 +12,9 @@ sources:
 
 # Stop Making TUIs
 
-Simon Willison reflects on his experience with vibe-coded native macOS apps, noting that he still uses two AI-generated bandwidth and GPU monitoring task bar apps daily. He suggests that developers are running out of excuses not to build real UIs for their throwaway projects, especially with AI tools lowering the barrier to entry (Simon Willison, 2026).
+Simon Willison reflects on the growing ease of building native user interfaces through vibe-coding, citing his own SwiftUI-based macOS task bar apps for bandwidth and GPU monitoring as daily-use examples. He suggests that developers who routinely create throwaway CLIs should instead consider converting them into native apps, as AI coding agents have reduced the friction of UI development. The post highlights a quote from Thomas Ptacek encouraging developers to try building native UIs, implying it can change one's perspective on what's possible with AI-assisted development.
 
-Citing Thomas Ptacek, Willison encourages developers to try turning a CLI into a native app, arguing that the process can change how you think about software development. The post highlights the shift from terminal-based tools to polished native interfaces as a natural next step in the AI-assisted coding workflow, driven by the ease of generating UI code with large language models.
-
-- Vibe-coded native apps can be useful enough for daily personal use.
-- Developers should consider converting throwaway CLIs into native applications.
-- AI tools significantly reduce the effort required to build native UIs.
-- Building a native UI can provide a new perspective on coding.
+- Vibe-coding can produce functional native UIs, not just scripts or CLIs.
+- Simon's SwiftUI task bar apps for monitoring are used daily, proving the value of native tools.
+- Developers should consider upgrading throwaway CLIs into native apps using AI coding agents.
+- Thomas Ptacek argues that building a native UI can change how you think about your projects.

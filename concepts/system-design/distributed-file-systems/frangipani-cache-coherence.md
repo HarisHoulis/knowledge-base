@@ -2,19 +2,24 @@
 domain: system-design
 subdomain: distributed-file-systems
 concept: frangipani-cache-coherence
-title: Cache Consistency: Frangipani
+title: Cache Consistency: Frangipani (MIT 6.824 Lecture 11)
 sources:
   - title: "Lecture 11: Cache Consistency: Frangipani"
     url: "https://www.youtube.com/watch?v=-pKNCjUhPjQ"
     author: "MIT 6.824: Distributed Systems"
-    date: "2020-03-14T16:28:35+00:00"
+    date: "2020-03-14"
 ---
 
-# Cache Consistency: Frangipani
+# Cache Consistency: Frangipani (MIT 6.824 Lecture 11)
 
-Lecture 11 of MIT 6.824 discusses Frangipani, an old distributed file system whose design centers on cache coherence, distributed transactions, and distributed crash recovery, and their interactions. Frangipani presents a standard UNIX file-system interface to applications; each workstation runs a Frangipani module that handles file-system calls, while all persistent file-system data structures (inodes, directories, free-block maps) live on Petal, a shared virtual disk accessed over the network as a block device. The intended environment is a small, trusted research lab (roughly 50 people) where users share home and project files and can use any workstation. (MIT 6.824, 2020)
+Frangipani is a distributed file system designed for a small, trusted research lab of about 50 people. It presents a standard file system interface to applications, running a Frangipani server on each user's workstation. All storage is provided by a shared virtual disk called Petal, which acts like a network-attached disk drive and can be replicated for fault tolerance. Frangipani servers cache data and metadata locally, and the paper's core focus is on cache coherence—ensuring that when one client modifies a file, other clients with cached copies eventually observe the changes. The system also relies on distributed transactions and crash recovery to keep the file system data structures consistent across the distributed set of servers.
 
-- Frangipani is a network file system that appears as a local UNIX file system to applications, with a Frangipani server module on every workstation.
-- All persistent data is stored on Petal, a shared virtual disk, so Frangipani must handle cache coherence when multiple workstations cache and modify the same blocks.
-- The design combines distributed transactions with crash recovery, ensuring that complex multi-block file-system updates remain consistent even when servers fail.
-- It targets a small, trusted group of users, so security is largely ignored; the goal is usability and sharing rather than fault isolation.
+The lecture emphasizes three intertwined design concerns: cache coherence, distributed transactions, and crash recovery. Cache coherence is necessary because clients cache file blocks, but modifications must be visible to other clients. Distributed transactions allow complex updates to file system structures (e.g., inodes, directories, free-block lists) to be atomic, even though the data is spread across multiple machines and the Petal disk. Crash recovery is critical because any workstation may fail at any time, and the combination of caching and transactions must ensure that the file system remains consistent and no updates are lost or half-applied.
+
+The authors intended Frangipani for a small, cooperative environment where all users and computers are trusted, so security is not a primary concern. This design choice simplifies many aspects of the system, allowing it to focus on performance and consistency. The paper is studied in distributed systems courses because it illustrates how to build a practical system that integrates caching, transactions, and crash recovery in a compelling way.
+
+- Frangipani is a network file system for small, trusted groups, using a shared virtual disk (Petal) for storage.
+- Each workstation runs a Frangipani server that caches file data and metadata for performance.
+- Cache coherence ensures that cached data is invalidated or updated when other clients modify files.
+- Distributed transactions and crash recovery are used to maintain consistency across the distributed file system structures.
+- The system is designed for cooperative environments, so security is not a primary focus.
