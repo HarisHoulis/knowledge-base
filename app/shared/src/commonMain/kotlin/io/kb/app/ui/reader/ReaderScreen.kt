@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -48,6 +49,7 @@ fun ReaderScreen(
     conceptId: String,
     repository: FakeConceptRepository,
     variant: PrototypeVariant,
+    onBack: () -> Unit,
     viewModel: ReaderViewModel = viewModel { ReaderViewModel(repository, conceptId) },
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -55,7 +57,16 @@ fun ReaderScreen(
     LaunchedEffect(conceptId) { viewModel.onOpen() }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Reader") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text("Reader") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Text("‹", style = MaterialTheme.typography.titleLarge)
+                    }
+                },
+            )
+        },
         bottomBar = {
             if (!uiState.isLoading) {
                 when (variant) {

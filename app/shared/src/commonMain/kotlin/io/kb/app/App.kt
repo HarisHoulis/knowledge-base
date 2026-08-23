@@ -25,7 +25,6 @@ import io.kb.app.ui.prototype.VariantSwitcher
 import io.kb.app.ui.reader.ReaderScreen
 import io.kb.app.ui.resume.ResumeScreen
 import io.kb.app.ui.search.SearchScreen
-import io.kb.app.tts.TtsEngine
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclassesOfSealed
@@ -41,7 +40,6 @@ private val navConfiguration = SavedStateConfiguration {
 @Composable
 fun App(repository: ConceptRepository = FakeConceptRepository()) {
     val fakeRepository = repository as FakeConceptRepository // PROTOTYPE: screens observe the live in-memory store
-    val ttsEngine = TtsEngine()
     var variant by remember { mutableStateOf(PrototypeVariant.BADGE_FIRST) }
     val backStack = rememberNavBackStack(navConfiguration, Route.Browse)
 
@@ -78,6 +76,7 @@ fun App(repository: ConceptRepository = FakeConceptRepository()) {
                         conceptId = route.conceptId,
                         repository = fakeRepository,
                         variant = variant,
+                        onBack = { backStack.removeLastOrNull() },
                     )
                 }
             },
