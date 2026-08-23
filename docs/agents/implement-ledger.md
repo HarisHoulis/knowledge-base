@@ -39,5 +39,6 @@ Each finding is attributed to one class — the fix's root cause, not the surfac
 | # | Date | Signals | Categories | Severity | Root causes | Link |
 | --- | --- | --- | --- | --- | --- | --- |
 | 63 | 2026-08-23 | ✓ Preflight | ✓ seam | ✓ bounds | 3 asm | 0 esc | unstated-decision ×3, duplicated-code ×1, ambiguous-req ×1 | 5 minor / 0 major / 0 blocker | spec-gap ×2, seam-gap ×1, unstated-decision ×1 | [#179](https://github.com/HarisHoulis/knowledge-base/pull/179) |
+| 170 | 2026-08-23 | ✓ Preflight | ✓ seam | ✓ bounds | 0 asm | 0 esc | spec-gap ×1, unstated-decision ×1, doc-standard ×1 | 3 minor / 0 major / 0 blocker | spec-gap ×2, unstated-decision ×1 | [#177](https://github.com/HarisHoulis/knowledge-base/pull/177) |
 
 **Signals** columns, per ticket: Pre-flight present (✓/✗), seam named (✓/✗), bounds stated (✓/✗), # assumptions, # escalations.
