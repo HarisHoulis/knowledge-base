@@ -60,8 +60,10 @@ if [ "$DRY_RUN" = true ]; then
 fi
 
 BRANCH="daily-ingest/$(date +%Y-%m-%d)"
+echo "[daily-ingest] Refreshing branch base from origin/main..."
+git fetch origin main
 echo "[daily-ingest] Creating branch $BRANCH..."
-git checkout -B "$BRANCH"
+git checkout -B "$BRANCH" origin/main
 git add -A
 
 STAT=$(git diff --stat --cached)
