@@ -5,6 +5,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 include = ["kb_pipeline*"]
 
+[tool.setuptools.package-data]
+kb_pipeline = ["sources.json"]
+
 [project]
 name = "kb-pipeline"
 version = "0.1.0"

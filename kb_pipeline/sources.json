@@ -1,0 +1,63 @@
+[
+  {
+    "id": "jake-wharton",
+    "type": "rss",
+    "url": "https://jakewharton.com/atom.xml"
+  },
+  {
+    "id": "manuel-vivo",
+    "type": "rss",
+    "url": "https://medium.com/feed/@manuelvicnt"
+  },
+  {
+    "id": "martin-fowler",
+    "type": "rss",
+    "url": "https://martinfowler.com/feed.atom"
+  },
+  {
+    "id": "simon-willison",
+    "type": "rss",
+    "url": "https://simonwillison.net/atom/everything/"
+  },
+  {
+    "id": "kent-beck",
+    "type": "rss",
+    "url": "https://kentbeck.substack.com/feed"
+  },
+  {
+    "id": "charity-majors",
+    "type": "rss",
+    "url": "https://charity.wtf/feed/"
+  },
+  {
+    "id": "gergely-orosz",
+    "type": "rss",
+    "url": "https://newsletter.pragmaticengineer.com/feed"
+  },
+  {
+    "id": "matt-pocock",
+    "type": "youtube",
+    "channel": "UCswG6FSbgZjbWtdf_hMLaow"
+  },
+  {
+    "id": "john-ousterhout",
+    "type": "youtube",
+    "playlist": "PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB"
+  },
+  {
+    "id": "gilded-rose",
+    "type": "youtube",
+    "playlist": "PL1ssMPpyqociJNwykAOB9_KEZVW7BW7m2"
+  },
+  {
+    "id": "ai-engineer",
+    "type": "youtube",
+    "channel": "UCLKPca3kwwd-B59HNr-_lvA"
+  },
+  {
+    "id": "bytebytego",
+    "type": "rss",
+    "url": "https://blog.bytebytego.com/feed",
+    "cookie_env_var": "BYTEBYTEGO_SUBSTACK_COOKIE"
+  }
+]

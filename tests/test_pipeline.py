@@ -1,8 +1,11 @@
+import json
 import re
 import subprocess
 from pathlib import Path
 from typing import Any, Optional
 from unittest.mock import MagicMock
+
+import pytest
 
 from kb_pipeline.audit import AuditResult
 from kb_pipeline.config import SOURCES, Source
@@ -463,14 +466,84 @@ def test_source_cookie_env_var_defaults_to_empty() -> None:
 
 
 def test_existing_sources_instantiate_without_error() -> None:
+    assert len(SOURCES) > 0
     for s in SOURCES:
         assert isinstance(s, Source)
+        assert isinstance(s.id, str) and s.id
+
+
+def test_all_current_sources_migrate_with_selectors() -> None:
+    expected = {
+        "jake-wharton": {"url": "https://jakewharton.com/atom.xml"},
+        "manuel-vivo": {"url": "https://medium.com/feed/@manuelvicnt"},
+        "martin-fowler": {"url": "https://martinfowler.com/feed.atom"},
+        "simon-willison": {"url": "https://simonwillison.net/atom/everything/"},
+        "kent-beck": {"url": "https://kentbeck.substack.com/feed"},
+        "charity-majors": {"url": "https://charity.wtf/feed/"},
+        "gergely-orosz": {"url": "https://newsletter.pragmaticengineer.com/feed"},
+        "matt-pocock": {"channel": "UCswG6FSbgZjbWtdf_hMLaow"},
+        "john-ousterhout": {"playlist": "PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB"},
+        "gilded-rose": {"playlist": "PL1ssMPpyqociJNwykAOB9_KEZVW7BW7m2"},
+        "ai-engineer": {"channel": "UCLKPca3kwwd-B59HNr-_lvA"},
+        "bytebytego": {
+            "url": "https://blog.bytebytego.com/feed",
+            "cookie_env_var": "BYTEBYTEGO_SUBSTACK_COOKIE",
+        },
+    }
+    by_id = {s.id: s for s in SOURCES}
+    assert set(by_id) == set(expected)
+    for src_id, selector in expected.items():
+        source = by_id[src_id]
+        for field_name, value in selector.items():
+            assert getattr(source, field_name) == value
 
 
 def test_bytebytego_source_has_cookie_env_var() -> None:
     src = next((s for s in SOURCES if s.id == "bytebytego"), None)
     assert src is not None
     assert src.cookie_env_var == "BYTEBYTEGO_SUBSTACK_COOKIE"
+
+
+class TestConfigLoad:
+    @staticmethod
+    def _fixture(name: str) -> Path:
+        return Path(__file__).parent / "fixtures" / name
+
+    @staticmethod
+    def _load_with(monkeypatch, path: Path) -> Any:
+        from kb_pipeline import config
+
+        monkeypatch.setattr(config, "SOURCES_FILE", path)
+        return config.load_sources()
+
+    def test_valid_fixture_loads_one_source_per_object(self, monkeypatch) -> None:
+        loaded = self._load_with(monkeypatch, self._fixture("sources-valid.json"))
+
+        assert len(loaded) == 2
+        assert all(isinstance(s, Source) for s in loaded)
+
+    def test_missing_file_raises(self, monkeypatch) -> None:
+        with pytest.raises(FileNotFoundError):
+            self._load_with(monkeypatch, self._fixture("does-not-exist.json"))
+
+    def test_malformed_json_raises_parse_error(self, monkeypatch) -> None:
+        with pytest.raises(json.JSONDecodeError):
+            self._load_with(monkeypatch, self._fixture("sources-malformed.json"))
+
+    def test_empty_array_raises(self, monkeypatch, tmp_path) -> None:
+        empty = tmp_path / "sources-empty.json"
+        empty.write_text("[]")
+
+        with pytest.raises(ValueError):
+            self._load_with(monkeypatch, empty)
+
+    def test_missing_type_field_raises(self, monkeypatch) -> None:
+        with pytest.raises(TypeError):
+            self._load_with(monkeypatch, self._fixture("sources-missing-type.json"))
+
+    def test_unknown_field_raises(self, monkeypatch) -> None:
+        with pytest.raises(TypeError):
+            self._load_with(monkeypatch, self._fixture("sources-unknown-field.json"))
 
 
 def _rss_entry(

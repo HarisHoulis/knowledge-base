@@ -1,3 +1,4 @@
+import json
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -35,39 +36,18 @@ class Source:
     cookie_env_var: str = ""
 
 
-SOURCES: list[Source] = [
-    Source(id="jake-wharton", type="rss", url="https://jakewharton.com/atom.xml"),
-    Source(id="manuel-vivo", type="rss", url="https://medium.com/feed/@manuelvicnt"),
-    Source(id="martin-fowler", type="rss", url="https://martinfowler.com/feed.atom"),
-    Source(
-        id="simon-willison",
-        type="rss",
-        url="https://simonwillison.net/atom/everything/",
-    ),
-    Source(id="kent-beck", type="rss", url="https://kentbeck.substack.com/feed"),
-    Source(id="charity-majors", type="rss", url="https://charity.wtf/feed/"),
-    Source(
-        id="gergely-orosz",
-        type="rss",
-        url="https://newsletter.pragmaticengineer.com/feed",
-    ),
-    Source(id="matt-pocock", type="youtube", channel="UCswG6FSbgZjbWtdf_hMLaow"),
-    Source(
-        id="john-ousterhout",
-        type="youtube",
-        playlist="PLrw6a1wE39_tb2fErI4-WkMbsvGQk9_UB",
-    ),
-    Source(
-        id="gilded-rose", type="youtube", playlist="PL1ssMPpyqociJNwykAOB9_KEZVW7BW7m2"
-    ),
-    Source(id="ai-engineer", type="youtube", channel="UCLKPca3kwwd-B59HNr-_lvA"),
-    Source(
-        id="bytebytego",
-        type="rss",
-        url="https://blog.bytebytego.com/feed",
-        cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
-    ),
-]
+SOURCES_FILE = Path(__file__).parent / "sources.json"
+
+
+def load_sources() -> list[Source]:
+    with SOURCES_FILE.open(encoding="utf-8") as f:
+        data = json.load(f)
+    if not data:
+        raise ValueError(f"{SOURCES_FILE} contains no sources")
+    return [Source(**s) for s in data]
+
+
+SOURCES: list[Source] = load_sources()
 
 SYSTEM_PROMPT = """You are a knowledge-base curator. Given an article or transcript, \
 output a JSON object with:
