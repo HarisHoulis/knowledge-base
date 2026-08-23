@@ -43,7 +43,7 @@ private val navConfiguration = SavedStateConfiguration {
 fun App(repository: ConceptRepository = FakeConceptRepository()) {
     val fakeRepository = repository as FakeConceptRepository // PROTOTYPE: screens observe the live in-memory store
     var variant by remember { mutableStateOf(PrototypeVariant.BADGE_FIRST) }
-    var listenVariant by remember { mutableStateOf(ListenVariant.DOCK) }
+    var listenVariant by remember { mutableStateOf(ListenVariant.IMMERSIVE) }
     val backStack = rememberNavBackStack(navConfiguration, Route.Browse)
 
     Box(modifier = Modifier.fillMaxSize()) {

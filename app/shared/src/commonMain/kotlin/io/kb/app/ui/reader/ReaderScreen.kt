@@ -83,10 +83,17 @@ fun ReaderScreen(
     val playerFlow = player?.state ?: remember(conceptId) { MutableStateFlow(ListenUiState()) }
     val listenState by playerFlow.collectAsState()
 
-    // Entering listen mode resumes from the saved char offset; leaving pauses.
+    // Entering listen mode resumes from the saved char offset (the read position);
+    // leaving pauses and bumps a key so the Reader re-scrolls to the audio position.
+    var readSyncKey by remember(conceptId) { mutableStateOf(0) }
     LaunchedEffect(listening) {
         val p = player ?: return@LaunchedEffect
-        if (listening) p.play(uiState.progress.position) else p.pause()
+        if (listening) {
+            p.play(uiState.progress.position)
+        } else {
+            p.pause()
+            readSyncKey++
+        }
     }
 
     Scaffold(
@@ -154,6 +161,7 @@ fun ReaderScreen(
                     contentPadding = PaddingValues(0.dp),
                     onPositionChanged = viewModel::updatePosition,
                     onScrolledToEnd = viewModel::onScrolledToEnd,
+                    restoreKey = readSyncKey,
                 )
                 ListenPlayerDock(
                     state = listenState,
@@ -184,6 +192,7 @@ fun ReaderScreen(
                     contentPadding = PaddingValues(0.dp),
                     onPositionChanged = viewModel::updatePosition,
                     onScrolledToEnd = viewModel::onScrolledToEnd,
+                    restoreKey = readSyncKey,
                 )
             }
 
@@ -193,6 +202,7 @@ fun ReaderScreen(
                 contentPadding = innerPadding,
                 onPositionChanged = viewModel::updatePosition,
                 onScrolledToEnd = viewModel::onScrolledToEnd,
+                restoreKey = readSyncKey,
             )
         }
     }
@@ -205,11 +215,13 @@ private fun ReaderBody(
     contentPadding: androidx.compose.foundation.layout.PaddingValues,
     onPositionChanged: (Int) -> Unit,
     onScrolledToEnd: () -> Unit,
+    restoreKey: Int,
 ) {
     val scrollState = rememberScrollState()
 
-    // Restore resume position once per concept open (not on every position write).
-    val restoreFraction = remember(uiState.conceptId) {
+    // Restore resume position: on concept open, and again whenever we return from
+    // listen mode (restoreKey bumps) so reading picks up exactly where audio left off.
+    val restoreFraction = remember(uiState.conceptId, restoreKey) {
         ProgressModel.fraction(uiState.progress.position, uiState.bodyLength)
     }
     LaunchedEffect(scrollState.maxValue, restoreFraction) {
