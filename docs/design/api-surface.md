@@ -11,7 +11,7 @@ Constraint that shapes everything: **the DTOs are shared Kotlin code** — the a
 - REST, JSON, base path `/api/v1`.
 - Pagination: **offset** — `page` (1-based) + `limit` (default 20, max 100). Fine for a single user and ≤ 1000 concepts; no cursors.
 - Errors: minimal JSON `{ "error": { "code": "...", "message": "..." } }` + HTTP status. No envelopes around success payloads.
-- Single user: no auth, no rate limiting.
+- Single user: static API-key auth via an `X-API-Key` header, enforced on every route behind `/api/v1` (see [Authentication](#authentication)); modest per-IP rate limiting.
 - Domain/subdomain ride as **slugs** in concept payloads; display names come from the `/domains` tree. `id` is the opaque URL key for detail + progress writes.
 
 ## Progress model
@@ -129,9 +129,16 @@ Whole-store Postgres FTS via raw SQL: `websearch_to_tsquery` (tolerant of plain 
 { "status": "REVISITING", "position": 1840 }
 ```
 
+## Authentication
+
+- **Phone → API:** a single static API key in the `X-API-Key` header, checked with Ktor's `apiKeyAuth` provider behind an `authenticate {}` route guard covering all `/api/v1` routes. TLS terminates at the VPS; the key is only meaningful over it.
+- **Rate limiting:** a modest per-IP limit via Ktor's `RateLimit` plugin — single-user defense against a leaked key being hammered by scanners, not a scale measure.
+- **On-device key:** embedded in the app at build time (plain resources). It is extractable by design (public-client reality); accepted for a personal single-user app. Rotation is on-demand and requires re-shipping the app, so the key is treated as non-confidential.
+- **DB credentials (not through this API):** the BE connects to Postgres with a dedicated `app` role (read content, write `concept_progress` only), distinct from the `ingest` role the pipeline uses — see #161. Direct connection over SSL, no pooler.
+
 ## Explicitly not in scope (per #120)
 
-- Auth, multi-user, rate limiting — single user.
+- Multi-user / per-user accounts — single user. (Auth in the single-user form above is in scope.)
 - Ingestion writes — the pipeline writes the DB directly, not through this API.
 - Server-side TTS / media — on-device only, this API carries no audio.
 - Bookmarks / review queue / analytics — no endpoints for them.
