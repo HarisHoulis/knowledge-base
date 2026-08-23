@@ -489,6 +489,19 @@ def test_all_current_sources_migrate_with_selectors() -> None:
             "url": "https://blog.bytebytego.com/feed",
             "cookie_env_var": "BYTEBYTEGO_SUBSTACK_COOKIE",
         },
+        "jjohannes-understanding-gradle": {
+            "playlist": "PLWQK2ZdV4Yl2k2OmC_gsjDpdIBTN0qqkE"
+        },
+        "jjohannes-gradle-fundamentals": {
+            "playlist": "PLWQK2ZdV4Yl0pSTDqZi4vGPUbHtxGy1sD"
+        },
+        "jjohannes-java-modularity": {"playlist": "PLWQK2ZdV4Yl092zlY7Dy1knCmi0jhTH3H"},
+        "jjohannes-java-development": {
+            "playlist": "PLWQK2ZdV4Yl2aEdQv5bdXenXWfTgn918V"
+        },
+        "jjohannes-control-gradle": {"playlist": "PLWQK2ZdV4Yl1LpnMvbbC07pFxggprujwH"},
+        "kentcdodds": {"url": "https://kentcdodds.com/blog/rss.xml"},
+        "kentcdodds-yt": {"playlist": "PLV5CVI1eNcJhP4nrJt85L7PxHjebFpDfY"},
     }
     by_id = {s.id: s for s in SOURCES}
     assert set(by_id) == set(expected)
@@ -496,6 +509,22 @@ def test_all_current_sources_migrate_with_selectors() -> None:
         source = by_id[src_id]
         for field_name, value in selector.items():
             assert getattr(source, field_name) == value
+
+
+def test_new_sources_expose_expected_types() -> None:
+    expected_types = {
+        "jjohannes-understanding-gradle": "youtube",
+        "jjohannes-gradle-fundamentals": "youtube",
+        "jjohannes-java-modularity": "youtube",
+        "jjohannes-java-development": "youtube",
+        "jjohannes-control-gradle": "youtube",
+        "kentcdodds": "rss",
+        "kentcdodds-yt": "youtube",
+    }
+    by_id = {s.id: s for s in SOURCES}
+    for src_id, expected_type in expected_types.items():
+        assert src_id in by_id, f"missing source {src_id}"
+        assert by_id[src_id].type == expected_type
 
 
 def test_bytebytego_source_has_cookie_env_var() -> None:

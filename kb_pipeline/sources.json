@@ -59,5 +59,40 @@
     "type": "rss",
     "url": "https://blog.bytebytego.com/feed",
     "cookie_env_var": "BYTEBYTEGO_SUBSTACK_COOKIE"
+  },
+  {
+    "id": "jjohannes-understanding-gradle",
+    "type": "youtube",
+    "playlist": "PLWQK2ZdV4Yl2k2OmC_gsjDpdIBTN0qqkE"
+  },
+  {
+    "id": "jjohannes-gradle-fundamentals",
+    "type": "youtube",
+    "playlist": "PLWQK2ZdV4Yl0pSTDqZi4vGPUbHtxGy1sD"
+  },
+  {
+    "id": "jjohannes-java-modularity",
+    "type": "youtube",
+    "playlist": "PLWQK2ZdV4Yl092zlY7Dy1knCmi0jhTH3H"
+  },
+  {
+    "id": "jjohannes-java-development",
+    "type": "youtube",
+    "playlist": "PLWQK2ZdV4Yl2aEdQv5bdXenXWfTgn918V"
+  },
+  {
+    "id": "jjohannes-control-gradle",
+    "type": "youtube",
+    "playlist": "PLWQK2ZdV4Yl1LpnMvbbC07pFxggprujwH"
+  },
+  {
+    "id": "kentcdodds",
+    "type": "rss",
+    "url": "https://kentcdodds.com/blog/rss.xml"
+  },
+  {
+    "id": "kentcdodds-yt",
+    "type": "youtube",
+    "playlist": "PLV5CVI1eNcJhP4nrJt85L7PxHjebFpDfY"
   }
 ]
