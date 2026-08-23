@@ -352,6 +352,26 @@ class TestVerifySourceAuth:
         )
         assert verify_source_auth(source) is False
 
+    def test_returns_true_when_env_var_has_trailing_newline(self, monkeypatch):
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "auth_cookie_value\n")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+        assert verify_source_auth(source) is True
+
+    def test_returns_false_when_env_var_is_whitespace_only(self, monkeypatch):
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "\n")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+        assert verify_source_auth(source) is False
+
     def test_getenv_seam_is_injected(self):
         source = Source(
             id="bytebytego",
@@ -381,6 +401,26 @@ class TestAuthHeaders:
             cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
         )
         assert auth_headers(source) == {"Cookie": "auth_cookie_value"}
+
+    def test_strips_whitespace_from_cookie_value(self, monkeypatch):
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "auth_cookie_value\n")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+        assert auth_headers(source) == {"Cookie": "auth_cookie_value"}
+
+    def test_returns_empty_dict_when_env_var_is_whitespace_only(self, monkeypatch):
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "\n")
+        source = Source(
+            id="bytebytego",
+            type="rss",
+            url="https://blog.bytebytego.com/feed",
+            cookie_env_var="BYTEBYTEGO_SUBSTACK_COOKIE",
+        )
+        assert auth_headers(source) == {}
 
     def test_returns_empty_dict_when_env_var_unset(self, monkeypatch):
         monkeypatch.delenv("BYTEBYTEGO_SUBSTACK_COOKIE", raising=False)

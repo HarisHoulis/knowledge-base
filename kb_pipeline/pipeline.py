@@ -11,6 +11,7 @@ from typing import Any, Callable, Optional
 from .audit import AuditResult, classification_audit, content_audit
 from .config import SOURCES, Source
 from .fetcher import (
+    ExtractionErrorCallback,
     ExtractionErrorType,
     auth_headers,
     extract_text,
@@ -209,7 +210,9 @@ def run_pipeline(
     *,
     transcript_fn: Callable[[str], str] = transcript_youtube,
     fetch_url_text_fn: Callable[[str], str] = fetch_url_text,
-    fetch_article_fn: Callable[[str, dict[str, str]], str] = fetch_article,
+    fetch_article_fn: Callable[
+        [str, dict[str, str], Optional[ExtractionErrorCallback]], str
+    ] = fetch_article,
     notify_fn: Callable[[str, str], None] = _notify_auth_failure,
     classify_fn: Callable[..., Optional[dict[str, Any]]] = classify_summarize,
     report_fn: Callable[[list[ExtractionFailure]], None] = _report_extraction_failures,
@@ -259,17 +262,31 @@ def run_pipeline(
                     text = transcript_fn(video_id)
             elif src.cookie_env_var:
                 headers = auth_headers(src)
-                text = fetch_article_fn(url, headers)
+                text = fetch_article_fn(url, headers, record_failure_type)
                 if not text:
-                    logger.warning(
-                        "  auth fetch empty for %s (%s): %s",
-                        src.id,
-                        src.cookie_env_var,
-                        url,
-                    )
-                    _notify_or_log_auth_failure(
-                        src, dry_run=dry_run, notify_fn=notify_fn
-                    )
+                    if failure_type is not None:
+                        failures.append(
+                            ExtractionFailure(
+                                src.id,
+                                entry.get("title", ""),
+                                url,
+                                failure_type,
+                            )
+                        )
+                        logger.warning(
+                            "  auth article extract %s for %s (%s): %s",
+                            failure_type,
+                            src.id,
+                            src.cookie_env_var,
+                            url,
+                        )
+                    else:
+                        logger.warning(
+                            "  auth fetch failed for %s (%s): %s",
+                            src.id,
+                            src.cookie_env_var,
+                            url,
+                        )
                     break
 
             if not text and not src.cookie_env_var:
