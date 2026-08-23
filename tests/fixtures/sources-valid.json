@@ -1,0 +1,12 @@
+[
+  {
+    "id": "alpha",
+    "type": "rss",
+    "url": "https://alpha.example.com/feed"
+  },
+  {
+    "id": "beta",
+    "type": "youtube",
+    "playlist": "PL_FAKE_BETA"
+  }
+]

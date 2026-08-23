@@ -1,0 +1,8 @@
+[
+  {
+    "id": "alpha",
+    "type": "rss",
+    "url": "https://alpha.example.com/feed",
+    "bogus_field": "x"
+  }
+]
