@@ -12,11 +12,12 @@ sources:
 
 # Lecture 14: Optimistic Concurrency Control
 
-This lecture introduces Farm, a research prototype designed to exploit the high performance of RDMA networking for distributed transactions. Unlike Spanner, which focuses on geographic replication and tolerating data-center failures, Farm assumes all replicas are in the same data center, aiming to minimize CPU time and network overhead. The main technique is optimistic concurrency control, which is enabled by RDMA's low-latency communication. Farm achieves a simple transaction in 58 microseconds—about 100 times faster than Spanner's typical 10-millisecond transaction time (MIT 6.824 Lecture 14, 2020).
+The lecture introduces FaRM, a research prototype distributed system that leverages optimistic concurrency control to achieve extremely low-latency transactions. FaRM is contrasted with Spanner: both replicate data and use two-phase commit, but Spanner focuses on geographic replication across data centers, while FaRM assumes all replicas are in the same data center, aiming to exploit RDMA high-speed networking. FaRM achieves a simple transaction in 58 microseconds (Figure 7, Section 6.3), roughly 100x faster than Spanner's 10-100 milliseconds, primarily because its bottleneck is CPU time on servers rather than network delays between data centers.
 
-Farm's design is driven by the constraints of RDMA, which restricts design options and forces the use of optimistic concurrency control. Data is sharded across primary-backup pairs, with reads always going to the primary and updates propagated to backups for fault tolerance. The system uses a configuration manager (Zookeeper) to coordinate replicas, but the core contribution is exploring how optimistic concurrency control can deliver high throughput in a single data center while keeping consistency. The bottleneck in Farm is CPU time on servers, not network delays, which contrasts with Spanner's concern over inter-data-center speed-of-light latency (MIT 6.824 Lecture 14, 2020).
+FaRM uses a configuration manager (implemented with Zookeeper) to assign each shard to primary-backup pairs. Data is sharded by key, and all updates must be applied to both primary and backup replicas. Reads are always served from the primary. Replication provides fault tolerance, but unlike Spanner, FaRM does not use a consensus protocol like Paxos; instead, it relies on optimistic concurrency control to manage concurrent transactions efficiently.
 
-- Farm uses optimistic concurrency control, achieving 58-microsecond transactions, ~100x faster than Spanner's ~10ms.
-- Farm targets a single data center with RDMA, assuming all replicas are co-located, unlike Spanner's geographic replication.
-- The main bottleneck in Farm is CPU time on servers, not network or speed-of-light delays.
-- Replication is primary-backup based, with reads always from the primary, and fault tolerance for individual crashes rather than whole data centers.
+- FaRM uses optimistic concurrency control to achieve 58 microsecond transactions, about 100x faster than Spanner.
+- FaRM is designed for a single data center with RDMA networking, unlike Spanner's geographic replication.
+- The primary bottleneck in FaRM is CPU time, not network speed of light delays.
+- Data is sharded across primary-backup pairs; reads go to the primary, and all replicas are updated on writes.
+- FaRM is a research prototype, not a deployed system, exploring RDMA's performance potential.

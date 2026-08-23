@@ -11,9 +11,9 @@ sources:
 
 # Practitioner Voice: The Writing Category Nobody has Named Yet
 
-The article introduces a distinct style of writing called 'practitioner voice,' a term coined by Jim Highsmith. This style is characterized by insights drawn from hands-on experience, differing from academic writing or thought-leadership pieces. Fowler advocates this approach and notes that his contributors predominantly follow it. The naming of this category helps identify and legitimize a mode of writing that bridges practical experience and knowledge sharing.
+The article, authored by Martin Fowler, highlights a distinct style of writing that Jim Highsmith identified and named: the 'practitioner voice.' This style is differentiated from academic writing and thought-leadership content, focusing on practical, experience-based insights from practitioners who actively work in the field. Fowler advocates for this style, noting that his contributors mostly follow it, and emphasizes the importance of recognizing it as a unique category. The key distinction lies in its grounding in real-world experience, actionable advice, and a conversational yet authoritative tone, rather than theoretical analysis or abstract visionary ideas. Highsmith's naming of this category helps clarify its essence and value, encouraging more practitioners to share their knowledge in a way that resonates with peers.
 
-- Practitioner voice is a distinct writing style separate from academic or thought-leadership content.
-- The term was introduced by Jim Highsmith to give a name to this unnamed category.
-- Martin Fowler advocates for this style, and his contributors generally adopt it.
-- The style emphasizes practical experience and real-world insights.
+- Practitioner voice is a distinct writing style separate from academic writing and thought leadership.
+- It emphasizes practical, experience-driven insights from active practitioners.
+- Grounding in real-world experience makes it more actionable and relatable for readers.
+- The name gives recognition to this style, promoting its use and legitimacy.

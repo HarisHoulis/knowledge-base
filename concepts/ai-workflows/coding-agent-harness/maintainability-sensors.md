@@ -11,8 +11,9 @@ sources:
 
 # Maintainability sensors for coding agents
 
-Martin Fowler's article introduces the concept of sensors and guides in coding agent harnesses, a mental model proposed by Birgitta Böckeler. These components are designed to increase the probability of good agent outputs and enable self-correction before issues reach human eyes. The article highlights Böckeler's forthcoming publication on her experiences using sensors to keep a codebase maintainable, with the first part focusing on static analysis through basic code linting. This approach underscores the practical role of automated checks in enhancing agent-driven development workflows.
+Martin Fowler introduces Birgitta Böckeler's mental model for harness engineering in coding-agent workflows. A harness consists of guides and sensors that increase the probability of good agent outputs and enable self-correction before issues reach human eyes (Fowler, https://martinfowler.com/articles/sensors-for-coding-agents.html). The article begins exploring Birgitta's practical experiences using sensors to keep a codebase maintainable, starting with static analysis and basic code linting. This represents the first in a planned series of sensor-based maintainability practices.
 
-- Sensors and guides are core components of a coding agent harness.
-- They aim to improve output quality and support self-correction.
-- Static analysis via code linting is the first sensor type explored for maintainability.
+- Coding agent harnesses combine guides and sensors to improve output quality.
+- Sensors enable agents to self-correct before human review, reducing downstream issues.
+- Static analysis and basic linting are the initial sensors discussed for maintainability.
+- The approach is grounded in real-world experience from Birgitta Böckeler's ongoing article.
