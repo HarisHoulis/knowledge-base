@@ -10,6 +10,7 @@ Issues and PRDs for this repo live as GitHub issues. Use the `gh` CLI for all op
 - **Comment on an issue**: `gh issue comment <number> --body "..."`
 - **Apply / remove labels**: `gh issue edit <number> --add-label "..."` / `--remove-label "..."`
 - **Close**: `gh issue close <number> --comment "..."`
+- **`gh api` flags**: `-f` sends strings, `-F` sends typed values (integers). GitHub rejects string values for integer properties (e.g. `sub_issue_id`, `issue_id`) with a 422 — use `-F` for any numeric field.
 
 Infer the repo from `git remote -v` — `gh` does this automatically when run inside a clone.
 
@@ -37,8 +38,8 @@ Run `gh issue view <number> --comments`.
 
 Used by `/to-tickets`. Tickets are issues created as **sub-issues** of a parent (the source spec/issue the conversation was about), each wired to its blockers with GitHub's native **issue dependencies**.
 
-- **Create a ticket under the parent**: `gh issue create --title "..." --body "..."`, then link it as a sub-issue: `gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -f sub_issue_id=<child-db-id>`, where `<child-db-id>` is the child's numeric **database id** (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`, _not_ the `#number` or `node_id`). The child must belong to the same repository owner as the parent. Where sub-issues aren't enabled (`403`/`404`/`410`/`422`), fall back to prepending `Part of #<parent>` to the child body and adding a task-list item to the parent's body.
-- **Wire blocked-by edges** (a second pass, after every ticket exists and has an id): for each blocker, `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -f issue_id=<blocker-db-id>`, using the blocker's **database id**. Always keep a `Blocked by: #<n>, #<n>` line at the top of the child body — it is the readable summary when native edges succeed and the sole carrier when they fail.
+- **Create a ticket under the parent**: `gh issue create --title "..." --body "..."`, then link it as a sub-issue: `gh api --method POST repos/<owner>/<repo>/issues/<parent>/sub_issues -F sub_issue_id=<child-db-id>`, where `<child-db-id>` is the child's numeric **database id** (`gh api repos/<owner>/<repo>/issues/<n> --jq .id`, _not_ the `#number` or `node_id`). The child must belong to the same repository owner as the parent. Where sub-issues aren't enabled (`403`/`404`/`410`/`422`), fall back to prepending `Part of #<parent>` to the child body and adding a task-list item to the parent's body.
+- **Wire blocked-by edges** (a second pass, after every ticket exists and has an id): for each blocker, `gh api --method POST repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by -F issue_id=<blocker-db-id>`, using the blocker's **database id**. Always keep a `Blocked by: #<n>, #<n>` line at the top of the child body — it is the readable summary when native edges succeed and the sole carrier when they fail.
 - **Verify**: re-`GET` `repos/<owner>/<repo>/issues/<parent>/sub_issues` and `repos/<owner>/<repo>/issues/<child>/dependencies/blocked_by`, confirm the expected set, and surface any mismatch to the user.
 
 ## Wayfinding operations
