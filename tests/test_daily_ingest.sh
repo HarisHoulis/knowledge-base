@@ -357,6 +357,33 @@ test_limit_flag() {
     echo "PASS: limit flag"
 }
 
+test_audit_flag() {
+    local test_dir; test_dir=$(mktemp -d)
+    local repo_dir="$test_dir/repo"
+    local mock_dir="$test_dir/mocks"
+    local calls_file="$test_dir/gh_calls"
+    mkdir -p "$repo_dir" "$mock_dir"
+
+    setup_repo "$repo_dir"
+    make_mock_gh "$mock_dir" "$calls_file"
+    local args_file="$test_dir/pipeline_args"
+    make_mock_python "$mock_dir" "echo \"\$@\" > $args_file && exit 0"
+
+    local rc
+    set +e
+    PATH="$mock_dir:$PATH" GH="$mock_dir/gh" KB_PATH="$repo_dir" KB_STATE="$test_dir/state.json" \
+        bash "$SCRIPT_DIR/scripts/daily-ingest.sh" --audit > "$test_dir/output" 2>&1
+    rc=$?
+    set -e
+
+    local fail=0
+    [ "$rc" -eq 0 ] || { echo "FAIL: audit flag — expected exit 0, got $rc"; fail=1; }
+    grep -q -- "--audit" "$test_dir/pipeline_args" 2>/dev/null || { echo "FAIL: expected --audit in pipeline args, got: $(cat "$test_dir/pipeline_args" 2>/dev/null)"; fail=1; }
+    rm -rf "$test_dir"
+    [ "$fail" -eq 0 ] || return 1
+    echo "PASS: audit flag"
+}
+
 echo "=== daily-ingest tests ==="
 test_clean_repo && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_dirty_repo && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
@@ -367,6 +394,7 @@ test_mixed_repo_comment && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_non_md_skip_merge && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_auto_merge_failure_exits_zero && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_limit_flag && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+test_audit_flag && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 echo "======================"
 echo "Results: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ] || exit 1

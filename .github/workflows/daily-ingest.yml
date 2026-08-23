@@ -66,6 +66,7 @@ jobs:
           else
             ARGS="$ARGS --limit=10"
           fi
+          ARGS="$ARGS --audit"
           bash scripts/daily-ingest.sh $ARGS
 
 
