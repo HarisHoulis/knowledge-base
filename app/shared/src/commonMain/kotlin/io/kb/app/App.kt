@@ -20,6 +20,8 @@ import io.kb.app.data.ConceptRepository
 import io.kb.app.data.FakeConceptRepository
 import io.kb.app.navigation.Route
 import io.kb.app.ui.browse.BrowseScreen
+import io.kb.app.ui.listen.ListenVariant
+import io.kb.app.ui.listen.ListenVariantSwitcher
 import io.kb.app.ui.prototype.PrototypeVariant
 import io.kb.app.ui.prototype.VariantSwitcher
 import io.kb.app.ui.reader.ReaderScreen
@@ -41,6 +43,7 @@ private val navConfiguration = SavedStateConfiguration {
 fun App(repository: ConceptRepository = FakeConceptRepository()) {
     val fakeRepository = repository as FakeConceptRepository // PROTOTYPE: screens observe the live in-memory store
     var variant by remember { mutableStateOf(PrototypeVariant.BADGE_FIRST) }
+    var listenVariant by remember { mutableStateOf(ListenVariant.DOCK) }
     val backStack = rememberNavBackStack(navConfiguration, Route.Browse)
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -76,15 +79,24 @@ fun App(repository: ConceptRepository = FakeConceptRepository()) {
                         conceptId = route.conceptId,
                         repository = fakeRepository,
                         variant = variant,
+                        listenVariant = listenVariant,
                         onBack = { backStack.removeLastOrNull() },
                     )
                 }
             },
         )
-        VariantSwitcher(
-            current = variant,
-            onChange = { variant = it },
-            modifier = Modifier.align(Alignment.BottomCenter),
-        )
+        if (backStack.lastOrNull() is Route.Reader) {
+            ListenVariantSwitcher(
+                current = listenVariant,
+                onChange = { listenVariant = it },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
+        } else {
+            VariantSwitcher(
+                current = variant,
+                onChange = { variant = it },
+                modifier = Modifier.align(Alignment.BottomCenter),
+            )
+        }
     }
 }

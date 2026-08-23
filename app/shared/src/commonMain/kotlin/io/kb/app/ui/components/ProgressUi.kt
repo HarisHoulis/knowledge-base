@@ -54,9 +54,13 @@ fun StatusDot(status: ProgressStatus, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun FractionBar(fraction: Float) {
+fun FractionBar(
+    fraction: Float,
+    modifier: Modifier = Modifier,
+) {
     LinearProgressIndicator(
         progress = { fraction.coerceIn(0f, 1f) },
+        modifier = modifier,
     )
 }
 

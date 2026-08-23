@@ -3,6 +3,7 @@ package io.kb.app.ui.reader
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +21,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +44,14 @@ import io.kb.app.ui.components.FractionRing
 import io.kb.app.ui.components.StatusBadge
 import io.kb.app.ui.components.percentText
 import io.kb.app.ui.components.statusColor
+import io.kb.app.ui.listen.FakeTtsPlayer
+import io.kb.app.ui.listen.ListenPlayerDock
+import io.kb.app.ui.listen.ListenPlayerImmersive
+import io.kb.app.ui.listen.ListenPlayerInline
+import io.kb.app.ui.listen.ListenUiState
+import io.kb.app.ui.listen.ListenVariant
 import io.kb.app.ui.prototype.PrototypeVariant
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlin.math.roundToInt
 
@@ -49,12 +61,33 @@ fun ReaderScreen(
     conceptId: String,
     repository: FakeConceptRepository,
     variant: PrototypeVariant,
+    listenVariant: ListenVariant,
     onBack: () -> Unit,
     viewModel: ReaderViewModel = viewModel { ReaderViewModel(repository, conceptId) },
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var listening by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(conceptId) { viewModel.onOpen() }
+    // PROTOTYPE: one fake player per concept, driving the shared char-offset position.
+    val player = remember(conceptId, uiState.bodyLength) {
+        if (uiState.bodyLength > 0) {
+            FakeTtsPlayer(
+                bodyLength = uiState.bodyLength,
+                scope = scope,
+                onPositionChanged = viewModel::updatePosition,
+                onFinished = viewModel::onScrolledToEnd,
+            )
+        } else null
+    }
+    val playerFlow = player?.state ?: remember(conceptId) { MutableStateFlow(ListenUiState()) }
+    val listenState by playerFlow.collectAsState()
+
+    // Entering listen mode resumes from the saved char offset; leaving pauses.
+    LaunchedEffect(listening) {
+        val p = player ?: return@LaunchedEffect
+        if (listening) p.play(uiState.progress.position) else p.pause()
+    }
 
     Scaffold(
         topBar = {
@@ -65,10 +98,17 @@ fun ReaderScreen(
                         Text("‹", style = MaterialTheme.typography.titleLarge)
                     }
                 },
+                actions = {
+                    if (!uiState.isLoading) {
+                        TextButton(onClick = { listening = !listening }) {
+                            Text(if (listening) "Reading" else "Listen")
+                        }
+                    }
+                },
             )
         },
         bottomBar = {
-            if (!uiState.isLoading) {
+            if (!uiState.isLoading && !listening) {
                 when (variant) {
                     PrototypeVariant.BADGE_FIRST -> ReaderActionsBadgeFirst(viewModel, uiState)
                     PrototypeVariant.RESUME_FIRST -> ReaderActionsResumeFirst(uiState)
@@ -91,6 +131,61 @@ fun ReaderScreen(
                     .fillMaxSize()
                     .padding(innerPadding),
             )
+
+            listening && listenVariant == ListenVariant.IMMERSIVE -> ListenPlayerImmersive(
+                state = listenState,
+                title = uiState.title,
+                onToggle = { player?.toggle() },
+                onSeek = { player?.seekTo(it) },
+                onRate = { player?.cycleRate() },
+                onVoice = { player?.cycleVoice() },
+                onBackToReading = { listening = false },
+                modifier = Modifier.padding(innerPadding),
+            )
+
+            listening && listenVariant == ListenVariant.DOCK -> Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                ReaderBody(
+                    uiState = uiState,
+                    variant = variant,
+                    contentPadding = PaddingValues(0.dp),
+                    onPositionChanged = viewModel::updatePosition,
+                    onScrolledToEnd = viewModel::onScrolledToEnd,
+                )
+                ListenPlayerDock(
+                    state = listenState,
+                    title = uiState.title,
+                    onToggle = { player?.toggle() },
+                    onSeek = { player?.seekTo(it) },
+                    onRate = { player?.cycleRate() },
+                    onVoice = { player?.cycleVoice() },
+                )
+            }
+
+            listening && listenVariant == ListenVariant.INLINE -> Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+            ) {
+                ListenPlayerInline(
+                    state = listenState,
+                    onToggle = { player?.toggle() },
+                    onSeek = { player?.seekTo(it) },
+                    onRate = { player?.cycleRate() },
+                    onVoice = { player?.cycleVoice() },
+                    modifier = Modifier.padding(top = 8.dp),
+                )
+                ReaderBody(
+                    uiState = uiState,
+                    variant = variant,
+                    contentPadding = PaddingValues(0.dp),
+                    onPositionChanged = viewModel::updatePosition,
+                    onScrolledToEnd = viewModel::onScrolledToEnd,
+                )
+            }
 
             else -> ReaderBody(
                 uiState = uiState,

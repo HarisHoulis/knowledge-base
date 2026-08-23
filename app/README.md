@@ -1,22 +1,20 @@
-# KB App — progress-tracking prototype (PROTOTYPE)
+# KB App — listen-mode player prototype (PROTOTYPE)
 
-> PROTOTYPE — throwaway code for issue #130, to react to. Builds on the #129 scaffold. Validated decisions fold into the real app; this prototype lands on a throwaway branch as a primary source. Not production.
+> PROTOTYPE — throwaway code for issue #188, to react to. Builds on the #130 progress-tracking prototype (which builds on the #129 scaffold). Validated decisions fold into the real app; this prototype lands on a throwaway branch as a primary source. Not production.
 
-Answers the question: *how is per-concept read/listen status + resume position surfaced in the UI — browse list badges, concept detail, resume entry point — how do status transitions happen, and how is resume position stored/restored across sessions?*
+Answers the question: *how should the listen-mode player look and behave — play/pause/seek controls, resume-from-audio-position (the char-offset restored into speech), rate/voice access, iOS background audio (AVAudioSession) — integrated with #130's Reader?*
 
-**Three structurally-different variants**, switchable via the floating bottom bar:
+**Three structurally-different player variants**, switchable via the floating bottom bar (`L` prefix). Enter listen mode from the Reader's top-right **Listen** toggle; it resumes from the concept's saved char-offset. The `#130` read variants (`A/B/C`) still work when not listening.
 
-- **A — Badge-first**: explicit status badges on browse rows + Reader, a linear progress bar in the Reader, and manual status transitions ("Mark as done" / "Re-read" buttons). Resume lists IN_PROGRESS/REVISITING with a fraction bar.
-- **B — Resume-first**: Resume is the hub — large ring cards with "Continue at X%". Reader auto-transitions: opening a concept starts the pass, scrolling to the end auto-finishes it. No badges in Browse — just status dots.
-- **C — Minimal**: no badges at all. Browse filters by status via chips, rows carry a color accent; Reader shows a thin color accent + percent and a quiet status line. Transitions still happen on open/end but nothing is labelled.
+- **L-A — Dock**: a compact player pinned to the bottom of the Reader — play/pause, a seek slider, live position, tap-to-cycle rate and voice. The reading text stays visible above, and the header ring advances as the position moves.
+- **L-B — Immersive**: full-screen player — a large ring wrapping the play/pause button, seek slider, explicit rate chips (0.75/1/1.25/1.5×), tap-to-cycle voice, and an inline note that audio keeps playing in the background on iOS. A "Back to reading" button exits.
+- **L-C — Inline**: minimal controls sitting in the reading flow — small play/pause, a thin progress bar, cycle rate/voice, and a quiet "Listening · x%" caption. Least chrome.
 
-**All three share one interaction core** (the thing being prototyped): the status model `NEW → IN_PROGRESS → CONSUMED → REVISITING`, a single char-offset resume position per concept, scroll position mapped to char offset (restored on reopen), and `CONSUMED` normalised to `position = bodyLength` (mirroring api-surface.md).
+**All three share one interaction core** (the thing being prototyped): playback is a single **char offset into the concept body** — the same model #130 uses for scroll position — so listen and read share one resume position. The fake player (`FakeTtsPlayer`) simulates on-device TTS by advancing the offset over time and writing it to the in-memory repository, so the Reader's ring/bar stay live; `CONSUMED` fires when the end is reached. No real audio in this prototype — the engines are the #124-shaped stubs.
 
-State lives in-memory in `FakeConceptRepository` (a `StateFlow<Map<String, Progress>>`) — persistence is the thing being checked, not something the prototype depends on.
+**Deliberately not decided here (flagged for the screen-map ticket):** real TTS plumbing (segment-splitting on Android, AVSpeechSynthesizer delegate on iOS per `docs/research/cmp-on-device-tts.md`), and the concrete `AVAudioSession` category/`UIBackgroundModes` wiring for iOS background audio. The Immersive variant shows how that capability is surfaced in the UI.
 
-## Verdict (resolution of #130)
-
-**A's surfacing with B's Reader.** Browse rows + Resume cards carry the explicit status badges from A; the Reader follows B — ring progress in the header, no manual buttons, transitions are automatic (open starts the pass `NEW → IN_PROGRESS`, scrolling to the end auto-finishes `→ CONSUMED`, re-opening a finished concept `→ REVISITING`). Resume position stays a single char-offset, restored on reopen, `CONSUMED` → `position = bodyLength`.
+State lives in-memory in `FakeConceptRepository` (as in #130).
 
 ## Run
 
@@ -31,4 +29,8 @@ iOS framework compile check:
 ```
 ./gradlew :shared:compileKotlinIosSimulatorArm64
 ```
+
+## Prior prototype (what this builds on)
+
+The #130 progress-tracking prototype's verdict: **A's surfacing with B's Reader** — Browse rows + Resume cards carry explicit status badges; the Reader uses ring progress in the header with automatic transitions (`NEW → IN_PROGRESS` on open, `→ CONSUMED` at the end, `→ REVISITING` on re-open); one shared char-offset resume position, `CONSUMED` → `position = bodyLength`. The listen player shares that same char-offset, so read and listen stay in one place.
 
