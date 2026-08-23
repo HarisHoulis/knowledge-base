@@ -30,7 +30,7 @@ def auth_headers(
     source: Source, *, getenv: Callable[[str], Optional[str]] = os.getenv
 ) -> dict[str, str]:
     var = source.cookie_env_var
-    value = getenv(var) if var else None
+    value = (getenv(var) or "").strip() if var else None
     return {"Cookie": value} if value else {}
 
 
@@ -180,10 +180,10 @@ def transcript_youtube(
 def fetch_article(
     url: str,
     headers: dict[str, str],
+    on_error: Optional[ExtractionErrorCallback] = None,
     *,
     get: Callable[..., Any] = requests.get,
     extract_fn: Callable[..., Optional[str]] = trafilatura.extract,
-    on_error: Optional[ExtractionErrorCallback] = None,
 ) -> str:
     try:
         r = get(url, headers=headers, timeout=30)

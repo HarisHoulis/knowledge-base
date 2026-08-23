@@ -826,7 +826,7 @@ class TestRunPipelineAuthFetch:
 
         calls: list[tuple[str, dict[str, str]]] = []
 
-        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+        def stub_fetch_article(url: str, headers: dict[str, str], on_error: Any) -> str:
             calls.append((url, headers))
             return "markdown text " * 60
 
@@ -877,19 +877,21 @@ def mock_two_entry_fetch(monkeypatch) -> None:
 
 
 class TestRunPipelineAuthMidFetch:
-    def test_empty_fetch_files_issue_and_aborts_source(
+    def test_empty_extraction_reports_failure_not_auth_issue(
         self, monkeypatch, tmp_path
     ) -> None:
         from kb_pipeline import state as state_module
-        from kb_pipeline.pipeline import run_pipeline
+        from kb_pipeline.pipeline import ExtractionFailure, run_pipeline
 
         monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
         monkeypatch.setattr(state_module, "STATE_PATH", tmp_path / "state.json")
         mock_two_entry_fetch(monkeypatch)
 
         notify_calls, notify_fn = make_notify_stub()
+        reported, report_stub = _make_report_stub()
 
-        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+        def stub_fetch_article(url: str, headers: dict[str, str], on_error: Any) -> str:
+            on_error("empty")
             return ""
 
         stats = run_pipeline(
@@ -897,11 +899,53 @@ class TestRunPipelineAuthMidFetch:
             sources=[make_auth_source()],
             notify_fn=notify_fn,
             fetch_article_fn=stub_fetch_article,
+            report_fn=report_stub,
         )
 
-        assert notify_calls == [("bytebytego", "BYTEBYTEGO_SUBSTACK_COOKIE")]
+        assert notify_calls == []
         assert stats["seen"] == 1
         assert stats["sources"] == 1
+        assert stats["failed"] == 1
+        assert reported == [
+            [
+                ExtractionFailure(
+                    "bytebytego",
+                    "Paid 1",
+                    "https://example.com/paid-1",
+                    "empty",
+                )
+            ]
+        ]
+
+    def test_fetch_error_does_not_notify_and_aborts_source(
+        self, monkeypatch, tmp_path, caplog
+    ) -> None:
+        from kb_pipeline import state as state_module
+        from kb_pipeline.pipeline import run_pipeline
+
+        monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
+        monkeypatch.setattr(state_module, "STATE_PATH", tmp_path / "state.json")
+        mock_two_entry_fetch(monkeypatch)
+        caplog.set_level("WARNING")
+
+        notify_calls, notify_fn = make_notify_stub()
+
+        def stub_fetch_article(url: str, headers: dict[str, str], on_error: Any) -> str:
+            return ""
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[make_auth_source()],
+            notify_fn=notify_fn,
+            fetch_article_fn=stub_fetch_article,
+            report_fn=lambda failures: None,
+        )
+
+        assert notify_calls == []
+        assert stats["seen"] == 1
+        assert stats["sources"] == 1
+        assert stats["failed"] == 0
+        assert "auth fetch failed for bytebytego" in caplog.text
 
     def test_empty_fetch_aborts_only_that_source(self, monkeypatch) -> None:
         from kb_pipeline.pipeline import run_pipeline
@@ -913,7 +957,7 @@ class TestRunPipelineAuthMidFetch:
 
         notify_calls, notify_fn = make_notify_stub()
 
-        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+        def stub_fetch_article(url: str, headers: dict[str, str], on_error: Any) -> str:
             return ""
 
         stats = run_pipeline(
@@ -986,9 +1030,7 @@ class TestRunPipelineAuthDryRun:
         assert "(dry run) would file auth issue" in caplog.text
         assert stats["sources"] == 0
 
-    def test_dry_run_logs_mid_fetch_expiry_instead_of_issuing(
-        self, monkeypatch, caplog
-    ) -> None:
+    def test_dry_run_mid_fetch_empty_logs_no_issue(self, monkeypatch, caplog) -> None:
         from kb_pipeline.pipeline import run_pipeline
 
         monkeypatch.setenv("BYTEBYTEGO_SUBSTACK_COOKIE", "cookie")
@@ -997,7 +1039,8 @@ class TestRunPipelineAuthDryRun:
 
         notify_calls, notify_fn = make_notify_stub()
 
-        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+        def stub_fetch_article(url: str, headers: dict[str, str], on_error: Any) -> str:
+            on_error("empty")
             return ""
 
         stats = run_pipeline(
@@ -1008,8 +1051,9 @@ class TestRunPipelineAuthDryRun:
         )
 
         assert notify_calls == []
-        assert "(dry run) would file auth issue" in caplog.text
         assert stats["seen"] == 1
+        assert stats["failed"] == 1
+        assert "(dry run) would file auth issue" not in caplog.text
 
 
 def make_notify_stub() -> tuple[list[tuple[str, str]], Any]:
@@ -1078,7 +1122,7 @@ class TestRunPipelineAuthStartupCheck:
 
         notify_calls, notify_fn = make_notify_stub()
 
-        def stub_fetch_article(url: str, headers: dict[str, str]) -> str:
+        def stub_fetch_article(url: str, headers: dict[str, str], on_error: Any) -> str:
             return "markdown text " * 60
 
         stats = run_pipeline(
