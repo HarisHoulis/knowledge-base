@@ -16,6 +16,14 @@ setup_repo() {
     git -C "$repo_dir" branch -M main
 }
 
+setup_remote() {
+    local repo_dir="$1"
+    local remote_dir="$2"
+    git -C "$repo_dir" remote add origin "$remote_dir"
+    git init --bare "$remote_dir" --quiet
+    git -C "$repo_dir" push origin main --quiet
+}
+
 make_mock_gh() {
     local mock_dir="$1"
     local calls_file="$2"
@@ -122,8 +130,7 @@ test_dirty_repo() {
     setup_repo "$repo_dir"
     make_mock_gh "$mock_dir" "$calls_file"
     make_mock_python "$mock_dir" "mkdir -p \"$repo_dir/concepts\" && echo 'new concept' > \"$repo_dir/concepts/test.md\""
-    git -C "$repo_dir" remote add origin "$remote_dir"
-    git init --bare "$remote_dir" --quiet
+    setup_remote "$repo_dir" "$remote_dir"
 
     local rc
     set +e
@@ -139,6 +146,45 @@ test_dirty_repo() {
     rm -rf "$test_dir"
     [ "$fail" -eq 0 ] || return 1
     echo "PASS: dirty repo"
+}
+
+test_branches_from_fresh_main() {
+    local test_dir; test_dir=$(mktemp -d)
+    local repo_dir="$test_dir/repo"
+    local mock_dir="$test_dir/mocks"
+    local calls_file="$test_dir/gh_calls"
+    local remote_dir="$test_dir/remote.git"
+    mkdir -p "$repo_dir" "$mock_dir"
+
+    setup_repo "$repo_dir"
+    make_mock_gh "$mock_dir" "$calls_file"
+    make_mock_python "$mock_dir" "mkdir -p \"$repo_dir/concepts\" && echo 'new concept' > \"$repo_dir/concepts/test.md\""
+
+    mkdir -p "$repo_dir/.github/workflows"
+    echo "audit: true" > "$repo_dir/.github/workflows/daily-ingest.yml"
+    git -C "$repo_dir" add .github/workflows/daily-ingest.yml
+    git -C "$repo_dir" commit -m "workflow audit" --quiet
+    setup_remote "$repo_dir" "$remote_dir"
+
+    echo "audit: false" > "$repo_dir/.github/workflows/daily-ingest.yml"
+    git -C "$repo_dir" commit -am "stale local workflow" --quiet
+
+    local rc
+    set +e
+    PATH="$mock_dir:$PATH" GH="$mock_dir/gh" KB_PATH="$repo_dir" KB_STATE="$test_dir/state.json" \
+        bash "$SCRIPT_DIR/scripts/daily-ingest.sh" > "$test_dir/output" 2>&1
+    rc=$?
+    set -e
+
+    local fail=0
+    [ "$rc" -eq 0 ] || { echo "FAIL: stale base — expected exit 0, got $rc"; fail=1; }
+    local branch; branch=$(git -C "$repo_dir" for-each-ref --format='%(refname:short)' refs/heads/daily-ingest | head -1)
+    [ -n "$branch" ] || { echo "FAIL: expected daily-ingest branch"; fail=1; }
+    git -C "$repo_dir" show "$branch:.github/workflows/daily-ingest.yml" | grep -q "audit: true" || {
+        echo "FAIL: branch should carry fresh origin/main workflow, got:"; fail=1; }
+    rm -rf "$test_dir"
+    [ "$fail" -eq 0 ] || return 1
+    echo "PASS: branch is based on fresh origin/main"
 }
 
 test_pipeline_failure() {
@@ -207,8 +253,7 @@ test_content_only_auto_merge() {
     setup_repo "$repo_dir"
     make_mock_gh "$mock_dir" "$calls_file"
     make_mock_python "$mock_dir" "mkdir -p \"$repo_dir/concepts\" && echo 'new concept' > \"$repo_dir/concepts/test.md\""
-    git -C "$repo_dir" remote add origin "$remote_dir"
-    git init --bare "$remote_dir" --quiet
+    setup_remote "$repo_dir" "$remote_dir"
 
     local rc
     set +e
@@ -238,8 +283,7 @@ test_mixed_repo_comment() {
     setup_repo "$repo_dir"
     make_mock_gh "$mock_dir" "$calls_file"
     make_mock_python "$mock_dir" "mkdir -p \"$repo_dir/concepts\" \"$repo_dir/scripts\" && echo 'new concept' > \"$repo_dir/concepts/test.md\" && echo '#!/usr/bin/env bash' > \"$repo_dir/scripts/tool.sh\" && chmod +x \"$repo_dir/scripts/tool.sh\""
-    git -C "$repo_dir" remote add origin "$remote_dir"
-    git init --bare "$remote_dir" --quiet
+    setup_remote "$repo_dir" "$remote_dir"
 
     local rc
     set +e
@@ -270,8 +314,7 @@ test_non_md_skip_merge() {
     setup_repo "$repo_dir"
     make_mock_gh "$mock_dir" "$calls_file"
     make_mock_python "$mock_dir" "mkdir -p \"$repo_dir/concepts\" && echo 'draft note' > \"$repo_dir/concepts/notes.txt\""
-    git -C "$repo_dir" remote add origin "$remote_dir"
-    git init --bare "$remote_dir" --quiet
+    setup_remote "$repo_dir" "$remote_dir"
 
     local rc
     set +e
@@ -302,8 +345,7 @@ test_auto_merge_failure_exits_zero() {
     setup_repo "$repo_dir"
     make_mock_gh "$mock_dir" "$calls_file"
     make_mock_python "$mock_dir" "mkdir -p \"$repo_dir/concepts\" && echo 'new concept' > \"$repo_dir/concepts/test.md\""
-    git -C "$repo_dir" remote add origin "$remote_dir"
-    git init --bare "$remote_dir" --quiet
+    setup_remote "$repo_dir" "$remote_dir"
 
     cat > "$mock_dir/gh" << MOCK
 #!/usr/bin/env bash
@@ -387,6 +429,7 @@ test_audit_flag() {
 echo "=== daily-ingest tests ==="
 test_clean_repo && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_dirty_repo && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
+test_branches_from_fresh_main && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_pipeline_failure && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_dry_run && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
 test_content_only_auto_merge && PASS=$((PASS+1)) || FAIL=$((FAIL+1))
