@@ -2,21 +2,20 @@
 domain: android-kotlin
 subdomain: kotlin-collections
 concept: intermediate-collection-avoidance
-title: Intermediate Collection Avoidance
+title: Intermediate collection avoidance
 sources:
   - title: "Intermediate collection avoidance"
     url: "https://jakewharton.com/intermediate-collection-avoidance/"
     author: "Jake Wharton"
 ---
 
-# Intermediate Collection Avoidance
+# Intermediate collection avoidance
 
-Jake Wharton discusses how Kotlin's standard collection functions like `map` can create intermediate collections and iterators that are unnecessary. He demonstrates that the IDE's "weak warning" can refactor `users.map { it.name }.joinToString()` into the more efficient `users.joinToString() { it.name }`, which fuses the mapping into the joining operation and eliminates the intermediate collection and iterator. This is both shorter and faster, and the IDE helps discover this superior form (Jake Wharton, Intermediate collection avoidance).
+The article demonstrates how to avoid intermediate collections in Kotlin by fusing transformation and terminal operations. For example, instead of `users.map { it.name }.joinToString()`, one can write `users.joinToString() { it.name }`, which performs the mapping during string construction, eliminating the extra iterator and intermediate collection (source). Similarly, for arrays, `Array(users.size) { users[it].name }` replaces `users.map { it.name }.toTypedArray()`, and `MutableList(users.size) { ... }` offers a pre-sized list alternative.
 
-Wharton also highlights similar fused operations for array and pre-sized list initialization using lambda initializers, such as `Array(users.size) { users[it].name }` instead of `users.map { it.name }.toTypedArray()`, and `MutableList(users.size) { users[it].name }` for pre-sized lists. These alternatives trade the intermediate iterator and collection for indexed loops, which are more efficient. Benchmarks show significant improvements: for converting names to typed arrays, the lambda variant ran in 10.326 ns/op versus 78.444 ns/op for the map version and allocated fewer bytes. However, Wharton cautions that this technique only works well when the source list supports random access; for linked or persistent lists, performance will be abysmal, so it is best used for internal library code where the list type is controlled.
+Benchmarks provided in the article show the lambda-initialization variants are significantly faster and allocate fewer bytes. For the joinToString case, the lambda variant is roughly 42% faster and allocates 64 fewer bytes per operation; for typed arrays, the lambda is ~87% faster and allocates 80 fewer bytes. The article also cautions that this technique requires a random-access source to be efficient, and is best used where the list type is controlled, such as internal library code.
 
-- The IntelliJ IDEA weak warning can auto-refactor chained collection calls like `map` followed by `joinToString` into a fused form that eliminates intermediate collections and iterators.
-- For creating arrays or pre-sized lists, using a lambda initializer (e.g., `Array(size) { ... }`) is faster and allocates less than `map` followed by `toTypedArray()` or similar.
-- Primitive array variants like `IntArray` are also available for performance-sensitive code.
-- These optimizations rely on random access; when the source list is linked or persistent, the indexed loop approach can be much slower.
-- Benchmarks confirm the lambda initialization approach is both faster and more memory-efficient than the intermediate-collection approach.
+- Use `users.joinToString() { it.name }` instead of `users.map { it.name }.joinToString()` to avoid an intermediate collection.
+- Use `Array(users.size) { users[it].name }` instead of `users.map { it.name }.toTypedArray()` for arrays.
+- For pre-sized lists, use `MutableList(users.size) { ... }` to compute elements without intermediate collections.
+- These fused operations are faster and allocate less memory, but require a random-access source list.
