@@ -61,7 +61,7 @@ jobs:
         timeout-minutes: 30
         if: steps.find-issue.outputs.issue_number != ''
         env:
-          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.LLM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.PAT_AGENT }}
         with:
           model: deepseek/deepseek-v4-flash
