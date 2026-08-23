@@ -15,6 +15,10 @@ while [[ $# -gt 0 ]]; do
             PIPELINE_ARGS+=("$1")
             shift
             ;;
+        --audit)
+            PIPELINE_ARGS+=("--audit")
+            shift
+            ;;
         *)
             echo "[daily-ingest] Unknown option: $1" >&2
             exit 1
