@@ -12,14 +12,9 @@ sources:
 
 # My /teach skill is still insane
 
-Matt Pocock introduces the /teach skill, an AI-powered tool designed to master new concepts through personalized, tailored learning. The skill adapts to the user's needs, offering interactive explanations and quiz questions to reinforce understanding. It can cover a wide range of topics, from technical fields like development techniques to practical skills like land surveying and solving Rubik's Cubes, demonstrating its versatility as a learning companion.
+The /teach skill is an AI-powered tool designed to help users master new concepts through personalized, tailored learning experiences. It adapts to the learner's pace and style, offering interactive explanations and quiz questions to reinforce understanding. The skill can be applied to a wide range of topics, from technical development practices to hands-on activities like land surveying or solving a Rubik's Cube, demonstrating its versatility across domains.
 
-The approach leverages AI to break down complex subjects into digestible, engaging lessons. Instead of passive consumption, the /teach skill engages users actively with questions and feedback, making the learning process more effective. This aligns with modern AI workflows where tools are customized to individual learning styles and goals, providing on-demand education without a human tutor.
-
-Matt shares this skill as part of his broader collection of AI skills, inviting viewers to explore and adopt it for their own learning journeys. The video serves as both a demonstration and an endorsement of AI-driven personalized education, highlighting the potential of such tools to simplify and accelerate knowledge acquisition.
-
-- The /teach skill provides personalized, tailored learning experiences.
-- It uses interactive explanations and quiz questions to enhance understanding.
-- Can teach diverse topics, including technical, practical, and recreational subjects.
-- AI-driven learning adapts to the user's pace and style.
-- The skill is part of a larger set of AI skills available from the author.
+- The /teach skill delivers personalized learning by tailoring explanations to the user's needs.
+- It uses interactive explanations and quiz questions to reinforce comprehension.
+- The skill is versatile, covering both technical and practical subjects like surveying and Rubik's Cubes.
+- It can be accessed via AI Hero, with updates and community support available on Discord and Twitter.

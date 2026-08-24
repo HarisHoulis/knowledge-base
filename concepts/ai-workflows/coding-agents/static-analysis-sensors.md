@@ -2,18 +2,18 @@
 domain: ai-workflows
 subdomain: coding-agents
 concept: static-analysis-sensors
-title: Three More Static Code Analysis Sensors
+title: Three more static code analysis sensors
 sources:
   - title: "Three more static code analysis sensors"
     url: "https://martinfowler.com/articles/sensors-for-coding-agents.html#StaticCodeAnalysisDependencyRules"
-    author: "Birgitta Böckeler"
+    author: "Martin Fowler"
 ---
 
-# Three More Static Code Analysis Sensors
+# Three more static code analysis sensors
 
-Birgitta Böckeler discusses three additional sensors for static code analysis in the context of coding agents, focusing on checking and enforcing better modularity. Computational sensors for dependency checks were effective at enforcing predefined rules but limited in scope, as the rules themselves were constrained and could not capture broader architectural concerns.
+The article discusses three additional sensors for static code analysis in the context of coding agents, focusing on improving modularity. Dependency check sensors are effective at enforcing rules but are limited by the expressiveness of the rules themselves. A sensor for coupling data proved ineffective. In contrast, prompting an inferential sensor to review modularity yielded better results, suggesting that a more flexible approach can outperform rigid computational checks.
 
-- Dependency-check sensors enforce modularity rules well, but the rules are inherently limited.
-- A computational sensor for coupling data proved lackluster and not particularly useful.
-- Prompting an inferential sensor to review modularity was more effective than computational alternatives.
-- Sensor design for coding agents should consider the trade-off between rule-based enforcement and inferential review.
+- Dependency checks as computational sensors are good at enforcing rules but have limited rule expressiveness.
+- A computational sensor for coupling data proved lackluster.
+- An inferential sensor prompted to review modularity was more effective.
+- The focus is on checking and enforcing better modularity in code.

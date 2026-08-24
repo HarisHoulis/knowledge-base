@@ -11,9 +11,8 @@ sources:
 
 # Practitioner Voice: The Writing Category Nobody has Named Yet
 
-The article, authored by Martin Fowler, highlights a distinct style of writing that Jim Highsmith identified and named: the 'practitioner voice.' This style is differentiated from academic writing and thought-leadership content, focusing on practical, experience-based insights from practitioners who actively work in the field. Fowler advocates for this style, noting that his contributors mostly follow it, and emphasizes the importance of recognizing it as a unique category. The key distinction lies in its grounding in real-world experience, actionable advice, and a conversational yet authoritative tone, rather than theoretical analysis or abstract visionary ideas. Highsmith's naming of this category helps clarify its essence and value, encouraging more practitioners to share their knowledge in a way that resonates with peers.
+The article, authored by Martin Fowler, discusses a distinct category of writing called 'practitioner voice.' This style is recognized by Jim Highsmith, who identified it as being different from academic writing and thought-leadership content. Fowler advocates for this style and notes that his contributors mostly follow it. Highsmith gave this writing approach a name and highlighted what makes it distinctive, addressing a gap in how we categorize technical practitioner writing.
 
-- Practitioner voice is a distinct writing style separate from academic writing and thought leadership.
-- It emphasizes practical, experience-driven insights from active practitioners.
-- Grounding in real-world experience makes it more actionable and relatable for readers.
-- The name gives recognition to this style, promoting its use and legitimacy.
+- Practitioner voice is a distinct writing style separate from academic and thought-leadership writing.
+- Jim Highsmith recognized and named this category, identifying its unique characteristics.
+- Martin Fowler advocates for the practitioner voice, and his contributors predominantly adopt it.

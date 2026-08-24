@@ -2,17 +2,19 @@
 domain: python-backend
 subdomain: dependency-management
 concept: transitive-dependency-fix
-title: llm 0.32.1
+title: llm 0.32.1 release
 sources:
   - title: "llm 0.32.1"
     url: "https://simonwillison.net/2026/Aug/21/llm/"
-    date: "2026-08-21T17:16:13+00:00"
+    author: "Simon Willison"
+    date: "2026-08-21"
 ---
 
-# llm 0.32.1
+# llm 0.32.1 release
 
-The llm 0.32.1 release addresses a regression where fresh installs of LLM stopped working because the OpenAI Python library dropped its usage of httpx. LLM depended on httpx indirectly through the openai dependency, but since that library no longer uses httpx, the transitive dependency was removed and caused installs to fail (source).
+LLM 0.32.1 is a dot release that addresses a critical installation issue caused by a transitive dependency. According to Simon Willison, fresh installs of LLM stopped working because the OpenAI Python library dropped its usage of httpx, while LLM itself relied on httpx only as a transitive dependency through openai. The fix pins openai to a version lower than 3 to restore compatibility until a more permanent solution is implemented. The upcoming 0.33 release will switch from httpx to httpx2, a new library from the Pydantic team, to decouple from OpenAI's dependency choices. This case highlights the fragility of relying on transitive dependencies in Python packaging and the need for explicit dependency declarations.
 
-- Fresh LLM installs broke due to a missing transitive dependency on httpx after OpenAI's library dropped it.
-- The release pins openai<3 to temporarily restore the httpx dependency.
-- A future 0.33 release will switch from httpx to httpx2 to resolve the issue more permanently.
+- LLM 0.32.1 fixes installation failures by pinning openai to a version below 3.
+- The root cause was a transitive dependency on httpx that disappeared when OpenAI dropped it.
+- A future 0.33 release will migrate LLM from httpx to httpx2 to avoid similar issues.
+- The incident illustrates the importance of explicitly declaring direct dependencies rather than relying on transitive ones.
