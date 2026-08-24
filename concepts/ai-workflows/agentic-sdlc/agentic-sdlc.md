@@ -12,10 +12,10 @@ sources:
 
 # Agentic SDLC at Uber
 
-Uber's investments in agentic AI have transformed their software development lifecycle. Over the past year, more than 70% of pull requests are now authored by local or cloud agents, and lines of code per engineer have doubled year-over-year. Additionally, they handled over 250 automated migrations, automatically moving 9 million lines of code. This acceleration was enabled by six years of foundational work on monorepos and Bazel.
+Uber's journey toward a managed software factory is driven by agentic AI. With few thousand engineers across 12 global tech sites, their investments have led to over 70% of pull requests now authored by local or cloud agents, and twice the number of lines of code per engineer year-over-year. This extends beyond coding, with more than 250 automated migrations covering 9 million lines of code, significantly reducing toil (Medisetty & Huda, 2026).
 
-- 70%+ of PRs at Uber are now authored by local or cloud agents; lines of code per engineer doubled YoY.
-- The model gateway centralizes model access, enforcing PII redaction, safety guardrails, and per-project attribution under 100ms latency.
-- The model gateway handles over 100 million model requests per day across 800+ internal projects.
-- The MCP gateway provides a unified entry point for internal APIs and SaaS tools, with automated crawling into MCPs and token optimization strategies like Omni MCP and CLI projection.
-- Over 250 automated migrations moved 9 million lines of code automatically, reducing toil.
+- Over 70% of PRs at Uber are authored by local or cloud agents, doubling lines of code per engineer.
+- A model gateway enforces PII redaction, safety guardrails under 100ms, and per-user/project/team attribution, handling 100M+ daily requests across 800+ projects.
+- An MCP gateway automatically projects internal APIs and SaaS tools into MCPs, with token-optimization patterns like Omni MCP, CLI, and a code mode skill.
+- Uber completed 250+ automated migrations covering 9 million lines of code, reducing engineering toil.
+- The six building blocks are at various maturity stages; the talk demonstrates an end-to-end feature build using these blocks.

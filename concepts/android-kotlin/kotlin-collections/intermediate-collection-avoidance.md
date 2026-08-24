@@ -11,11 +11,13 @@ sources:
 
 # Intermediate collection avoidance
 
-The article demonstrates how to avoid intermediate collections in Kotlin by fusing transformation and terminal operations. For example, instead of `users.map { it.name }.joinToString()`, one can write `users.joinToString() { it.name }`, which performs the mapping during string construction, eliminating the extra iterator and intermediate collection (source). Similarly, for arrays, `Array(users.size) { users[it].name }` replaces `users.map { it.name }.toTypedArray()`, and `MutableList(users.size) { ... }` offers a pre-sized list alternative.
+Kotlin's collection extension functions make it easy to chain operations, but this can create intermediate collections that waste time and memory. For example, `users.map { it.name }.joinToString()` first builds a new list of names, then iterates that list to produce a string. The IDE's intention action suggests fusing these operations into `users.joinToString() { it.name }`, which maps each element directly during string construction, eliminating the intermediate list and iterator (Jake Wharton, https://jakewharton.com/intermediate-collection-avoidance/).
 
-Benchmarks provided in the article show the lambda-initialization variants are significantly faster and allocate fewer bytes. For the joinToString case, the lambda variant is roughly 42% faster and allocates 64 fewer bytes per operation; for typed arrays, the lambda is ~87% faster and allocates 80 fewer bytes. The article also cautions that this technique requires a random-access source to be efficient, and is best used where the list type is controlled, such as internal library code.
+The same strategy applies to array and pre-sized list initialization. Instead of `users.map { it.name }.toTypedArray()`, one can use `Array(users.size) { users[it].name }`. This uses an indexed loop rather than an iterator and intermediate collection, and primitive array variants like `IntArray` are available. For pre-sized lists, `MutableList(users.size) { users[it].name }` works similarly, allowing element initialization based on index or another source.
 
-- Use `users.joinToString() { it.name }` instead of `users.map { it.name }.joinToString()` to avoid an intermediate collection.
-- Use `Array(users.size) { users[it].name }` instead of `users.map { it.name }.toTypedArray()` for arrays.
-- For pre-sized lists, use `MutableList(users.size) { ... }` to compute elements without intermediate collections.
-- These fused operations are faster and allocate less memory, but require a random-access source list.
+These fused forms are both shorter and faster, as benchmark results show: `joinToString` with a lambda runs in 73.6 ns/op vs 126.6 ns/op for `map` followed by `joinToString`, and allocated 168 B/op vs 232 B/op. The array initializer is even more dramatic: 10.3 ns/op vs 78.4 ns/op, with 40 B/op vs 120 B/op. However, the author cautions that this technique relies on random access to the source; using it with linked or persistent lists will degrade performance, so it is best suited for internal code with controlled inputs.
+
+- Fuse operations like `map` and `joinToString` to avoid intermediate collections; e.g., `users.joinToString() { it.name }`.
+- Use lambda-based initializers `Array(size) { ... }` and `MutableList(size) { ... }` to create arrays and lists without intermediate `map` results.
+- These forms use indexed loops instead of iterators, making them faster and more memory-efficient.
+- Only apply when the source supports random access; linked or persistent lists will suffer poor performance.

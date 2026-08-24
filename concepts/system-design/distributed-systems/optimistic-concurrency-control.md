@@ -2,7 +2,7 @@
 domain: system-design
 subdomain: distributed-systems
 concept: optimistic-concurrency-control
-title: MIT 6.824 Lecture 14: Optimistic Concurrency Control in FaRM
+title: Lecture 14: Optimistic Concurrency Control
 sources:
   - title: "Lecture 14: Optimistic Concurrency Control"
     url: "https://www.youtube.com/watch?v=Cw6Nj2evjSs"
@@ -10,16 +10,14 @@ sources:
     date: "2020-04-10T17:24:08+00:00"
 ---
 
-# MIT 6.824 Lecture 14: Optimistic Concurrency Control in FaRM
+# Lecture 14: Optimistic Concurrency Control
 
-This lecture from MIT 6.824 introduces FaRM, a research prototype distributed system that explores the performance potential of RDMA (Remote Direct Memory Access) networking hardware. FaRM is contrasted with Spanner: while Spanner focuses on geographic replication and wide-area transactions, FaRM assumes all replicas are in the same data center, targeting CPU time as the main bottleneck rather than speed-of-light delays. This design choice enables drastically lower latencies, with simple transactions completing in 58 microseconds compared to Spanner's 10 milliseconds, roughly 100 times faster (MIT 6.824, 2020).
+This lecture from MIT 6.824 focuses on FaRM, a research prototype that leverages RDMA (Remote Direct Memory Access) to achieve extremely fast transactions within a single data center. FaRM is contrasted with Spanner: while Spanner emphasizes geographic replication and handles long-distance two-phase commit using synchronized time for read-only transactions, FaRM targets same-datacenter deployment, reducing the dominant bottleneck to server CPU time rather than network latency. The lecture highlights FaRM's transaction latency of 58 microseconds, which is roughly 100 times faster than Spanner's 10-100 milliseconds, illustrating the performance gains possible with RDMA and optimistic concurrency control (MIT 6.824, 2020).
 
-FaRM uses sharding across primary-backup pairs, with a configuration manager (backed by Zookeeper) deciding which servers hold each shard. Updates must be applied to both primary and backup replicas, while reads always go to the primary. Replication is not coordinated via Paxos; instead, all replicas are updated on every change, and fault tolerance is provided as long as one replica of each shard remains available.
+FaRM's architecture shards data across primary-backup pairs, with all replicas updated on every change and reads always directed to the primary. Unlike consensus-based replication like Paxos, FaRM simply replicates to both primary and backup. The design is heavily influenced by RDMA's capabilities, which restrict certain coordination patterns and push FaRM toward optimistic concurrency control. The lecture also notes that while ZooKeeper is used for configuration management, the core innovation lies in the concurrency control mechanism and its fit with high-speed networking hardware. These choices enable far higher performance than Spanner, but at the cost of geographic fault tolerance, since all replicas must reside in the same data center (MIT 6.824, 2020).
 
-Because RDMA imposes restrictions on the design, FaRM is forced to use optimistic concurrency control (OCC). The lecture explains how OCC allows transactions to proceed without locking, validating at commit time to ensure serializability, which is well-suited to the low-latency, high-throughput environment enabled by RDMA. The key takeaway is that FaRM demonstrates how specialized hardware can reshape distributed systems trade-offs, achieving orders-of-magnitude performance improvements over systems designed for geo-replication.
-
-- FaRM targets a single data center and uses RDMA to achieve 58-microsecond transactions, about 100x faster than Spanner.
-- Unlike Spanner, FaRM optimizes for CPU time rather than network latency, making it unsuitable for geographic replication.
-- FaRM uses optimistic concurrency control because RDMA severely restricts the available design options.
-- Data is sharded across primary-backup pairs, with all replicas updated on writes and reads served from the primary.
-- Replication is not managed by Paxos; fault tolerance relies on one replica per shard being available.
+- FaRM uses RDMA to deliver 58-microsecond transactions, about 100x faster than Spanner's 10-100 ms.
+- Unlike Spanner's focus on geographic replication, FaRM assumes all replicas are in the same data center, optimizing for CPU time and network efficiency.
+- Data is sharded across primary-backup pairs; reads go to the primary, and writes update all replicas without consensus protocols like Paxos.
+- RDMA significantly constrains design choices, motivating the use of optimistic concurrency control.
+- FaRM is a research prototype, not a deployed product, intended to explore RDMA's potential for transaction processing.

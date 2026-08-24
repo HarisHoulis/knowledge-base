@@ -2,22 +2,20 @@
 domain: ai-workflows
 subdomain: ai-coding-skills
 concept: skills-repo-workflow
-title: A Complete AI Coding Workflow with mattpocock/skills
+title: Matt Pocock's Complete AI Coding Workflow with the skills Repo
 sources:
   - title: "mattpocock/skills: A complete AI Coding workflow, end-to-end"
     url: "https://www.youtube.com/watch?v=M6mYodf0dJM"
     author: "Matt Pocock"
-    date: "2026-07-16"
+    date: "2026-07-16T09:32:49+00:00"
 ---
 
-# A Complete AI Coding Workflow with mattpocock/skills
+# Matt Pocock's Complete AI Coding Workflow with the skills Repo
 
-Matt Pocock walks through the end-to-end setup of his skills repository, mattpocock/skills, which has gained significant traction (162,000 stars and 7.5 million downloads). The workflow begins with a single command: `NPX skills@latest add mattpocock/skills`, which requires Node.js and uses Vercel's skills.sh CLI. This installer fetches the GitHub repo and presents a list of 38 available skills, split into official skills (blessed by Matt) and experimental ones. Users can select all official skills with a spacebar toggle, then configure the installation for their preferred AI agent—though Claude Code requires additional manual configuration (Pocock, 2026).
+The installation process offers choices about installation scope and method. Pocock recommends project-level installation for teams so everyone shares the same skills and can contribute to them, while global installation is fine for solo developers. He also recommends the symlink option over copying files, describing it as the nicer and easier method. Once installed, the skills appear as slash commands in Claude Code, and notably are mostly user-invoked rather than automatically injected into every conversation, keeping agent descriptions short.
 
-The installer then prompts for installation scope, where Matt recommends project-level installation for teams to ensure shared skill sets and collaborative maintenance, while global installation suits solo developers. He also recommends choosing symlink over copy for a cleaner setup. After installation, skills become available as slash commands in the agent (e.g., Claude Code). A key design principle is that most skills are user-invoked rather than automatically injected into context, keeping agent descriptions short and avoiding unnecessary context bloat (Pocock, 2026).
-
-- Install with `NPX skills@latest add mattpocock/skills`; requires Node.js and Vercel's skills.sh CLI.
-- Choose official skills and configure the target agent; Claude Code requires manual setup.
-- Use project-level installation for team consistency; global for solo work.
-- Symlink is the recommended installation method.
-- Skills are mostly user-invoked via slash commands, not auto-loaded into context.
+- Install the skills repo with `npx skills@latest add mattpocock/skills`.
+- The repo contains 38 skills, split into official and experimental, and works with multiple AI agents such as Claude Code, Cursor, and Codex.
+- Choose project-scoped installation for team consistency and shared contributions; global installation is fine for individual developers.
+- Use the symlink installation method for simplicity.
+- The skills are mostly user-invoked via slash commands, not auto-injected into context.

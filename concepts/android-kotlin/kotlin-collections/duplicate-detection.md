@@ -11,9 +11,8 @@ sources:
 
 # Perils of duplicate finding
 
-The article explores different Kotlin approaches to finding duplicate integers in an array, highlighting subtle pitfalls in collection operations. The naive approach of subtracting a set from a list (`ints.toList() - ints.toSet()`) yields an empty list because Kotlin's `minus` operator removes all occurrences of each element in the collection, not just the first. Similarly, `MutableList.removeAll` also removes all occurrences, contrary to what `remove` does, leading to unexpected results. The author eventually arrives at a concise and efficient solution using `filterNotTo` with a bound `HashSet::add` reference, which keeps elements that were already seen. The article also notes that these behaviors are inherited from Java and emphasizes the importance of understanding collection semantics.
+In this article, Jake Wharton explores how to find duplicate elements in an integer array using Kotlin. He first presents a straightforward groupBy approach that prints [1, 3] but finds it wasteful. This leads to an investigation of Kotlin collection operations, where he discovers surprising behaviors in the minus operator and MutableList.removeAll, both of which remove all occurrences of elements rather than just the first. These misconceptions initially produce incorrect empty outputs [1].
 
-- Kotlin's `minus` operator and `MutableList.removeAll` remove all occurrences, not just the first, causing naive duplicate-finding attempts to fail.
-- A correct approach uses a `HashSet` to track seen elements: `filterNotTo(HashSet(), HashSet<Int>()::add)` keeps only duplicates.
-- Bound function references like `HashSet<Int>()::add` allow concise inline stateful predicates.
-- The `filterNotTo` variant is both the fastest and most memory-efficient among the tested alternatives.
+- Kotlin's minus operator and removeAll remove all occurrences of each element in the supplied collection, not just the first occurrence, which can lead to unexpected results.
+- The correct manual approach is to use a MutableList and remove the first occurrence of each element via remove, or more elegantly use a bound function reference like filterNot(HashSet<Int>()::add).
+- The filterNotTo variant (e.g., ints.filterNotTo(HashSet(), HashSet<Int>()::add)) is both concise and the fastest, allocating the fewest bytes in benchmarks.

@@ -2,7 +2,7 @@
 domain: engineering-culture
 subdomain: observability
 concept: observability-opinions-request
-title: Got Opinions on Observability? A Call for Help
+title: Got opinions on observability? I could use your help (once more, with feeling)
 sources:
   - title: "Got opinions on observability? I could use your help (once more, with feeling)"
     url: "https://charity.wtf/p/got-opinions-on-observability-i-could-use-your-help-once-more-with-feeling"
@@ -10,12 +10,14 @@ sources:
     date: "2025-10-13"
 ---
 
-# Got Opinions on Observability? A Call for Help
+# Got opinions on observability? I could use your help (once more, with feeling)
 
-Charity Majors, author of the second edition of her book on observability, makes a public plea for practitioner input on a wide range of observability topics. She explains that after receiving strong feedback on a previous request about buying software, she is pressing her luck with additional questions about vendor migrations, cost control, telemetry pipelines, build vs buy decisions, OpenTelemetry adoption, instrumentation, and tool consolidation. She specifically wants to hear from teams that are happy with the traditional 'three pillars' model, acknowledging her own selection bias against that architecture.
+Charity Majors, author of a forthcoming second edition of her book, reflects on the success of her previous request for advice on buying software, noting that vendor engineering is a powerful and underappreciated form of high-leverage engineering work. She argues that deep expertise in evaluating and managing vendors can multiply an engineer's impact across an organization and even beyond it, shaping the work of hundreds or thousands of engineers for a tiny cost. This experience emboldened her to seek community input on observability, a topic where she worries her writing may be skewed by selection bias, particularly regarding traditional 'three pillars' architectures like Datadog, Grafana, and Chronosphere.
 
-- Vendor engineering is high-leverage, allowing engineers to impact many teams and customers through thoughtful software purchasing decisions.
-- The author is gathering real-world experience on observability vendor migrations, including hardest parts and lessons learned.
-- She asks about cost control strategies for Datadog, Grafana, Chronosphere, and similar tools, including tiered service models and telemetry pipelines.
-- She wants to understand why some teams choose not to adopt OpenTelemetry and how engineers reduce instrumentation cognitive overhead.
-- Responses are due within a week, and contributors can be credited by name without identifying their employers.
+Majors poses a wide range of questions to her readers, covering migration between observability vendors, cost control strategies, telemetry pipelines, build vs. buy decisions, OpenTelemetry adoption, instrumentation ergonomics, and tool consolidation. She is especially interested in practical advice from large enterprises with multiple business units, as well as contributions from engineers who have successfully managed observability teams or migrated at scale. She asks respondents to email her with opinions, offering to credit them by name but not by employer. She also includes a lighthearted grammar note on 'opinions about' versus 'opinions on,' showing her characteristic blend of technical and cultural commentary.
+
+- Vendor engineering is a high-leverage skill that enables engineers to influence many others directly, even beyond their own organization.
+- Majors is actively seeking community input to strengthen her book's coverage of observability, especially from users of traditional three-pillar monitoring tools.
+- Open questions include observability vendor migration, cost control, telemetry pipelines, OpenTelemetry adoption, build vs. buy, and tool consolidation.
+- She values practical, hands-on advice and asks for anonymous-by-default attribution, crediting names but not employers.
+- The article highlights the importance of community feedback in shaping technical writing and thought leadership.
