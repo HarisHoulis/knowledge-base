@@ -7,19 +7,15 @@ sources:
   - title: "Schema Evolution: Changing the Contract Without Breaking What Runs"
     url: "https://blog.bytebytego.com/p/schema-evolution-changing-the-contract"
     author: "ByteByteGo"
-    date: "2026-08-20"
+    date: "Thu, 20 Aug 2026 15:32:18 GMT"
 ---
 
 # Schema Evolution: Changing the Contract Without Breaking What Runs
 
-Schema changes are risky because multiple schema versions always coexist in a running system. Reasons include rolling deploys, stored data written by old code, third-party clients still using old versions, and asynchronous messages that are read later or reprocessed. Staging environments mask this version overlap because they run a single version against recent data (ByteByteGo, 2026).
+Schema changes are inherently risky because multiple schema versions are always in play simultaneously. Rolling deploys, stored data, third-party clients, and asynchronous messages mean old and new code read and write the same data long after a migration. This makes version overlap a permanent feature, not just a release-time concern, and explains why staging rarely exposes schema-related issues. Compatibility depends on the direction of data access: backward compatibility lets new code read old data, while forward compatibility lets old code read new data. The decoder resolves differences by discarding unknown fields and substituting defaults for missing ones, which is why adding a field with a default is usually safe and renaming or removing a field can break consumers.
 
-Compatibility is directional: backward compatibility means new code can read old data, while forward compatibility means old code can read new data. Decoding a record uses the writer's schema and the reader's schema; fields present in data but missing in the reader are discarded, and fields in the reader but missing in the data are filled with defaults. Breaking changes include removing or renaming fields, making optional fields required, changing types, and narrowing validation. Adding a field with a default is safe, but adding a required field to a request or removing a field from a response breaks consumers (ByteByteGo, 2026).
-
-Expand-contract migrations break breaking changes into reversible steps: add a nullable column, dual-write, backfill, switch reads, stop writing the old column, and finally drop it. Schema registries store and validate schemas centrally, catching incompatible changes at registration time. Versioning strategies differ by context: internal APIs allow coordinated breaks, public APIs require explicit versioning and deprecation windows, and event logs need schema registry enforcement with defaults on every field. Finally, deprecating unused schema elements is often skipped; field-level usage instrumentation and scheduling removal during the expansion phase help make it happen (ByteByteGo, 2026).
-
-- Multiple schema versions always coexist; compatibility is a property of a pair of versions and the data flow direction.
-- Adding a field with a default is usually non-breaking; removing or renaming a field, or making it required, breaks consumers.
-- Expand-contract migrations let breaking changes be deployed in individually safe, reversible steps.
-- Schema registries validate schemas against previous versions, but cannot catch semantic changes like unit shifts.
-- Deprecation and removal of unused schema elements require explicit scheduling and usage measurement.
+- Multiple schema versions coexist due to rolling deploys, historical data, old clients, and queued messages, making overlap permanent.
+- Compatibility is directional: backward (new reads old) vs. forward (old reads new) determines safe deployment order.
+- Adding a field with a default is safe; removing, renaming, or redefining a field breaks consumers depending on the field matching method.
+- Expand-contract migrations decompose breaking changes into individually safe steps, with dual writes and backfills.
+- Schema registries catch incompatible changes at registration time, but cannot detect semantic changes like unit shifts.

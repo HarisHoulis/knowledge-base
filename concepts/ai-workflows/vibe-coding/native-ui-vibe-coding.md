@@ -12,9 +12,8 @@ sources:
 
 # Stop Making TUIs
 
-Simon Willison reflects on his experience with vibe-coded native macOS apps, specifically bandwidth and GPU monitoring tools built in SwiftUI. He notes that these apps, created with AI assistance, have become daily-use tools, challenging his previous habit of relying on throwaway CLI scripts. The article highlights a shift in developer mindset: instead of defaulting to text-based TUIs, developers can leverage AI to build polished native interfaces with minimal effort. Willison quotes Thomas Ptacek, who argues that turning a CLI into a native app is a valuable exercise that can change how you think about software design. The piece suggests that AI coding tools have lowered the barrier to UI development, making it feasible for backend-focused developers to create functional, long-lived desktop applications. This represents a broader trend where vibe-coding extends beyond prototypes to production-quality personal tools.
+Simon Willison reflects on his experience with vibe-coded native macOS apps for bandwidth and GPU monitoring, which he built in March and continues to use daily. He points to a quote from Thomas Ptacek urging developers to try turning one of their many throwaway CLIs into a native app, suggesting it will change how they think about UI development. Willison agrees, noting that with modern AI coding tools, developers are running out of excuses not to build real, polished native interfaces for their personal tools. The article encourages a shift from terminal-based utilities to full desktop applications as an accessible and rewarding practice in the age of vibe-coding.
 
-- Vibe-coded native apps can be practical, durable tools, not just throwaway experiments.
-- Developers should consider upgrading their most-used CLIs to native UIs.
-- AI coding assistants reduce the effort required to build native interfaces.
-- Building native UIs can shift a developer's perspective on design and usability.
+- Vibe-coded native apps can be practical enough for daily personal use.
+- Developers should consider converting throwaway CLIs into native UIs.
+- AI coding tools have lowered the barrier to building native applications, making this a worthwhile experiment.
