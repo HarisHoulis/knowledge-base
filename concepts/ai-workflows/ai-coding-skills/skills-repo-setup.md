@@ -2,22 +2,20 @@
 domain: ai-workflows
 subdomain: ai-coding-skills
 concept: skills-repo-setup
-title: A Complete AI Coding Workflow with Matt Pocock's Skills Repo
+title: Skill-Based AI Coding Workflows with mattpocock/skills
 sources:
   - title: "mattpocock/skills: A complete AI Coding workflow, end-to-end"
     url: "https://www.youtube.com/watch?v=M6mYodf0dJM"
     author: "Matt Pocock"
-    date: "2026-07-16T09:32:49+00:00"
+    date: "2026-07-16"
 ---
 
-# A Complete AI Coding Workflow with Matt Pocock's Skills Repo
+# Skill-Based AI Coding Workflows with mattpocock/skills
 
-Matt Pocock presents a tutorial for his 'skills' repo, a collection of AI agent skills with over 162,000 stars and 7.5 million downloads. The main flow involves installing the repo via the Vercel Skills CLI using `npx skills@latest add mattpocock/skills`. The installer prompts the user to select which skills to install, choosing between official skills and experimental ones, and then configures the skills for a specific agent like Claude Code, Cursor, or Codex. The user also chooses the installation scope—project-level (recommended for teams) or global (fine for solo developers)—and the installation method, with symlink recommended over copying.
+Matt Pocock walks through the main end-to-end workflow for his skills repository, which has over 162,000 stars and 7.5 million downloads. The setup begins by running `npx skills@latest add mattpocock/skills` inside a project directory; this uses Vercel's skills CLI to install the repository and presents a list of 38 available skills (Pocock, 2026). The installer separates official "blessed" skills from experimental ones, and users can select which to install using the spacebar.
 
-Once installed, the skills appear as slash commands in Claude Code, such as 'grill me' and 'way finder'. A key design principle is that these skills are mostly user-invoked rather than automatically injected into the agent's context, keeping descriptions short and intentional. The tutorial targets both brownfield and greenfield projects, showing that the setup works in any directory. The overall workflow emphasizes simplicity, team collaboration through shared project skills, and a clean agent integration via symlinks.
-
-- Install skills with `npx skills@latest add mattpocock/skills`, which runs the Vercel CLI and guides through configuration.
-- Choose project-scoped skills for team consistency; global scope is acceptable for solo developers.
-- Select symlink as the installation method—it's the recommended and easiest way to link skills into the agent.
-- Skills are user-invoked (e.g., via slash commands in Claude Code) rather than auto-loaded, keeping agent context uncluttered.
-- The setup works on both existing codebases and empty projects, making it flexible for any workflow.
+- Install with `npx skills@latest add mattpocock/skills` and select the desired skills interactively.
+- Skills can be installed at project scope or globally; project scope is recommended for team projects, global for solo developers.
+- Configure the skills for your specific AI agent; with Claude Code, users must explicitly select it during setup.
+- Prefers symlink installation over copying for a cleaner setup.
+- The skills are mostly user-invoked via slash commands rather than auto-injected into the agent's context.

@@ -2,20 +2,20 @@
 domain: android-kotlin
 subdomain: test-driven-development
 concept: clock-abstraction
-title: Kotlin TDD - To Production At Last
+title: Kotlin TDD: To Production At Last
 sources:
   - title: "Kotlin TDD - To Production At Last"
     url: "https://www.youtube.com/watch?v=UH7_kYAG-TE"
     author: "Pairing with Duncan"
-    date: "2022-03-05"
+    date: "2022-03-05T20:10:25+00:00"
 ---
 
-# Kotlin TDD - To Production At Last
+# Kotlin TDD: To Production At Last
 
-The team integrates a stock updating feature using Kotlin and TDD. They start by re-enabling a disabled test that captures the expected behavior, then move the Stock class from the test tree to the main source set so it can be used in production. To make time-dependent behavior testable, they introduce a clock functional parameter that returns an Instant, replacing direct calls to Instant.now(). This allows tests to control time deterministically. They then refactor their test fixtures to use Instant instead of LocalDate for precise timing, deriving dates from instants, and commit the work as a work-in-progress.
+The video demonstrates a TDD workflow for delivering a story that updates stock quantities in the browser. The team re-enables a disabled test to confirm expected behavior, then moves the Stock class from the test tree into the main source tree to integrate it. They wire the Stock class into the route handler, replacing the previous direct stock file loading, and introduce a function parameter for the clock to return an Instant instead of using Instant.now() directly, making time control possible in tests. The test fixtures are updated to pass an Instant rather than a LocalDate, and the date is derived from the instant to maintain consistency. After running the tests, they pass, and the work is committed as a work-in-progress (WIP).
 
-- Re-enable a failing test to drive the integration of new functionality.
-- Move production code from the test tree into the main source set.
-- Introduce a clock function parameter to inject time, avoiding direct Instant.now() calls.
-- Refactor test fixtures to use Instant for precise time control and derive LocalDate from it.
-- Commit work-in-progress to checkpoint progress during TDD.
+- Re-enable failing tests to drive integration work
+- Move code from test tree to main tree for production use
+- Inject a clock function (returning Instant) to make time testable
+- Replace LocalDate with Instant for time-sensitive operations
+- Derive fixture date from instant to keep test data consistent

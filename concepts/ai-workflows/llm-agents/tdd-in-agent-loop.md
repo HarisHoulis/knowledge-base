@@ -11,8 +11,8 @@ sources:
 
 # TDD inside the agent loop - theater or actual value?
 
-The article, authored by Martin Fowler, explores whether Test-Driven Development (TDD) is genuinely effective when used to instruct LLM agents in software building. Fowler notes that many in the industry advocate for TDD with agents, but questions whether it truly makes a difference. To investigate, his colleague Birgitta Böckeler conducted a series of experiments, suggesting that the value of TDD in this context is not just theoretical but subject to empirical validation.
+The article explores whether instructing LLM agents to follow Test-Driven Development (TDD) genuinely improves software generation or is merely performative. It highlights that many industry practitioners advocate TDD for AI agents, but empirical evidence is needed.
 
-- TDD is increasingly advocated as a practice for guiding LLM agents in software development.
-- Birgitta Böckeler conducted experiments to assess whether TDD actually improves outcomes when used with LLM agents.
-- The article raises the question of whether TDD in the agent loop is merely theatrical or provides tangible value.
+- TDD is widely recommended for LLM-based coding agents, but its real impact is underexplored.
+- Birgitta Böckeler conducted experiments to test if TDD changes agent outcomes.
+- The article questions whether TDD in agent loops is 'theater' or delivers actual value.

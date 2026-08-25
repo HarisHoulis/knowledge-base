@@ -7,19 +7,19 @@ sources:
   - title: "Crash course on the Android UI layer | Part 2"
     url: "https://medium.com/bumble-tech/crash-course-on-the-android-ui-layer-part-2-2335171467e0"
     author: "Manuel Vivo"
-    date: "Tue, 19 Dec 2023 15:58:45 GMT"
+    date: "2023-12-19"
 ---
 
 # Crash course on the Android UI layer | Part 2
 
-This article explores state holders in the Android UI layer, distinguishing between business logic (what to do with data) and UI logic (how to display it). Business logic should be handled by a screen-level state holder, typically an androidx.ViewModel, because it survives configuration changes and integrates with Jetpack libraries. UI logic can live in the composable itself when simple, or be delegated to a plain class state holder when complexity grows (Manuel Vivo, Medium).
+This article is the second part of a crash course on the Android UI layer, focusing on state holders and related topics. It distinguishes between business logic (product requirements for data) and UI logic (how to display state changes). Business logic in the UI layer should be handled by a screen-level state holder, typically an androidx.ViewModel, while UI logic can be managed within the UI itself or delegated to a plain class state holder when complexity grows (Vivo, 2023).
 
-The ViewModel is recommended for screen-level state because it survives configuration changes, caches UI state, and continues executing business logic via viewModelScope. It also integrates with Jetpack Navigation and Hilt. However, its scope should not be abused; introduce a state holder only when the UI grows complex, as demonstrated by DrawerState and NiaAppState. Plain state holders follow the UI lifecycle and can hold references to Context or Resources, but business logic should be injected (Manuel Vivo, Medium).
+The ViewModel is recommended as a screen-level state holder because it survives configuration changes, providing a stable instance that caches UI state and continues executing business logic via viewModelScope. It also integrates with Jetpack libraries like Navigation and Hilt, making instance retention easier. However, ViewModel should not be overused; plain state holders are suitable for simpler UI logic and can safely hold references to Context or Resources because they are scoped to the Composition (Vivo, 2023).
 
-State hoisting should place state in the lowest common ancestor that reads or writes it. If business logic requires the state, it should be hoisted to the screen-level ViewModel; otherwise it stays in the UI tree. For persistence, SavedState APIs handle configuration changes and system-initiated process death, while persistent storage is needed for unexpected app dismissals (Manuel Vivo, Medium).
+State hoisting principles advise placing state in the lowest common ancestor that reads or writes it. If business logic needs the state, it should be hoisted to the screen-level ViewModel; otherwise, it belongs in the UI tree. To survive system-initiated process death, SavedState APIs are available, while persistent storage is for long-term data. The article provides practical guidance and decision trees for managing state and logic in the Android UI layer (Vivo, 2023).
 
-- Business logic on the UI layer belongs in a screen-level ViewModel; UI logic can be handled by the UI or a plain state holder.
-- ViewModel survives configuration changes and integrates with Navigation and Hilt, making it ideal for exposing UI state.
-- Introduce plain state holders (e.g., NiaAppState) when UI complexity grows; they are scoped to the UI lifecycle.
-- Hoist state to the lowest common ancestor; if business logic needs it, hoist to the ViewModel.
-- Use SavedState APIs for process death and persistent storage for unexpected app dismissal.
+- Business logic in the UI layer should be handled by a screen-level state holder, typically an androidx.ViewModel.
+- UI logic can be kept in the UI or delegated to a plain class state holder when complexity grows.
+- ViewModel survives configuration changes, caches UI state, and integrates with Jetpack libraries like Navigation and Hilt.
+- State should be hoisted to the lowest common ancestor; if business logic requires it, hoist to the ViewModel.
+- SavedState APIs preserve state across process death, while persistent storage is for long-term data.

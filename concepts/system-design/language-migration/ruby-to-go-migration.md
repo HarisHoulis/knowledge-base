@@ -7,19 +7,20 @@ sources:
   - title: "How We Migrated the Parse API From Ruby to Golang (Resurrected)"
     url: "https://charity.wtf/p/how-we-migrated-the-parse-api-from-ruby-to-golang-resurrected"
     author: "Charity Majors"
-    date: "2025-07-24T02:14:45Z"
+    date: "2025-07-24"
 ---
 
 # How We Migrated the Parse API From Ruby to Golang (Resurrected)
 
-This article recounts Parse's two-year migration from Ruby on Rails to Go, driven by the scaling limitations of the one-process-per-request model. Ruby allowed rapid initial development, but as traffic grew, the fixed worker pool became a bottleneck, causing slow requests to fill the pool and making deployments painful. After evaluating EventMachine, JRuby, C++, C#, and Go, the team chose Go for its lightweight goroutines, excellent MongoDB driver, and strong developer appeal ([source](https://charity.wtf/p/how-we-migrated-the-parse-api-from-ruby-to-golang-resurrected)).
+Parse's API was originally written in Ruby on Rails, which enabled rapid early development but eventually hit hard scaling limits. The one-process-per-request model meant a fixed pool of workers, and slow requests could quickly exhaust the pool. By the end of 2012, Parse ran 200 API servers for 3000 requests per second, and deploys took 20 minutes. As traffic grew 10x, the team concluded the Rails model could not scale and an asynchronous architecture was required (Majors, 2025).
 
-The hardest part of the rewrite was maintaining backward compatibility with Rails' permissive HTTP handling. Rails accepted undocumented and non-RFC-compliant requests, so the team had to port these quirks to Go, adding comments to explain each oddity. They used a live shadowing system: running each request against both Go and Ruby servers in production and diffing the responses field by field. This tooling-influenced approach later inspired the creation of Honeycomb ([source](https://charity.wtf/p/how-we-migrated-the-parse-api-from-ruby-to-golang-resurrected)).
+The team evaluated EventMachine, JRuby, C++, C#, and Go. EventMachine and JRuby suffered from poor async library support; C++ was harder to maintain; C# had good concurrency but poor Linux support. Go won because goroutines are lightweight, the MongoDB driver was excellent, and engineers were excited to write Go. A preliminary rewrite of the push backend from Ruby to Go increased connections per node from 250k to 1.5 million, cementing the choice (Majors, 2025).
 
-The rewrite yielded dramatic improvements: reliability improved by an order of magnitude, the API server pool shrank by 90%, the integration test suite dropped from 25 minutes to 2 minutes, and full deploys from 30 minutes to 3 minutes. The async model also enabled better instrumentation and simplified the architecture. The author credits the migration as essential to Honeycomb's origins ([source](https://charity.wtf/p/how-we-migrated-the-parse-api-from-ruby-to-golang-resurrected)).
+The core API rewrite was done endpoint-by-endpoint using a shadowing system: production traffic was split between the Ruby and Go servers, and responses were diffed field-by-field. This was crucial because Rails middleware was liberal in what it accepted, so clients sent undocumented or non-RFC-compliant requests that Rails silently fixed. The Go code had to replicate quirks like doubly encoded URLs, weird content-length requirements, and mis-encoded Unicode, leading to many cranky comments referencing Ruby behavior (Majors, 2025).
 
-- Ruby on Rails' one-process-per-request model became a scalability bottleneck as traffic grew, motivating the move to an async language.
-- Comparing Go and Ruby responses in production via a shadowing system was key to preserving undocumented Rails behaviors.
-- Go's lightweight goroutines and strong MongoDB driver made it the preferred choice over C# and other alternatives.
-- The migration improved reliability by 10x, cut API server count by 90%, and drastically reduced deploy and test times.
-- The rewrite was a grueling two-year effort that the author credits with enabling Honeycomb's creation.
+The rewrite was a success. Reliability improved by an order of magnitude, and the API layer almost stopped being the cause of incidents. The asynchronous model allowed better instrumentation, a 90% reduction in API server pool size, and simpler architecture. The full integration test suite dropped from 25 minutes to 2 minutes, and a full deploy dropped from 30 minutes to 3 minutes (Majors, 2025).
+
+- Rails' one-process-per-request model was the core scaling bottleneck; an async architecture was necessary as Parse grew 10x.
+- Go was chosen over JRuby, C++, and C# due to goroutines, the MongoDB driver, and team enthusiasm.
+- Shadowing production traffic and diffing Ruby vs Go responses exposed undocumented Rails behaviors that had to be replicated.
+- The migration improved reliability by an order of magnitude, reduced API server pool by 90%, and cut test/deploy times dramatically.

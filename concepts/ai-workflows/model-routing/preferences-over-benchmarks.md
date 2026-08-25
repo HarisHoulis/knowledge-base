@@ -2,7 +2,7 @@
 domain: ai-workflows
 subdomain: model-routing
 concept: preferences-over-benchmarks
-title: Preferences Over Benchmarks: Model Routing
+title: Preferences Over Benchmarks: Model Routing — Archana Kamath & Tyler Gillam, DigitalOcean
 sources:
   - title: "Preferences Over Benchmarks: Model Routing — Archana Kamath & Tyler Gillam, DigitalOcean"
     url: "https://www.youtube.com/watch?v=FvxY8oPoI8o"
@@ -10,14 +10,14 @@ sources:
     date: "2026-08-22T15:30:18+00:00"
 ---
 
-# Preferences Over Benchmarks: Model Routing
+# Preferences Over Benchmarks: Model Routing — Archana Kamath & Tyler Gillam, DigitalOcean
 
-The talk challenges the common instinct to select a model based on top benchmark scores, arguing that there is no single best model for all tasks. The right model depends on the actual request: the task itself, system prompts and tools, cost budget, latency requirements, and end-user preferences. The authors identify three key drivers for moving beyond one-model habits: exploding inference costs (citing companies like Walmart, Uber, and Microsoft capping usage), the overkill of using frontier models for simple tasks where smaller open models suffice, and the risk of relying on a single model with no failover when it degrades or goes down. (Archana Kamath & Tyler Gillam, 2026)
+The talk argues that choosing a single 'best' model based on public benchmarks is the wrong instinct. Instead, model routing—selecting a model per request based on task, cost, latency, and user preference—is emerging as a critical discipline. The authors identify three drivers: exploding costs, task-model fit (frontier models are often overkill), and risk of relying on a single model for failover. They emphasize that no public leaderboard can encode the right choice because it depends on the actual request, system prompts, tools, and end-user needs (Archana Kamath & Tyler Gillam, 2026).
 
-DigitalOcean's solution is an inference router built on an open-source, purpose-built routing model. Users describe their workload in natural language and set preferences such as cost, latency, quality, preferred models, or hard rules; the router then selects the appropriate model per request. This avoids vendor lock-in and black-box behavior, as users can customize, evaluate, and improve the routing. The routing model is highly efficient—under 200 milliseconds—and costs customers nothing extra. In evaluations, it even outperformed frontier models like the GPT-5 series at the routing task itself with much lower latency. (Archana Kamath & Tyler Gillam, 2026)
+DigitalOcean's inference router is presented as an open-source solution that avoids black-box behavior. It runs through an open proxy and a purpose-built routing model, allowing users to describe preferences in natural language and set hard rules. The router picks the right model per request in under 200ms at no extra cost, and in evaluations it beats frontier models like the GPT-5 series on the routing task itself with lower latency. This approach emphasizes customization, evaluation, and improvement without vendor lock-in (Archana Kamath & Tyler Gillam, 2026).
 
-- Don't chase benchmark leaders; the optimal model depends on the specific request—task, system prompts, cost, latency, and user preference.
-- Three forces driving multi-model adoption: cost explosion, frontier-model overkill for simple tasks, and risk of single-model failure without failover.
-- DigitalOcean's router uses an open-source, purpose-built routing model that accepts natural-language task descriptions and explicit preferences to pick the best model per request.
-- The routing model is fast (<200ms), costs nothing extra, and in evaluations beats frontier GPT-5 series models at the routing task itself.
-- No vendor lock-in: users can customize, evaluate, and improve the router to fit their workload.
+- There is no single best model; the right model depends on the individual request's task, cost constraints, latency needs, and end-user preferences.
+- Model routing addresses cost explosion, task-model fit, and the risk of depending on one model for production failover.
+- DigitalOcean's router is open source, fast (<200ms), and lets users define natural-language preferences and hard rules to pick a model per request.
+- The routing model outperforms frontier models at the routing task itself while adding no extra cost to customers.
+- The key design principle is transparency: routing should be customizable, evaluable, and improvable, avoiding the black-box problem.

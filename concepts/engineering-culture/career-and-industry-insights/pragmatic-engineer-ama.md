@@ -12,10 +12,10 @@ sources:
 
 # The Pragmatic Engineer AMA
 
-In this Ask Me Anything episode, Gergely Orosz shares personal stories behind The Pragmatic Engineer: how pandemic-era Uber layoffs led him to writing, why he chose not to publish a critical article about Bunq after hearing from an immigrant engineer who credited Bunq for giving him a chance, and how being called a 'nobody' by Pollen's CEO prompted his only investigative piece—which uncovered unpaid salaries and a $3.2M double charge (https://blog.pragmaticengineer.com/pollen/). He explains that investigative journalism is not for him and that he now writes about what works inside companies (https://newsletter.pragmaticengineer.com/p/the-pragmatic-engineer-ama).
+In this AMA episode, Gergely Orosz shares how The Pragmatic Engineer came to be: after Uber layoffs during COVID-19, he left to finish a book and discovered he enjoyed writing, eventually pivoting from a planned startup to running the newsletter full-time. He also recounts a pivotal editorial decision: after receiving a message from a former Bunq engineer who appreciated the company for sponsoring his visa, Orosz shelved a critical article and adopted a policy of writing about what works inside companies rather than what seems broken (Orosz, 2026).
 
-- Career pivots can be catalyzed by external shocks: Uber layoffs during COVID-19 gave Orosz the push to leave and become a full-time writer.
-- Editorial choices matter: a single engineer's story convinced Orosz to abandon a critical Bunq piece and adopt a 'write about what works' policy.
-- Investigative journalism can have real impact—Pollen's collapse was exposed—but it wasn't a sustainable path for Orosz.
-- LeetCode interviews may persist because they filter for tolerance of corporate absurdity, not because they measure job-relevant skills.
-- Standards like MCP succeed partly due to timing and competitive positioning; AI use requires conscious tradeoffs to avoid skill atrophy.
+- Orosz started The Pragmatic Engineer serendipitously after COVID-era Uber layoffs; he originally planned to build a startup but found he liked writing.
+- A personal message from a Bunq engineer changed his editorial approach: he now focuses on what works in companies, not what seems broken.
+- His sole investigative piece on Pollen uncovered unpaid salaries, cancelled health insurance, and a deliberate $3.2M double charge; he later contributed to the BBC documentary and decided investigative journalism isn't for him.
+- Orosz argues LeetCode-style interviews persist because they self-select for tolerance of corporate nonsense, though AI may push companies back to in-person interviewing.
+- MCP became an industry standard partly because Anthropic wasn't yet dominant when it launched, unlike Google's later Agent2Agent protocol; he also warns that AI use can cause skill atrophy if not mindful.

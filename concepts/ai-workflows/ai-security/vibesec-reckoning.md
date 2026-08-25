@@ -11,9 +11,10 @@ sources:
 
 # The VibeSec Reckoning
 
-Vibe coding accelerates software prototyping, but AI agents frequently recommend insecure configurations, creating security vulnerabilities. Drawing on experience building applications for Thoughtworks' global marketing, the authors identify a critical gap: AI assistants lack security context and often suggest default or permissive settings. To mitigate these risks, they propose a multi-layered approach: writing a security context file that explicitly guides AI behavior, carefully reviewing AI permission requests, establishing a daily security intelligence feed to keep models updated on emerging threats, and providing builders with secure-by-default harnesses and templates. These practices shift security from an afterthought to an integrated part of the AI-assisted development workflow.
+Vibe coding accelerates software prototyping but AI agents often recommend insecure configurations, creating security risks. Thoughtworks engineers Gautam Koul, Lucian Moss, Neil Drew-Lopez, and Daberechi Ruth Edeokoh share lessons from building marketing applications, emphasizing the need for deliberate security practices when using AI assistants.
 
-- AI agents often recommend insecure configurations, leading to security problems in vibe-coded applications.
-- A security context file can guide AI assistants to make safer choices during code generation.
-- Developers should be cautious with AI permission requests to avoid excessive access or unintended actions.
-- A daily security intelligence feed and secure-by-default templates help operationalize security in AI-driven development.
+- AI agents frequently suggest insecure settings, so security must be actively managed.
+- Write a security context file to guide AI behavior and constrain its choices.
+- Be cautious with AI permission requests to avoid granting excessive access.
+- Create a daily security intelligence feed to keep up with emerging AI-related threats.
+- Provide builders with secure-by-default harnesses and templates to reduce risk.

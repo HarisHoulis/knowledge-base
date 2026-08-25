@@ -7,14 +7,16 @@ sources:
   - title: "Do software fundamentals still matter?"
     url: "https://www.youtube.com/shorts/eEjBhVI9Qok"
     author: "Matt Pocock"
-    date: "2026-07-16T12:14:54+00:00"
+    date: "2026-07-16"
 ---
 
 # Do Software Fundamentals Still Matter?
 
-Matt Pocock argues that software fundamentals—code quality, design patterns, and managing software entropy—are not obsolete in the age of AI, but have become more important. As AI agents increasingly generate and modify code, clean and well-structured codebases are essential for AI to work effectively. Poor architecture and accumulated technical debt hinder AI's ability to understand and safely edit code. Pocock emphasizes that building codebases that are easy for AI to navigate, modify, and extend is now a critical skill. This means applying disciplined engineering practices to reduce cognitive load—both for humans and AI systems.
+In the age of AI, software fundamentals such as code quality, software entropy, and good design patterns are more important than ever. Matt Pocock argues that these principles directly impact how well AI agents can work within a codebase (Matt Pocock, 2026). Rather than becoming obsolete, fundamentals serve as the foundation for building codebases that AI can effectively navigate and modify.
 
-- Software fundamentals matter more than ever when using AI agents.
-- Code quality and good design patterns are critical for AI to understand codebases.
-- Managing software entropy prevents AI from making mistakes or introducing regressions.
-- The goal is to build codebases that AI agents can work in efficiently and safely.
+The key takeaway is that developers should intentionally design codebases that are 'AI-friendly.' This means prioritizing clean structure, clear patterns, and low entropy to enable AI agents to operate efficiently. By maintaining strong fundamentals, developers ensure that both humans and AI can collaborate productively (Matt Pocock, 2026).
+
+- Code quality remains essential in the age of AI.
+- Software entropy must be managed to keep codebases maintainable for AI agents.
+- Good design patterns help AI agents understand and modify code effectively.
+- Developers should build codebases that are specifically optimized for AI collaboration.

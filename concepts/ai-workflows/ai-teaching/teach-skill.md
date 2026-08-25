@@ -12,9 +12,9 @@ sources:
 
 # My /teach skill is still insane
 
-Matt Pocock demonstrates a custom '/teach' skill that enables AI to deliver personalized, tailored learning experiences. The skill helps users master new concepts by breaking down complex topics such as land surveying, Rubik's Cubes, and development techniques. It uses interactive explanations and quiz questions to reinforce understanding, making it adaptable to individual learning needs. The approach highlights how AI can act as a dynamic tutor, providing on-demand education across diverse domains.
+Matt Pocock demonstrates the /teach skill, an AI-powered tool designed to deliver personalized and tailored learning experiences. The skill is presented as a way to master new concepts across a wide range of subjects, from practical fields like land surveying to recreational challenges like solving Rubik's Cubes, as well as technical development techniques (Pocock, 2026).
 
-- The /teach skill creates personalized learning paths for any topic.
-- It explains complex subjects like land surveying and Rubik's Cubes interactively.
-- Quiz questions are used to reinforce understanding and retention.
-- The skill demonstrates AI's potential as an adaptable teaching tool.
+- The /teach skill enables personalized, tailored learning on demand.
+- It can tackle complex topics across diverse domains, including land surveying, Rubik's Cubes, and development.
+- Learning is reinforced through interactive explanations and quiz questions.
+- The skill demonstrates how AI can adapt instruction to individual learner needs.

@@ -11,8 +11,9 @@ sources:
 
 # Perils of duplicate finding
 
-In this article, Jake Wharton explores how to find duplicate elements in an integer array using Kotlin. He first presents a straightforward groupBy approach that prints [1, 3] but finds it wasteful. This leads to an investigation of Kotlin collection operations, where he discovers surprising behaviors in the minus operator and MutableList.removeAll, both of which remove all occurrences of elements rather than just the first. These misconceptions initially produce incorrect empty outputs [1].
+The article (source: https://jakewharton.com/perils-of-duplicate-finding/) explores different Kotlin approaches to finding duplicate elements in a list, starting with a groupBy-based solution. It then investigates alternatives like `toList() - toSet()` and `removeAll`, which surprisingly remove all occurrences rather than just the first, leading to incorrect results. The author demonstrates unexpected behavior in Kotlin's collection operators, inherited from Java, and iteratively refines to a correct solution using a `HashSet` as a bound function reference.
 
-- Kotlin's minus operator and removeAll remove all occurrences of each element in the supplied collection, not just the first occurrence, which can lead to unexpected results.
-- The correct manual approach is to use a MutableList and remove the first occurrence of each element via remove, or more elegantly use a bound function reference like filterNot(HashSet<Int>()::add).
-- The filterNotTo variant (e.g., ints.filterNotTo(HashSet(), HashSet<Int>()::add)) is both concise and the fastest, allocating the fewest bytes in benchmarks.
+- Kotlin's minus operator and `MutableList.removeAll` remove all occurrences, making them unsuitable for duplicate detection.
+- `MutableList.remove` removes only the first occurrence, but there is no built-in to remove first occurrences of each element in a collection.
+- A clean and idiomatic solution is `ints.filterNotTo(HashSet(), HashSet<Int>()::add)`, which keeps duplicates.
+- The `filterNotTo` version is both the fastest and allocates the fewest bytes in benchmarks.

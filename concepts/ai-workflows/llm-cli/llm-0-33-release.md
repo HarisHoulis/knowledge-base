@@ -2,7 +2,7 @@
 domain: ai-workflows
 subdomain: llm-cli
 concept: llm-0-33-release
-title: LLM 0.33 release highlights
+title: llm 0.33
 sources:
   - title: "llm 0.33"
     url: "https://simonwillison.net/2026/Aug/22/llm/"
@@ -10,11 +10,10 @@ sources:
     date: "2026-08-22"
 ---
 
-# LLM 0.33 release highlights
+# llm 0.33
 
-The release of LLM 0.33 introduces two significant improvements to embedding workflows. The `llm embed` and `llm embed-multi` commands now accept a `--key` argument, and the corresponding Python methods (`EmbeddingModel.embed()`, `EmbeddingModel.embed_multi()`, `Collection.embed()`, and `Collection.embed_multi()`) accept a `key=` parameter. This allows per-call keys to be passed to embedding plugins without altering shared model state. Existing plugins that rely on `self.key` continue to work through a compatibility fallback, as noted in the release notes (Simon Willison, 2026).
+Simon Willison announced the release of llm 0.33, a comprehensive update following a quick 0.32.1 fix. The release introduces the ability to pass per-call API keys to embedding commands and Python methods, aligning embedding models with the key handling used by regular LLM models. This change, contributed by ChrisJr404, ensures compatibility with existing plugins through a fallback mechanism (Simon Willison, 2026).
 
-- Embedding commands and Python methods now support per-call keys via `--key` and `key=`, with a compatibility fallback for existing plugins that use `self.key`.
-- The `llm prompt -t/--template` option can be repeated to combine templates in order, allowing model configuration to be decoupled from the prompt.
-- A new `reasoning_summary` option is available for reasoning-capable Responses API models, with values `auto`, `concise`, and `detailed`.
-- This release includes a more comprehensive fix following a quick 0.32.1 patch, addressing the same issue more thoroughly.
+- `llm embed` and `llm embed-multi` now accept `--key`, and the corresponding Python methods (e.g., `EmbeddingModel.embed()`) support a `key=` parameter.
+- Templates can now be combined by repeating `-t/--template`, enabling model configuration from one template to be used with a prompt from another.
+- Reasoning-capable Responses API models support a `reasoning_summary` option with `auto`, `concise`, and `detailed` values.

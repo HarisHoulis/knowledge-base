@@ -12,13 +12,11 @@ sources:
 
 # The Pulse: We need to talk about migrations with AI
 
-The article highlights how AI is becoming a powerful tool for large-scale framework migrations, a task often deferred due to the massive manual effort involved. Asana's migration off the Enzyme testing framework serves as a key example: with AI assistance, the project was completed in just two weeks, whereas without AI it would likely have been postponed indefinitely. This demonstrates AI's ability to handle repetitive code transformations at scale.
+The newsletter highlights how AI is transforming large-scale framework migrations. Asana needed to migrate off the testing framework Enzyme, which required rewriting extensive test cases. With AI, the project was completed in two weeks; without AI, the work would likely have been postponed indefinitely. Airbnb and Uber share similar migration success stories, suggesting AI is a particularly good fit for this type of mechanical but labor-intensive work.
 
-The article also cites similar experiences at Airbnb and Uber, where AI has accelerated migration efforts. The author argues that AI is a superb fit for framework migrations because they involve mechanical, pattern-based changes that AI can automate effectively. This shifts the cost-benefit calculus, enabling teams to tackle technical debt that was previously deprioritized.
+The article also covers shifting engineering leadership roles and the debate over Gartner's Magic Quadrant, which ranked AWS, Microsoft, and IBM above AI-native vendors like Anthropic, Cursor, and OpenAI. The author suggests the ranking may be influenced by vendor payments, as many AI startups refuse to pay the 'Gartner tax.' These developments indicate broader changes in how engineering work is executed and evaluated (Orosz, 2026).
 
-Beyond migrations, the article touches on other industry news, including GitHub outages, Slack's new code feature, and the disruption of traditional analyst rankings by AI startups. However, the central theme is the transformative potential of AI in modernization projects.
-
-- Asana migrated off Enzyme in two weeks using AI, a task that would otherwise have been deferred due to effort.
-- Airbnb and Uber report similar success stories, highlighting AI's broad applicability to framework migrations.
-- AI excels at repetitive, pattern-based code transformations, making it a natural fit for large-scale rewrites.
-- AI enables tackling technical debt that was previously deprioritized because of cost.
+- Asana used AI to migrate off Enzyme, finishing a massive test-case rewrite in two weeks—work that would otherwise have been deferred.
+- Airbnb and Uber report similar successes, positioning AI as an excellent fit for framework migrations.
+- Engineering leadership roles (VPE/CTO) are evolving, offering opportunities to reorganize engineering teams for the AI era.
+- AI startups are challenging traditional analyst rankings like Gartner's Magic Quadrant, which still favor large incumbent vendors.
