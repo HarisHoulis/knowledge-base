@@ -6,14 +6,13 @@ title: TDD inside the agent loop - theater or actual value?
 sources:
   - title: "TDD inside the agent loop - theater or actual value?"
     url: "https://martinfowler.com/articles/exploring-gen-ai/tdd-in-the-agent-loop.html"
-    author: "Martin Fowler"
+    author: "Birgitta Böckeler"
 ---
 
 # TDD inside the agent loop - theater or actual value?
 
-The article examines whether instructing LLM agents to use Test-Driven Development (TDD) genuinely improves software generation or if it is merely performative. It notes that many Thoughtworks colleagues are strong advocates of TDD and that the industry widely recommends telling AI agents to follow TDD when building software. Birgitta Böckeler, curious about the real impact, conducted experiments to test if TDD actually makes a difference in the agent loop. The piece frames this as an open question: does TDD provide tangible value in AI-assisted development, or is it theater?
+The investigation aims to determine if TDD's benefits—such as clearer requirements, faster feedback, and safer refactoring—translate when the developer is an AI agent. The article presents the experimental setup and results, likely comparing agent performance with and without TDD instructions. The central question is whether TDD in the agent loop is theater (a superficial process that adds no real value) or whether it actually leads to higher-quality outcomes.
 
-- Thoughtworks colleagues are big fans of Test-Driven Development.
-- Many industry practitioners advocate instructing LLM agents to use TDD.
-- Birgitta Böckeler ran experiments to test whether TDD in the agent loop actually matters.
-- The article questions whether TDD's role is substantive or just ceremony.
+- Many developers advocate instructing LLM agents to use TDD, but its effectiveness has not been empirically validated.
+- Birgitta Böckeler ran experiments to compare AI-generated code with and without TDD instructions.
+- The article evaluates whether TDD in the agent loop is merely performative or genuinely adds value.

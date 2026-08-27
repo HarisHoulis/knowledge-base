@@ -11,11 +11,9 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine is a library from Cash App for testing kotlinx.coroutines Flow and other push-based mechanisms. It transforms push-based flows into pull-based suspend functions, allowing developers to write straightforward sequential assertions. The library's core `test` function lets you await emitted items, completion, or errors, with failures throwing AssertionError on unexpected events or timeouts (Jake Wharton).
+Turbine is a library from Cash App for testing kotlinx.coroutines Flow and other push-based mechanisms. It converts push-based flows into pull-based suspend functions, simplifying asynchronous testing by allowing developers to await specific events like items, completion, or errors. The library's `test` function provides a concise API for asserting the sequence of events emitted by a Flow.
 
-Turbine can also be used as a standalone object to adapt callbacks and other push-based patterns for testing. For example, a fake logger can add messages to a Turbine, which can then be awaited upon in tests. The library provides additional utilities for handling multiple turbines, flows, timeouts, and error aggregation, making it a comprehensive testing tool for asynchronous code (Jake Wharton).
-
-- Turbine changes push-based Flows into pull-based suspend functions for simplified testing.
-- Use `test` to await items, completion, or errors sequentially; unexpected events or timeouts throw AssertionError.
-- Standalone Turbines can adapt any push-based mechanism, such as callbacks, into testable queues.
-- The library includes utilities for multiple turbines, multiple flows, shared timeouts, and error aggregation.
+- Turbine transforms Flow testing into pull-based suspend functions, making tests linear and readable.
+- awaitItem() and awaitComplete() suspend until the desired event occurs, throwing AssertionError on mismatch or timeout.
+- Standalone Turbine instances can adapt other push-based mechanisms, such as callbacks, for testing.
+- Turbine offers utilities for multiple flows, shared timeouts, and error aggregation for complex testing needs.

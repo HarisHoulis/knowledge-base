@@ -11,10 +11,12 @@ sources:
 
 # Bliki: Vibe Coding
 
-Vibe coding is a term coined by Andrej Karpathy in February 2025 for building software by prompting an LLM without reading or reviewing the generated code. The practitioner describes what they want, runs the result, and iterates based on errors or changes, effectively treating the LLM as a black box. This approach allows people without programming knowledge to create working applications, but it carries significant risks related to maintainability, correctness, and security. Martin Fowler distinguishes vibe coding from agentic programming, where programmers still care about and review LLM-generated code, emphasizing that vibe coding specifically means "forget that the code even exists."
+Vibe coding is a software development approach where the user prompts an LLM to build an application, iterates based on trial and error, and does not read or inspect the generated code. The term was coined by Andrej Karpathy in February 2025, who described it as fully giving in to the vibes, accepting all changes, and forgetting that the code even exists. This technique allows people without programming knowledge to create software, making it useful for personal or throwaway projects, but it often leads to maintainability, correctness, and security issues (Fowler, 2025).
 
-- Vibe coding involves prompting an LLM to build software without reviewing the generated code.
-- The term was coined by Andrej Karpathy in February 2025.
-- It enables non-programmers to create applications but leads to poor maintainability and security risks.
-- Vibe coding is best suited for disposable software used by a small, risk-accepting audience.
-- It should be distinguished from agentic programming, where developers review and care about generated code.
+Fowler distinguishes vibe coding from agentic programming, where programmers still care about and review the code produced by LLMs. While vibe coding is convenient and accessible, it carries significant risks: LLMs can generate insecure code, accumulate poorly structured software that is hard to modify, and hallucinate behaviors that result in incorrect functionality. Therefore, vibe-coded software is best suited for disposable applications used only by a small, risk-aware group, while more consequential software should not be left entirely to autopilot (Fowler, 2025).
+
+- Vibe coding means building software by prompting an LLM without looking at the generated code.
+- It was coined by Andrej Karpathy in early 2025 and enables non-programmers to create simple applications.
+- It differs from agentic programming, where developers review and maintain the LLM-written code.
+- Major risks include security vulnerabilities, poor code quality, and hallucinated behavior.
+- Best use case is disposable software for a limited audience, not critical or widely used systems.

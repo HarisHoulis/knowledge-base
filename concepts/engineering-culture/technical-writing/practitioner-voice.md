@@ -11,14 +11,14 @@ sources:
 
 # Practitioner Voice: The Writing Category Nobody has Named Yet
 
-The article introduces a distinct writing category called 'practitioner voice,' a term coined by Jim Highsmith. This style is neither academic writing nor thought-leadership content, but rather a practical, experience-based form of communication used by practitioners in the field. Martin Fowler advocates for this style and notes that his contributors mostly follow it, emphasizing its importance in sharing actionable knowledge from real-world practice.
+The article highlights a distinct style of writing that practitioners use, which has not been formally named until now. Jim Highsmith identified this category as separate from academic writing and thought-leadership content, giving it the name 'practitioner voice.' Martin Fowler advocates for this style and notes that his contributors mostly follow it, emphasizing its importance in technical communication.
 
-The practitioner voice focuses on concrete experiences, lessons learned, and practical insights rather than theoretical frameworks or visionary ideas. It bridges the gap between formal academia and high-level thought leadership by providing grounded, useful guidance that resonates with other practitioners. The article highlights the need to name and recognize this category so that its value can be more fully appreciated.
+Practitioner voice is characterized by writing that comes from hands-on experience, focusing on practical insights rather than theoretical or promotional narratives. It fills a gap between rigorous academia and high-level thought leadership, offering authentic, experience-based knowledge that resonates with other practitioners. The act of naming this category helps recognize and legitimize the value of such writing in the engineering community.
 
-By giving a name to this style, Highsmith and Fowler aim to legitimize and encourage a form of writing that is often overlooked but essential for knowledge sharing in engineering and software development. The practitioner voice captures the nuanced reality of work, making it a vital complement to more traditional forms of technical writing.
+The article serves as a call to acknowledge and cultivate this writing style, which is often undervalued or overlooked. By giving it a name, Highsmith and Fowler aim to encourage more practitioners to share their valuable insights and contribute to the collective knowledge in a way that is approachable and grounded in real-world practice.
 
-- Practitioner voice is a distinct writing style, different from academic and thought-leadership writing.
-- Jim Highsmith coined the term, and Martin Fowler advocates for its use.
-- This style emphasizes practical, experience-based knowledge and actionable insights.
-- Naming the category helps legitimize and promote this valuable form of writing.
-- Practitioner voice bridges the gap between theory and real-world application.
+- Practitioner voice is a distinct writing style separate from academic writing and thought leadership.
+- Jim Highsmith named this category, bringing recognition to its unique value.
+- Martin Fowler advocates for practitioner voice and uses it in his own writing.
+- This style emphasizes practical, experience-based insights that resonate with other practitioners.
+- Naming the category helps legitimize and encourage more practitioner-authored content.

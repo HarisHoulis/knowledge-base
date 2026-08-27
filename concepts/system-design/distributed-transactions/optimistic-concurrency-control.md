@@ -12,12 +12,11 @@ sources:
 
 # Lecture 14: Optimistic Concurrency Control
 
-The lecture introduces FaRM, a research prototype distributed system that leverages optimistic concurrency control to achieve extremely low-latency transactions. FaRM is contrasted with Spanner: both replicate data and use two-phase commit, but Spanner focuses on geographic replication across data centers, while FaRM assumes all replicas are in the same data center, aiming to exploit RDMA high-speed networking. FaRM achieves a simple transaction in 58 microseconds (Figure 7, Section 6.3), roughly 100x faster than Spanner's 10-100 milliseconds, primarily because its bottleneck is CPU time on servers rather than network delays between data centers.
+This MIT 6.824 lecture introduces FaRM, a research prototype for distributed transactions that exploits RDMA networking to achieve extremely low latencies. The talk contrasts FaRM with Spanner: while Spanner is a deployed system focused on geographic replication and wide-area consistency, FaRM targets a single data center and achieves 58-microsecond transactions, roughly 100x faster than Spanner's 10-100 millisecond latencies. The key technique is optimistic concurrency control, which FaRM is forced to use because RDMA seriously restricts design options, particularly by making CPU time the main bottleneck rather than network delay (MIT 6.824, 2020).
 
-FaRM uses a configuration manager (implemented with Zookeeper) to assign each shard to primary-backup pairs. Data is sharded by key, and all updates must be applied to both primary and backup replicas. Reads are always served from the primary. Replication provides fault tolerance, but unlike Spanner, FaRM does not use a consensus protocol like Paxos; instead, it relies on optimistic concurrency control to manage concurrent transactions efficiently.
+FaRM's architecture consists of sharded primary-backup pairs managed by a configuration service like Zookeeper. All replicas must be updated on writes, while reads always go to the primary. Since FaRM assumes a single data center, it does not protect against entire data center failures, only individual crashes or restoration after power loss. The lecture highlights how the performance potential of RDMA motivates the design and why optimistic concurrency control is a natural fit for this high-speed networking environment.
 
-- FaRM uses optimistic concurrency control to achieve 58 microsecond transactions, about 100x faster than Spanner.
-- FaRM is designed for a single data center with RDMA networking, unlike Spanner's geographic replication.
-- The primary bottleneck in FaRM is CPU time, not network speed of light delays.
-- Data is sharded across primary-backup pairs; reads go to the primary, and all replicas are updated on writes.
-- FaRM is a research prototype, not a deployed system, exploring RDMA's performance potential.
+- FaRM delivers ~58 microsecond transactions, about 100x faster than Spanner's 10-100 ms.
+- Optimistic concurrency control is required because RDMA constrains design options, shifting the bottleneck from network latency to CPU time.
+- FaRM is a single-datacenter system using sharded primary-backup replication; writes update all replicas, reads go to the primary.
+- Unlike Spanner, FaRM does not address geographic replication or whole-datacenter failures, focusing instead on maximizing performance within one data center.
