@@ -12,11 +12,10 @@ sources:
 
 # Kotlin TDD - Degrading
 
-In this episode, Duncan and the Gilded Rose development team tackle a new requirement: item quality should never fall below zero. They adopt a TDD approach, first writing a test to verify that an item with quality zero stays at zero after a day's update. Running the test reveals surprising behavior: instead of failing with a negative value or an exception, the quality jumps to a massive number like 42 billion. This occurs because the codebase uses Kotlin's UInt type, and subtracting 1 from 0 underflows, wrapping around to a huge positive value. The test failure exposes that UInt does not enforce non-negativity; it merely wraps on overflow, which is unintuitive and dangerous for this domain.
+The Gilded Rose team receives a new requirement that item quality should not fall below zero. Using TDD, they write tests to verify this behavior. When they test an item with zero quality and update it by one day, they expect the quality to remain zero, but instead, it jumps to roughly 42 billion. The root cause is Kotlin's UInt type: it wraps around on underflow rather than clamping or erroring. The team realizes UInt is unsuitable for values that can conceptually become negative, so they refactor the codebase to use Int instead. This involves changing the item class and replacing all unsigned integer literals. The failing test highlights the hidden dangers of unsigned types and reinforces the value of TDD in exposing unintended behavior.
 
-Realizing the issue, the team decides to abandon UInt in favor of Int for all quality fields. This change requires updating the type declarations and removing the unsigned integer literals across the codebase, causing many compilation errors that are fixed systematically. Once switched to Int, the tests pass, confirming that quality now correctly clamps at zero instead of wrapping. The video highlights how TDD can uncover hidden assumptions about data types and forces a reconsideration of implementation choices early in the process.
-
-- UInt in Kotlin wraps on underflow, so subtracting 1 from 0 produces a very large positive number, not a negative or error.
-- TDD helped reveal the unexpected UInt behavior by writing a failing test for the 'quality not below zero' requirement.
-- Using UInt as a type does not guarantee non-negative values; it only changes the memory representation and wrap-around semantics.
-- The team refactored from UInt to Int, making the code more intuitive and ensuring the quality floor is enforced correctly.
+- TDD guides the implementation of a quality floor by writing a failing test first.
+- Kotlin's UInt wraps around when decremented below zero, producing a huge positive number.
+- Unsigned types are not a safeguard against negative logic; they only affect the bit pattern.
+- Switching from UInt to Int resolves the underflow and aligns with domain semantics.
+- The team uses a simple find-and-replace to migrate unsigned literals to signed ones.

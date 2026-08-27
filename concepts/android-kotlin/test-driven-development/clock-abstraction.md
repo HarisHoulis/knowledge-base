@@ -2,7 +2,7 @@
 domain: android-kotlin
 subdomain: test-driven-development
 concept: clock-abstraction
-title: Kotlin TDD: To Production At Last
+title: Kotlin TDD - To Production At Last
 sources:
   - title: "Kotlin TDD - To Production At Last"
     url: "https://www.youtube.com/watch?v=UH7_kYAG-TE"
@@ -10,12 +10,14 @@ sources:
     date: "2022-03-05T20:10:25+00:00"
 ---
 
-# Kotlin TDD: To Production At Last
+# Kotlin TDD - To Production At Last
 
-The video demonstrates a TDD workflow for delivering a story that updates stock quantities in the browser. The team re-enables a disabled test to confirm expected behavior, then moves the Stock class from the test tree into the main source tree to integrate it. They wire the Stock class into the route handler, replacing the previous direct stock file loading, and introduce a function parameter for the clock to return an Instant instead of using Instant.now() directly, making time control possible in tests. The test fixtures are updated to pass an Instant rather than a LocalDate, and the date is derived from the instant to maintain consistency. After running the tests, they pass, and the work is committed as a work-in-progress (WIP).
+In this session, the team works on integrating a stock-viewing feature into production. They move the Stock class from the test tree to the main tree and wire it into the routes, replacing the previous direct file loading. This is part of a TDD workflow where a previously disabled test is re-enabled and drives the integration (YouTube, 2022).
 
-- Re-enable failing tests to drive integration work
-- Move code from test tree to main tree for production use
-- Inject a clock function (returning Instant) to make time testable
-- Replace LocalDate with Instant for time-sensitive operations
-- Derive fixture date from instant to keep test data consistent
+To make the feature testable while still using the current time in production, they introduce a clock abstraction: a functional parameter that returns an Instant. This allows tests to control time instead of relying on Instant.now(). They also refactor their test fixture to use Instant rather than LocalDate, deriving dates from instants to avoid inconsistency between the date and time values (Pairing with Duncan, 2022).
+
+- Move the Stock class from the test tree to the main source tree and integrate it into the route handler.
+- Re-enable a previously disabled test to drive the integration.
+- Introduce a clock strategy (function returning Instant) instead of directly calling Instant.now() for testability.
+- Change test fixtures from LocalDate to Instant to accurately represent moments in time.
+- Derive LocalDate from Instant in fixtures to keep date and time consistent.

@@ -2,18 +2,18 @@
 domain: ai-workflows
 subdomain: coding-agents
 concept: static-analysis-sensors
-title: Three more static code analysis sensors
+title: Three More Static Code Analysis Sensors
 sources:
   - title: "Three more static code analysis sensors"
     url: "https://martinfowler.com/articles/sensors-for-coding-agents.html#StaticCodeAnalysisDependencyRules"
     author: "Martin Fowler"
 ---
 
-# Three more static code analysis sensors
+# Three More Static Code Analysis Sensors
 
-The article discusses three additional sensors for static code analysis in the context of coding agents, focusing on improving modularity. Dependency check sensors are effective at enforcing rules but are limited by the expressiveness of the rules themselves. A sensor for coupling data proved ineffective. In contrast, prompting an inferential sensor to review modularity yielded better results, suggesting that a more flexible approach can outperform rigid computational checks.
+Birgitta Böckeler discusses three additional sensors for static code analysis, focusing on checking and enforcing better modularity in codebases. Computational sensors for dependency checks proved effective at enforcing predefined rules, but the rules themselves were limited in scope and flexibility. A computational sensor for coupling data was attempted but yielded lackluster results, indicating that simple metrics may not capture the nuanced quality of modularity. In contrast, prompting an inferential sensor to review modularity was more effective, suggesting that AI-based reasoning can outperform rigid computational checks for architecture-level concerns. This highlights a shift toward using inferential sensors for higher-order code quality assessments.
 
-- Dependency checks as computational sensors are good at enforcing rules but have limited rule expressiveness.
-- A computational sensor for coupling data proved lackluster.
-- An inferential sensor prompted to review modularity was more effective.
-- The focus is on checking and enforcing better modularity in code.
+- Computational dependency-rule sensors are good at enforcement but limited by rigid rules.
+- A computational sensor for coupling data was ineffective at assessing modularity.
+- An inferential sensor, prompted to review modularity, proved more effective.
+- Inferential sensors may be better suited for architectural and design-level feedback.

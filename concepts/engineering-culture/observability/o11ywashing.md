@@ -12,12 +12,14 @@ sources:
 
 # From Cloudwashing to O11ywashing
 
-In this article, Charity Majors criticizes how the term 'observability' has been watered down by vendors and misused by executives. She recounts a panel where an executive described traditional observability tools as capable of detecting faults but insufficient for understanding the quality of service from each customer's perspective, which he claimed required custom tooling. Majors argues that this is exactly the original definition of observability, and that such execs are unknowingly describing the problem observability should solve, not a new one (Majors, 2025).
+Charity Majors recounts an executive panel where industry leaders claimed traditional observability tools handle availability but fail to measure product quality from each customer's perspective, leading them to build custom solutions. She argues this is a misunderstanding: true observability has always been about understanding each customer's experience, while what they call 'traditional observability' is actually monitoring—the three pillars of metrics, logs, and traces (Majors, 2025).
 
-Majors introduces the term 'o11ywashing' as the observability equivalent of 'cloudwashing', where vendors relabel legacy monitoring tools as observability. She draws parallels to IBM reclassifying mainframes as cloud in 2008, and argues that the o11ywashing problem will persist because traditional vendors cannot solve the underlying technical challenge of combining app, business, and system telemetry in a unified, cardinality-rich way. She emphasizes that observability is a systems problem, not just operational monitoring, and that the industry needs to communicate this to engineering executives in terms of outcomes, not technical details (Majors, 2025).
+Majors introduces the term 'o11ywashing,' analogous to cloudwashing, where vendors rebrand legacy telemetry products as observability to capture budget and attention. She cites IBM reclassifying its Z-series mainframe as 'cloud' in 2008 as a historical parallel. The problem persists because today's monitoring tools cannot combine app, business, and system telemetry in a unified way, so executives invest in custom solutions rather than recognizing that observability is a systems problem (Majors, 2025).
 
-- Traditional 'observability' tools are often just monitoring, and they cannot answer product-quality questions from each customer's perspective.
-- The term 'o11ywashing' describes vendors falsely labeling monitoring as observability, similar to cloudwashing.
-- Observability is fundamentally a systems problem; it requires unified telemetry and the ability to slice by any dimension, such as customer ID or device.
-- To combat o11ywashing, the industry must focus on telling executives about outcomes, not just technical features.
-- If your tooling does not help you understand the quality of your product from each customer's perspective, it is not observability.
+Reflecting on Honeycomb's decade-long journey, Majors emphasizes that engineers must tell outcome-focused stories to executives, not just explain technical concepts like cardinality and dimensionality. Observability should be the most powerful lever for disrupting doom loops, but only if buyers learn to distinguish true observability from o11ywashing. If your tooling doesn't help you understand the quality of your product from each customer's perspective, it's not observability—it's just monitoring dressed in marketing dollars (Majors, 2025).
+
+- Traditional observability tools are often just monitoring; true observability must enable understanding each customer's perspective.
+- O11ywashing is the observability equivalent of cloudwashing, with vendors rebranding monitoring as observability.
+- Executives need outcome-oriented storytelling, not just technical details, to understand the value of observability.
+- Observability is a systems problem requiring unified telemetry, not separate metrics, logs, and traces.
+- Any tool that cannot measure customer experience from an individual perspective is not observability.

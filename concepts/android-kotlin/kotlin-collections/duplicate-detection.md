@@ -11,9 +11,9 @@ sources:
 
 # Perils of duplicate finding
 
-The article (source: https://jakewharton.com/perils-of-duplicate-finding/) explores different Kotlin approaches to finding duplicate elements in a list, starting with a groupBy-based solution. It then investigates alternatives like `toList() - toSet()` and `removeAll`, which surprisingly remove all occurrences rather than just the first, leading to incorrect results. The author demonstrates unexpected behavior in Kotlin's collection operators, inherited from Java, and iteratively refines to a correct solution using a `HashSet` as a bound function reference.
+Jake Wharton explores how to correctly find duplicate elements in a Kotlin collection, contrasting multiple approaches. He starts with a map-based groupBy solution that works but feels wasteful, then tries several alternatives, revealing surprising behaviors in Kotlin's collection operators. The minus operator removes all occurrences of each element in the set, not just the first, and MutableList.removeAll similarly removes all occurrences, whereas MutableList.remove only removes the first. These subtle asymmetries lead to incorrect results until he finds a functional idiom using a bound function reference to a HashSet's add method with filterNot. The final version, filterNotTo(HashSet(), HashSet<Int>()::add), is both concise and the most performant in microbenchmarks, allocating the fewest bytes.
 
-- Kotlin's minus operator and `MutableList.removeAll` remove all occurrences, making them unsuitable for duplicate detection.
-- `MutableList.remove` removes only the first occurrence, but there is no built-in to remove first occurrences of each element in a collection.
-- A clean and idiomatic solution is `ints.filterNotTo(HashSet(), HashSet<Int>()::add)`, which keeps duplicates.
-- The `filterNotTo` version is both the fastest and allocates the fewest bytes in benchmarks.
+- Kotlin's minus operator on a list and set removes all occurrences of each set element, yielding an empty list for duplicate-finding.
+- MutableList.removeAll removes all occurrences, while MutableList.remove only removes the first occurrence—a surprising asymmetry.
+- Using filterNot with a bound HashSet.add reference elegantly keeps only elements that have already been seen.
+- filterNotTo(HashSet(), HashSet<Int>()::add) is the fastest and most allocation-friendly approach in microbenchmarks.
