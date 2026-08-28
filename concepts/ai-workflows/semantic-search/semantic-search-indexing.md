@@ -12,9 +12,13 @@ sources:
 
 # Building Semantic Search on my Content
 
-Kent C. Dodds describes implementing semantic search on his website using modern AI tools and Cloudflare's AI platform. He had wanted this feature since 2019, but recent advances in AI agents (like Cursor) made it trivial to build. The system indexes content (blog posts, videos, podcasts) into a vector database by chunking text into overlapping segments, generating embeddings via Cloudflare Workers AI, and storing them in Cloudflare Vectorize. To support incremental indexing, each chunk is hashed and only changed chunks are re-embedded and upserted, saving time and money. For search, the query is embedded, a vector search fetches nearest neighbor chunks, and results are collapsed per document by keeping the best-scoring chunk. The article highlights how Cloudflare's integrated AI stack simplifies building AI-powered applications and how AI agents accelerated the development process.
+Kent C. Dodds describes how he built semantic search for his site, a feature on his wish list since 2019. He decided to implement it after being impressed by modern AI agents and Cloudflare's AI platform. The architecture uses Cloudflare Workers AI for embeddings and Vectorize as the vector database, making the implementation relatively simple (source: https://kentcdodds.com/blog/building-semantic-search-on-my-content).
 
-- Semantic search was implemented using Cloudflare Vectorize as the vector database and Workers AI for generating embeddings.
-- Content is chunked into overlapping segments with stable IDs, and each chunk is hashed to skip unchanged chunks during re-indexing.
-- Search overfetches chunk-level matches (up to 15) and then collapses them into per-document results by keeping the highest-scoring chunk per document.
-- AI coding agents (e.g., Cursor) made it feasible to quickly implement this long-requested feature and close all open issues.
+The indexing process starts by chunking the full text content into overlapping chunks (target 2500 chars, max 3500, overlap 250) to stay within embedding model limits and preserve context across boundaries. Each chunk gets a stable ID (`docId:chunk:i`) and is hashed; the hash is stored in a manifest. During incremental indexing, unchanged chunks are skipped, and only changed chunks are embedded and upserted into Vectorize, saving money and time (source: https://kentcdodds.com/blog/building-semantic-search-on-my-content).
+
+Search involves embedding the query, overfetching chunk-level matches (`safeTopK * 5`, capped at 20), then collapsing the results to document-level by keeping only the best-scoring chunk per document and sorting by score. This avoids the same document appearing multiple times and provides a clean set of results (source: https://kentcdodds.com/blog/building-semantic-search-on-my-content).
+
+- Semantic search is built by chunking content, embedding chunks, and storing vectors in a vector database.
+- Overlapping chunks with stable IDs and hashing enable efficient incremental indexing and reduce embedding costs.
+- The search query is embedded and vector similarity search returns chunk matches, which are then collapsed to document-level results.
+- Cloudflare Workers AI (with AI Gateway) and Vectorize provide a simple, powerful platform for building AI apps.
