@@ -12,12 +12,12 @@ sources:
 
 # From Cloudwashing to O11ywashing
 
-Charity Majors argues that the industry has co-opted the term 'observability' to describe mere monitoring, enabling what she calls 'o11ywashing'—rebranding traditional monitoring tools as observability solutions. She points to a panel where an executive described 'traditional observability' as only detecting whether systems are up or down, while complaining that no tool can measure service quality from each customer's perspective. Majors notes this is exactly the original definition of observability, but the industry has lost the plot, leaving companies to build custom solutions.
+Charity Majors argues that the term "observability" has been diluted by vendors in the same way "cloud" was watered down during cloudwashing. She recounts an executive panel where a leader described traditional observability tools as merely checking if systems are up or down, while claiming that understanding customer experience requires custom-built solutions. Majors points out that this is exactly what observability was originally meant to solve, and that the industry's failure to communicate this has led to a cycle of buying monitoring tools mislabeled as observability.
 
-Majors traces this to the same pattern as 'cloudwashing' in the 2000s, where vendors repackaged legacy products as cloud. She argues that true observability requires unifying app, business, and system telemetry to slice by customer ID, device, or location—a capability traditional three-pillar tools lack. To counter o11ywashing, she urges practitioners to speak to engineering executives in terms of results and outcomes, not technical details like cardinality or dimensionality, and to insist that observability must answer questions about customer experience, not just availability nines.
+The article draws parallels to IBM reclassifying mainframes as cloud in 2008, showing how vendor marketing can co-opt terms and confuse buyers. Majors emphasizes that true observability requires unifying app, business, and system telemetry to answer questions from any customer's perspective, not just operational uptime. She calls for the industry to tell better stories to engineering executives, focusing on outcomes rather than technical details, and warns that if your tool cannot help understand each customer's experience, it is not observability—it is o11ywashing.
 
-- Traditional 'observability' tools are often just monitoring: they answer up/down, not each customer's experience.
-- O11ywashing is the marketing practice of rebranding monitoring as observability, similar to cloudwashing.
-- True observability combines app, business, and system telemetry to explore service quality per customer, device, or location.
-- Observability must be framed to executives as a systems problem that drives business outcomes, not as technical features.
-- If a tool can't help you understand the product from each customer's perspective, it isn't observability—it's monitoring.
+- Traditional observability tools are often just monitoring tools that can only answer if systems are up or down, not why customer experiences degrade.
+- The industry is seeing 'o11ywashing'—vendors repackaging monitoring as observability, similar to IBM's 2008 cloudwashing of mainframes.
+- True observability requires unified telemetry across app, business, and system data, enabling analysis per customer, device, or location.
+- Engineers and vendors need to communicate observability's value to executives in terms of business outcomes, not just technical details.
+- If your tool can't help you understand the quality of the product from each customer's perspective, it isn't observability.

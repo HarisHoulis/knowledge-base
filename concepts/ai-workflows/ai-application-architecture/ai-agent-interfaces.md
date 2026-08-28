@@ -2,7 +2,7 @@
 domain: ai-workflows
 subdomain: ai-application-architecture
 concept: ai-agent-interfaces
-title: The Next Chapter: EpicAI.pro
+title: The next chapter: EpicAI.pro
 sources:
   - title: "The next chapter: EpicAI.pro"
     url: "https://kentcdodds.com/blog/the-next-chapter-epicai-pro"
@@ -10,16 +10,15 @@ sources:
     date: "2025-04-10"
 ---
 
-# The Next Chapter: EpicAI.pro
+# The next chapter: EpicAI.pro
 
-Kent C. Dodds announces EpicAI.pro, a new educational platform focused on building applications architected for AI-driven interaction. He argues that the traditional UI paradigm of forms, buttons, and direct manipulation is evolving toward conversational and agent-mediated experiences, where users issue simple instructions and AI agents execute complex workflows across multiple services. This shift requires developers to rethink application structure for both human and machine interaction, exposing capabilities in ways AI can reliably discover and use (Kent C. Dodds, 2025).
+In this announcement, Kent C. Dodds introduces EpicAI.pro, a new educational platform focused on teaching developers how to build applications architected for AI interaction. He argues that the traditional paradigm of forms, buttons, and direct manipulation is evolving toward conversational, agent-driven experiences where users give instructions and AI agents perform complex tasks across services [1]. The platform will emphasize enduring principles and sound architecture rather than vendor-specific hype.
 
-The platform will emphasize enduring principles over vendor hype, covering topics such as designing for AI interaction, structuring data and capabilities, and understanding protocols like the Model Context Protocol (MCP). Security challenges like authentication, authorization, and 'tool poisoning' are also highlighted as critical considerations. Dodds positions this as a natural evolution of web development, focusing on architectural challenges rather than fleeting trends, and notes that early signs of this shift are already visible (Kent C. Dodds, 2025).
+Dodds outlines four key areas of focus: designing applications where the primary user may be an AI agent, structuring data and capabilities for reliable machine understanding, understanding emerging standards like the Model Context Protocol (MCP) for AI-to-application communication, and addressing security and reliability challenges such as tool poisoning and proper authentication [1]. He positions this as the next major shift in application development, similar to previous leaps he has taught.
 
-To kick things off, Dodds is hosting a free live online event on April 16, 2025, where he will live-code an MCP server and demonstrate how an AI assistant can use it to interact with an application's capabilities. The event will not be recorded, emphasizing the urgency for developers to engage now. He invites the community to join in building this AI-native future, suggesting that developers who master these principles will lead the next era of application development (Kent C. Dodds, 2025).
+He also invites readers to a free live online event on April 16, 2025, where he will live-code an MCP server and demonstrate how an AI assistant can use it to interact with an application's capabilities. The event will not be recorded, and he encourages participation as the first step toward building the future of AI-powered applications [1].
 
-- The primary 'user' of future applications may be an AI agent acting on behalf of a human, requiring a fundamental shift in application architecture.
-- Developers need to expose application services via protocols like MCP so AI can reliably discover and use them, not just build for human eyes and fingers.
-- Security and reliability become more complex with AI interaction, including challenges like authentication, authorization, and 'tool poisoning'.
-- EpicAI.pro will focus on foundational principles rather than vendor-specific tools, continuing Dodds' teaching philosophy from Epic React and Epic Web.
-- Dodds is hosting a free live event on April 16, 2025, to demonstrate MCP server development and AI-to-app interaction.
+- Application development is shifting from human-only interfaces to systems that must also serve AI agents, enabling conversational, multi-service workflows.
+- EpicAI.pro will teach foundational principles like designing for AI interaction, exposing capabilities, and using the Model Context Protocol (MCP) as a standard framework.
+- Security and reliability—including authentication, authorization, and tool poisoning—are critical when AI interacts with systems.
+- A free live event on April 16, 2025 will showcase building an MCP server with live coding.

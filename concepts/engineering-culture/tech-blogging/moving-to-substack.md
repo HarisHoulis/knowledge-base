@@ -12,10 +12,10 @@ sources:
 
 # Moving from WordPress to Substack
 
-Charity Majors announces her decision to move her blog from WordPress to Substack after a decade of writing at charity.wtf. She cites frustration with WordPress's friction and the vibrant longform tech writer ecosystem on Substack as key motivations. The move is also timed around the completion of the second edition of 'Observability Engineering,' which has generated many insights she plans to share.
+Charity Majors announces her move from WordPress to Substack after a decade of blogging at charity.wtf. She explains that WordPress has become too friction-heavy, which has discouraged her from posting, and she sees Substack as the current hub for longform tech writing. She also mentions that the second edition of 'Observability Engineering' has inspired her to share what she's learned, and she plans to do so on Substack.
 
-- Charity started blogging on December 27, 2015 and is now moving after 10 years.
-- She finds WordPress to have too much friction, preventing her from posting.
-- Substack is seen as the current home for longform tech writing.
-- Email subscribers are being exported but are held up for manual review.
-- She will keep charity.wtf up for the foreseeable future to preserve bookmarks and links.
+- Charity is leaving WordPress due to friction and a dislike for the platform.
+- She believes Substack now hosts the vibrant ecosystem of longform tech writers.
+- She is working on the second edition of 'Observability Engineering' and wants to share insights.
+- She will keep charity.wtf active to preserve existing links and bookmarks.
+- Email subscriber import is stuck in manual review, and comments won't be carried over.

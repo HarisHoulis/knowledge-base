@@ -7,15 +7,15 @@ sources:
   - title: "From Chrome DevTools to AI Engineering, with Addy Osmani"
     url: "https://newsletter.pragmaticengineer.com/p/from-chrome-devtools-to-ai-engineering"
     author: "Gergely Orosz"
-    date: "2026-08-19"
+    date: "Wed, 19 Aug 2026 16:53:57 GMT"
 ---
 
 # From Chrome DevTools to AI Engineering, with Addy Osmani
 
-Addy Osmani, a long-time Google Chrome and DevTools leader, discusses his journey from building a browser at 16 to directing engineering at Google, and how AI is reshaping engineering work (Orosz, 2026). Early on, publishing free educational materials about frontend development led to a DevRel-and-builder role on Chrome. DevTools evolved from simple debugging help into a full-featured IDE-like tool, yet Addy notes that memory debugging remains underdeveloped because tooling hasn't advanced in a decade.
+In this episode of The Pragmatic Engineer, Gergely Orosz interviews Addy Osmani, who spent over 14 years at Google working on Chrome, DevTools, and Core Web Vitals. Osmani recounts his path from building a web browser at age 16 to becoming a Director of Engineering, and reflects on Google's engineering culture. He notes that the biggest shift when becoming a director was being accountable on a weekly basis for a top company goal, and that a recent culture change at Google sees VPs and SVPs coding on weekends thanks to AI tools (Orosz, 2026).
 
-- Addy Osmani built a web browser at age 16; free educational content about frontend development helped him get hired at Google for a DevRel-and-builder role on Chrome.
-- Chrome DevTools grew from basic debugging into an IDE-like tool, but memory debugging tooling has not advanced in years and remains hard to solve.
-- AI-assisted development carries the risk of 'cognitive surrender'—erosion of comprehension—so engineers should understand every major decision an LLM makes.
-- Use 'mutual amplification' and 'loop engineering': have AI agents log their decisions and key learnings, while the engineer reviews and internalizes them.
-- Software engineers remain essential because AI cannot be accountable; roles are unbundling, so 'don't be just an engineer'—develop product sense, go-to-market skills, and broader business awareness.
+- Cognitive surrender is a key risk of AI-assisted development; engineers should understand every major decision an LLM makes to avoid erosion of comprehension.
+- Mutual amplification is the goal when working with AI: the agent improves by logging its decisions, and the engineer improves by reviewing and internalizing the agent's actions.
+- AI models cannot be accountable, so software engineers remain essential; a 'what am I accountable for?' mindset will become more common.
+- Engineering roles are unbundling; engineers should develop product sense, go-to-market knowledge, and other skills to succeed in fuzzier roles.
+- Addy Osmani built a web browser at 16, and his free educational materials helped him land a job at Google.

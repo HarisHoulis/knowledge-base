@@ -11,14 +11,14 @@ sources:
 
 # Migrating to Workspaces and Nx
 
-The article describes migrating kentcdodds.com from a repo with multiple independent deployables and separate package managers to a proper npm workspaces monorepo with Nx. The key structural change was enforcing that all runnable applications live under `services/*`, each with its own package.json, while the root package.json became a thin orchestration layer with workspace declarations and forwarding scripts. Three old lockfiles were replaced by a single root lockfile, and Nx was added with minimal configuration, relying on caching defaults and package-script inference rather than hand-authored project files.
+The article recounts migrating kentcdodds.com to a proper monorepo structure using npm workspaces and Nx. Previously, the repo contained multiple deployable services (the main site, an OAuth worker, and two audio-related components) each with its own package.json and lockfile, making the folder layout a monorepo only in name. The change consolidated all runnable services under `services/*`, turned the root package.json into a thin orchestration layer, and replaced three lockfiles with a single root lockfile (source: Migrating to Workspaces and Nx, 2026).
 
-The migration surfaced several real-world issues. Package import aliases broke because Node enforces package boundaries once a subpackage is defined. Production went down because content paths hardcoded to `content/` had moved to `services/site/content/`. Docker build stages needed additional paths like the Prisma schema. The article emphasizes that restructuring around real service boundaries exposed hidden assumptions and that CI was then optimized around the actual workload, including site-only installs and Playwright browser caching.
+The migration exposed three categories of breakage. First, package import aliases like `#other/*` failed because Node's package boundary rules rejected imports outside the package root, requiring replacement with explicit relative paths. Second, production went down because the GitHub content path hardcoded as `content/` was now `services/site/content/`, causing 404s; a centralized path utility and graceful fallbacks fixed the issue. Third, Docker build stages needed additional files (Prisma schema and config) that were previously omitted from the production-deps stage (source: Migrating to Workspaces and Nx, 2026).
 
-The main lesson is to validate large refactors locally rather than trusting an agent's confidence, especially when the agent cannot build Docker images. Nx was useful mainly for caching; the real win came from having a clean, consistent monorepo structure.
+CI was restructured around actual usage: the site installs only its own dependencies, and Playwright browsers are cached and installed in the gate job. The author emphasizes that Nx's caching was useful, but the real win was the structural clarity of `services/*`, and warns against trusting an agent's confidence—it should be made to prove changes work, especially for infrastructure (source: Migrating to Workspaces and Nx, 2026).
 
-- Move all runnable deployables under `services/*`, each with its own package.json, and make the root package.json a thin orchestration layer.
-- Nx can be added minimally with caching defaults and package-script inference; no need for hand-authored project.json files.
-- Enforcing package boundaries breaks import aliases that cross package roots; replace them with relative paths.
-- Hardcoded content paths break when files move directories; centralize path logic and create graceful fallbacks.
-- Restructure CI around actual usage patterns: install only the workspace needed and cache Playwright browsers to avoid surprise failures.
+- Enforce a strict `services/*` layout for every runnable service, with a thin root package.json that delegates to workspaces.
+- Node package alias boundaries cause failures when code moves into a subpackage; replace aliases with relative imports.
+- Hardcoded paths relative to the repo root will break in a monorepo—centralize content paths to survive moves.
+- Docker stages need the full set of files (e.g., Prisma schema) even when not directly used in install steps.
+- Use Nx for caching but treat the structural monorepo change as the primary improvement.

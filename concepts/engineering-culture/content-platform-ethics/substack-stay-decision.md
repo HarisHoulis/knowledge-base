@@ -12,10 +12,10 @@ sources:
 
 # Hello World
 
-Charity Majors explains her decision to move her blog from WordPress to Substack, despite criticism that the platform supports Nazis. She initially paused her migration after receiving pushback and researching sites like LeaveSubstack, but ultimately decided to stay. Her primary motivation is to re-engage with the technical community, which she feels is a core part of her job and has been neglecting by going dark on social media (Majors, 2025).
+Charity Majors, in her article 'Hello World', explains her decision to stay on Substack after initially planning to migrate from WordPress, despite criticism that she would be 'supporting Nazis' by using the platform. She acknowledges the platform's governance issues but argues that Substack is on a continuum of grey, far from outright extremist platforms like Gab or Parler. Her primary motivation is to re-engage with the tech community, which she feels she has been neglecting, and to reduce friction in posting, as Substack feels more like writing an email than the heavyweight WordPress experience.
 
-- Majors decided to stay on Substack to prioritize active community engagement and lower posting friction.
-- She does not view Substack as equivalent to extremist platforms, describing it as 'light dove grey' on a continuum of content platform governance.
-- To reduce financial benefit to Substack, she will not accept paid subscriptions and encourages readers to use email or RSS.
-- She plans to auto-post from Substack to WordPress to maintain accessibility for conscientious objectors.
-- She respects that others may choose to boycott Substack entirely, but sees this as her own battle to choose.
+- Charity Majors decided to stay on Substack to rejoin the tech discussion and lower posting friction.
+- She believes Substack is not akin to platforms like Gab or Parler, and describes it as 'light dove grey' on a continuum of governance challenges.
+- She does not accept money from Substack to minimize ethical compromise, and will use RSS/email for distribution.
+- She respects those who choose to leave Substack but states this battle is not hers to fight.
+- Her primary goal is to be more active in the technical community, potentially also via LinkedIn, while avoiding X.

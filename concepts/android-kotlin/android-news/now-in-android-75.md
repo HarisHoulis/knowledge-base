@@ -7,15 +7,17 @@ sources:
   - title: "Now in Android #75"
     url: "https://medium.com/androiddevelopers/now-in-android-75-e4bbe977d33f"
     author: "Manuel Vivo"
-    date: "2023-01-18"
+    date: "Wed, 18 Jan 2023 22:32:24 GMT"
 ---
 
 # Now in Android #75
 
-Now in Android #75, the first episode of 2023, highlights the latest Android Studio stable release, which includes improvements to Compose Preview, layout inspector recomposition counts, XML linting for Views, and faster sync via parallel project imports. The release also integrates SDK Index, a new logcat, resizable emulators, and physical device mirroring. Notable AndroidX updates include stable AppCompat 1.6.0 with Android 13 support like per-language preferences and predictive back, and Room 2.5.0 which is now Kotlin-based and adds Upsert annotation and room-paging support for RxJava and Guava. Lifecycle 2.6.0-alpha04 stabilizes collectAsStateWithLifecycle and deprecates old APIs. New libraries include androidx.credentials for sign-in with passwords and passkeys, plus privacy sandbox libraries for ad services and SDK runtime (Manuel Vivo, 2023).
+This episode of Now in Android highlights the release of a new stable Android Studio version, featuring improvements such as auto-updating Compose Preview, recomposition counts in the layout inspector, visual XML linting for Views, enhanced sync performance, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring. The article also covers notable AndroidX releases: AppCompat 1.6.0 with Android 13 per-language preferences and predictive back, Room 2.5.0 with a Kotlin runtime and new Upsert and paging features, and Lifecycle 2.6.0-alpha04 which stabilizes collectAsStateWithLifecycle and deprecates launchWhenX APIs. New libraries like androidx.credentials, adservices, and sdkruntime are introduced for credentials and privacy sandbox integration.
 
-- Android Studio stable release adds Compose Preview auto-update, layout inspector recomposition counts, and visual XML linting.
-- AndroidX stable updates: AppCompat 1.6.0 (Android 13 support) and Room 2.5.0 (Kotlin runtime, Upsert, room-paging).
-- New libraries: androidx.credentials for passkeys, and privacy sandbox libraries (adservices, sdkruntime).
-- Articles cover architectural domain layers, extending the Android SDK, Wear OS media toolkit, HDR migration to SurfaceView, and stylus low-latency APIs.
-- Includes videos on app growth, CameraX, and Privacy Sandbox APIs, plus a podcast on Kotlin Multiplatform and K2.
+Beyond tooling and libraries, the post aggregates recent Android development content: articles on adding a domain layer to the Now in Android app for improved architecture, extending the Android SDK via extension SDKs, building media apps for Wear OS using the media toolkit, migrating from TextureView to SurfaceView for HDR playback, and achieving low stylus latency with new graphics and input libraries. Videos cover optimizing paywall conversion, engaging with push notifications, CameraX concepts, the FLEDGE API, and the Attribution Reporting API. A podcast episode discusses Kotlin Multiplatform and the upcoming K2 frontend, rounding out the update.
+
+- Android Studio stable release includes Compose Preview auto-update, recomposition counts, visual XML linting, and more.
+- AndroidX updates: AppCompat 1.6.0 (Android 13), Room 2.5.0 (Kotlin runtime, Upsert), Lifecycle 2.6.0-alpha04 (stable collectAsStateWithLifecycle).
+- New libraries: androidx.credentials for sign-in, adservices and sdkruntime for Privacy Sandbox.
+- Articles highlight domain layer architecture, extending the Android SDK, Wear OS media toolkit, HDR SurfaceView migration, and stylus low latency.
+- Videos and podcast cover app growth, CameraX, Privacy Sandbox APIs, and Kotlin Multiplatform.
