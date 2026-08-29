@@ -11,13 +11,14 @@ sources:
 
 # Native UI and multiplatform Compose with Redwood
 
-Redwood is Cash App's approach to multiplatform mobile client UI, with a focus on using native UI toolkits on each platform. It prioritizes four core values: rendering with native UI for the best look and feel, reusing existing app components and styles, leveraging Kotlin for its great tooling and cross-platform capabilities, and allowing incremental adoption within an existing app. The article explains that Kotlin compiles to Java bytecode, native (via LLVM), and JavaScript, supporting Android, iOS, and the web with intrinsic execution (source: https://code.cash.app/native-ui-and-multiplatform-compose-with-redwood).
+Redwood is Cash App's solution for multiplatform mobile client UI. Its core values emphasize using native UI toolkits on each platform for the best UI, reusing existing app components and styles, leveraging Kotlin for its tooling and ecosystem, and allowing incremental adoption. The approach combines Kotlin's ability to compile to multiple targets with Compose for UI node creation and state management, but uses a custom tree that interfaces with each platform's native UI toolkit.
 
-On top of Kotlin, Redwood uses Compose for creating UI nodes and managing state. Instead of using Compose UI directly, it runs Compose on a custom tree structure that interfaces with each platform's native UI toolkit via a schema. Developers define UI widgets like TextInput as data classes, and Redwood generates both a composable function and a platform interface. Each platform then binds that interface to its associated native UI component, enabling a shared Kotlin codebase to drive native UI (source: https://code.cash.app/native-ui-and-multiplatform-compose-with-redwood).
+A key aspect of Redwood is the use of a schema to define common UI widgets, from which Redwood generates composables and interfaces. Each platform then binds an implementation of these interfaces to its native UI components. The Redwood repository also includes Treehouse, which uses Zipline to dynamically update composable logic at runtime, enabling features between app upgrades. The release of Redwood 0.5, termed 'beta', permits breaking changes but maintains compatibility across the Treehouse bridge, allowing future versions to target older apps.
 
-Redwood also includes Treehouse, a module that uses Zipline to dynamically update the composable logic at runtime, improving development and allowing app logic updates between app store releases. The article announces the release of Redwood 0.5, which it calls "beta," allowing breaking changes while maintaining compatibility across the updatable Treehouse bridge. Usage of Redwood so far has been limited, but the beta is intended to roll out experiences to customers soon (source: https://code.cash.app/native-ui-and-multiplatform-compose-with-redwood).
+Redwood aims to provide a pragmatic path for adopting Kotlin Multiplatform in existing apps, as evidenced by Cash App's 'Summer of Kotlin Multiplatform' series. While current usage is limited, the beta release marks a step toward rolling out experiences to customers. (Source: Jake Wharton, article on Cash App code blog)
 
-- Uses native UI toolkits on each platform for rendering, preserving existing styles and custom controls.
-- Defines a common schema of UI widgets, from which Redwood generates composables and platform interfaces.
-- Built on Kotlin and Compose, enabling use on Android, iOS, and the web with incremental adoption.
-- Treehouse uses Zipline for dynamic logic updates; Redwood 0.5 is now beta.
+- Redwood prioritizes native UI per platform, reuse of existing components, Kotlin language, and incremental adoption.
+- Uses Compose for UI state management but with a custom tree that talks to native UI toolkits.
+- A schema defines UI widgets, generating composables and platform-bound interfaces.
+- Treehouse and Zipline enable dynamic runtime updates of composable logic.
+- Redwood 0.5 is released as 'beta' with forward compatibility across versions.

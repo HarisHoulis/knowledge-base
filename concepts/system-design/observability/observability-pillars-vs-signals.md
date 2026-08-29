@@ -7,19 +7,16 @@ sources:
   - title: "How many pillars of observability can you fit on the head of a pin?"
     url: "https://charity.wtf/p/the-pillar-is-a-lie"
     author: "Charity Majors"
-    date: "2025-10-30"
+    date: "Thu, 30 Oct 2025 05:27:38 GMT"
 ---
 
 # How many pillars of observability can you fit on the head of a pin?
 
-Charity Majors argues that the concept of "pillars" in observability is a marketing term, not a technical one. The technical term is "signal," as defined by OpenTelemetry, which currently includes traces, metrics, logs, and baggage, with events and profiles at proposal/development stage. The word "pillar" is absent from OpenTelemetry's documentation, highlighting that pillar-based thinking is not rooted in technical reality (Majors, 2025).
+Charity Majors argues that the concept of "pillars" of observability is a marketing construct, not a technical one. The technical term is "signal," as defined by OpenTelemetry, which currently lists traces, metrics, logs, and baggage as signal types, with profiling and events at proposal stage. Calling profiling a "fourth pillar" is a vendor framing to justify selling another siloed product, not a technical necessity. The real distinction is between architectural models: the multiple-pillars model (o11y 1.0) stores each signal type in a separate database, leading to massive data duplication and cost, while the unified storage model (o11y 2.0) stores all signals together in one highly cardinality-capable store, allowing zoom-like navigation rather than "bunny hopping" between separate tools (Majors, 2025).
 
-Majors contrasts two architectural models: the multiple pillars model (observability 1.0) and the unified storage model (o11y 2.0). The former stores each signal type in separate silos, leading to massive data duplication, high costs, and a poor "bunny hopping" user experience where engineers manually correlate data across metrics, logs, and traces. The latter stores all signals together in one database, preserving context and enabling a smooth zoom-in/zoom-out experience. She notes that most industry giants use the pillars model, while newer companies like Honeycomb use unified storage (Majors, 2025).
+The article emphasizes that OpenTelemetry itself unifies telemetry signals through shared context and does not require a pillar-based implementation, though many vendors choose to build pillar-style silos on top. Majors explains that in a unified storage world, profiling simply means being able to zoom into even finer-grained data, such as syscalls, just as tracing provides function-level insight. She concludes that engineers should focus on signals and unified data models, not pillars, and that the language of pillars mainly serves to increase vendor revenue through separate storage and query systems for each data type (Majors, 2025).
 
-Majors clarifies that engineers using "pillars" colloquially is fine, but when vendors push the term, it usually signals intent to sell more siloed products. She also addresses OpenTelemetry, citing Austin Parker to show that OTel fundamentally unifies telemetry signals through shared context, though it does not require this. Profiling, she suggests, is just another type of signal—another level of zoom in a unified storage world, not necessarily a separate pillar (Majors, 2025).
-
-- Pillar is a marketing term; signal is the technical term.
-- The multiple pillars model causes data duplication, high costs, and inefficient debugging workflows.
-- Unified storage (o11y 2.0) stores all telemetry together, allowing seamless zooming from SLOs to events to traces.
-- OpenTelemetry supports unified telemetry by design, not necessarily three pillars.
-- Profiling is a signal type, and in a unified storage model it becomes just another zoom level.
+- Pillar is a marketing term; signal is the technical term used by OpenTelemetry.
+- The multiple-pillars model stores each signal separately, causing data duplication and high costs; unified storage stores all signals together.
+- OpenTelemetry unifies signals through shared context, but vendors can choose to implement pillar-based architectures on top.
+- In a unified storage model, profiling is just a deeper zoom level into the same data, not a separate pillar.

@@ -12,10 +12,14 @@ sources:
 
 # Are you an experienced software buyer? I could use some help.
 
-Charity Majors is working on the second edition of "Observability Engineering" and notes how much the industry has changed since the first edition. Observability engineering teams are now widespread, prompting a new book section on "Observability Governance" covering staffing, org placement, tool purchasing, integration, cost management, and building business cases. Majors admits she lacks direct experience buying software at a large enterprise, so she is reaching out to readers for practical advice on vendor selection, proof-of-concept evaluation, stakeholder management, and consensus-building. She asks for emailed advice and promises not to quote anyone without permission or name vendors. This is an O'Reilly writing project, not a Honeycomb marketing effort.
+Charity Majors is working on the second edition of "Observability Engineering" and is adding a substantial new section on Observability Governance. This section will cover topics such as staffing observability teams, their place in the org chart, buying and integrating tools, managing costs, and making business cases to executives. Majors notes that observability engineering teams have become widespread since the first edition was written, necessitating practical guidance on governance and procurement (Majors, 2025).
 
-- The second edition of 'Observability Engineering' adds a section on Observability Governance, reflecting the rise of dedicated observability teams.
-- Majors explicitly requests advice from engineers and VPs who have experience buying software at scale, as she has never done it herself.
-- Key questions include how to shop for options, signs that a vendor change is needed, what a good proof of concept looks like, and how to drive consensus on large purchases.
-- All advice will be kept confidential; no vendors will be named, and no quotes are used without permission and a signed release.
-- The request is part of an O'Reilly book project, not a Honeycomb customer acquisition effort.
+Majors openly admits she has never personally bought software at a large enterprise and lacks direct experience with vendor selection, proof-of-concept processes, stakeholder consensus, or switching vendors. She appeals to principal engineers and VPs who have done this repeatedly to share their advice for first-time buyers, especially staff engineers or directors facing high-stakes purchasing decisions. She requests email submissions with subject line "Buying Software," including context about company size and the buyer's role (Majors, 2025).
+
+All advice will be used for the book, but Majors promises not to quote anyone without permission and will not name vendors, good or bad. She clarifies this is an O'Reilly writing project, not a Honeycomb marketing effort, and that the goal is to collect practical software-buying wisdom to share with engineers (Majors, 2025).
+
+- The second edition of Observability Engineering will include a new Observability Governance section covering team staffing, tool procurement, integration, cost management, and executive communication.
+- Majors seeks advice from experienced software buyers because she lacks firsthand experience purchasing software at large enterprises.
+- Key questions include how to evaluate vendors, run POCs, build stakeholder consensus, and decide when to switch vendors.
+- Contributors are asked to email advice with context on company size and role; submissions will remain confidential and vendor-neutral.
+- This is an O'Reilly book project, not a Honeycomb sales initiative.

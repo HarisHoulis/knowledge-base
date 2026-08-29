@@ -11,9 +11,9 @@ sources:
 
 # Implementing Hybrid Semantic + Lexical Search
 
-Semantic search alone was insufficient for improving search on kentcdodds.com. The author iterated through three rounds of improvement using Cursor and GPT-5.4, each round revealing limitations in the previous design. Ultimately, a hybrid approach combining semantic and lexical search was necessary to achieve better results.
+The article discusses the limitations of semantic search and describes an iterative approach to improving search on kentcdodds.com. The author states that semantic search alone was not good enough, prompting a series of refinements using Cursor and GPT-5.4. Over three rounds of iteration, each pass revealed new shortcomings that the previous design missed, leading to a more robust solution. As indicated by the title, the final approach integrates semantic and lexical search methods to overcome the weaknesses of relying solely on semantic matching. This hybrid strategy leverages both contextual understanding and exact keyword matching to deliver better search results. The process underscores the value of repeated iteration with AI-assisted development tools in refining search functionality.
 
-- Semantic search by itself did not meet quality needs.
-- Hybrid search combines semantic and lexical methods for better accuracy.
-- Iterative development with AI tools helped refine the search design.
-- Each iteration uncovered new shortcomings that the previous version missed.
+- Semantic search alone fails to deliver sufficient search quality.
+- Iteration with AI tools like Cursor and GPT-5.4 uncovered progressively deeper issues.
+- Each of the three rounds contributed new insights that the previous design lacked.
+- The solution combines semantic and lexical search for a hybrid approach.
