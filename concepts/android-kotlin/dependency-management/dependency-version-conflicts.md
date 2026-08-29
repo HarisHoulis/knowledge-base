@@ -12,14 +12,14 @@ sources:
 
 # Understanding Gradle #10 – Dependency Version Conflicts
 
-Dependency version conflicts arise when multiple dependencies in a Gradle build require different versions of the same library. For example, the project's own dependency on commons-lang 3.6 conflicts with the version 3.7 that commons-text 1.4 transitively requires. Gradle's default conflict resolution is a simple "highest version wins" rule, based on the assumption that newer versions are backward compatible (Jendrik Johannes, Understanding Gradle #10, YouTube, 2021).
+In this video, Jendrik Johannes explains the nature of dependency version conflicts in Gradle, how they arise, and how Gradle resolves them by default. He demonstrates that when multiple dependencies require different versions of the same library, Gradle's default conflict resolution is to select the highest required version, operating on a "higher version wins" rule (Jendrik Johannes, 2021). This approach is a best guess that assumes higher versions are backward compatible, but it can lead to unexpected behavior when a transitive dependency pulls in a higher version without the developer actively changing anything.
 
-This heuristic can lead to subtle problems. The author demonstrates a scenario where the business logic module is compiled and tested against commons-lang 3.6, but when assembled into the full application, commons-text 1.5 pulls in commons-lang 3.8.1. This newer version fixes a bug that changes behavior the code relies on—detecting leading zeros—causing an unexpected regression at runtime. Because the unit tests run in isolation, they still pass with the old version, so the breakage goes unnoticed (Jendrik Johannes, Understanding Gradle #10, YouTube, 2021).
+The video illustrates a real-world scenario: upgrading commons-text from 1.4 to 1.5 causes commons-lang to jump from 3.6 to 3.8.1 because the new commons-text depends on a newer commons-lang. This fix changes the behavior of a method (NumberUtils.isCreatable) that the developer's code relied upon, breaking the application even though the library's unit tests still pass. The problem is that the dependency conflict only appears at the application runtime classpath, not in the library's isolated test classpath, so the issue goes unnoticed during development (Jendrik Johannes, 2021).
 
-The root cause is that dependency resolution happens for the final application graph, not per-module. To address this, Gradle introduced a "consistent resolution" feature that aligns versions across projects, reducing the risk of conflicts and ensuring the versions used for compilation and testing match those used in the final runtime classpath (Jendrik Johannes, Understanding Gradle #10, YouTube, 2021).
+To address such surprises, Gradle introduced a feature called consistent resolution, which helps ensure that the same dependency versions are used across all projects and configurations, reducing the gap between compilation/test time and runtime behavior. The video emphasizes that understanding conflict resolution is crucial for any developer working with external libraries and transitive dependencies (Jendrik Johannes, 2021).
 
-- A dependency version conflict occurs when two or more dependencies require different versions of the same library.
-- Gradle's default strategy for conflicting required versions is to select the highest version.
-- The version chosen for a transitive dependency in a full application can differ from the version used when compiling/testing an individual module in isolation.
-- This mismatch can lead to runtime behavior changes that unit tests do not catch.
-- Gradle's consistent resolution feature helps avoid such surprises by aligning versions across the whole build.
+- Dependency version conflicts arise when different modules in the dependency graph declare different required versions of the same library.
+- Gradle's default conflict resolution rule is 'higher version wins', assuming backward compatibility, but this can lead to unintended runtime behavior.
+- Upgrading a direct dependency can pull a newer transitive dependency that changes behavior in your code, even if your tests still pass.
+- The inconsistency between a library's test classpath and the application's runtime classpath is a common root cause of subtle issues.
+- Gradle's consistent resolution feature helps avoid surprises by aligning dependency versions across projects and configurations.

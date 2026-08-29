@@ -12,10 +12,11 @@ sources:
 
 # Lecture 15: Big Data: Spark
 
-Spark is presented as an evolutionary successor to MapReduce for large-scale data-center computations. It generalizes MapReduce's two fixed stages into flexible multi-step data-flow graphs, which improves programmer expressiveness and gives the system more opportunities for optimization and fault handling (MIT 6.824, 2020).
+Spark is presented as an evolutionary successor to MapReduce, widely used for data-center computations. Unlike MapReduce's fixed map-then-reduce structure, Spark generalizes computation into multi-step dataflow graphs, making it more expressive and giving the system more opportunities for optimization and fault handling [1].
 
-- Spark generalizes MapReduce's map and reduce stages into multi-step data-flow graphs.
-- This design enables better optimization and fault tolerance compared to classic MapReduce.
-- Spark supports iterative applications much more naturally than chained MapReduce jobs.
-- PageRank is used as an example: it requires repeated iteration over the web graph, which is painful with MapReduce.
-- PageRank models a random surfer and iteratively updates page importance until convergence.
+The lecture motivates this with PageRank, a web-page importance algorithm that is naturally iterative. PageRank models a user who, with 85% probability, follows a random link from the current page and, with 15% probability, jumps to another page; the algorithm repeatedly updates each page's rank based on incoming links. In MapReduce, this requires chaining many map/reduce jobs one after another, which is painful and slow. Spark is designed to support such iterative applications more conveniently and effectively [1].
+
+- Spark is a widely used successor to MapReduce, designed for data-center-scale computations.
+- It generalizes MapReduce's two stages into multi-step dataflow graphs, enabling better optimization and fault handling.
+- Iterative algorithms like PageRank are awkward in MapReduce because each iteration requires a separate chained job.
+- PageRank estimates page importance by simulating a random user who follows links 85% of the time and jumps randomly 15% of the time.

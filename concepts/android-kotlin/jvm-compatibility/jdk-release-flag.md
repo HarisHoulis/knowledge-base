@@ -11,14 +11,14 @@ sources:
 
 # Kotlin's JDK release compatibility flag
 
-The article describes a production crash caused by Kotlin's jvmTarget setting not preventing references to newer JDK APIs. A NoSuchMethodError occurred because JDK 21 added removeFirst() as a member method on List, which then shadowed the Kotlin extension function of the same name. Although the class file was compiled to Java 8 bytecode (major version 52), the compiler still resolved the call to the JDK 21 interface method, leading to runtime failure on older Android devices [source].
+The article explains a production crash caused by a `NoSuchMethodError` for `List.removeFirst()`. The issue arose because the code was compiled with JDK 21, where `List` gained a member method `removeFirst()`. In Kotlin, extension functions are statically resolved, but member functions always win if they match. Thus, the Kotlin stdlib's `removeFirst()` extension was ignored, and the compiler emitted a direct interface call to the JDK 21 method, which is absent on older Android versions.
 
-Kotlin's jvmTarget only controls the emitted bytecode version, not the set of JDK APIs available at compile time. This is equivalent to javac's -target flag. The solution is the -Xjdk-release flag introduced in Kotlin 1.7, which acts like javac's --release by simultaneously setting source, target, and the JDK API surface. After enabling the flag, the bytecode correctly calls the Kotlin standard library helper instead of the missing List.removeFirst() method [source].
+Setting `jvmTarget` to 1.8 only controls the bytecode version, not the JDK API available at compile time. The article demonstrates that the classfile major version was 52 (Java 8), yet the bytecode still referenced the JDK 21 method. This mirrors `javac`'s `-target` flag, which also requires `-bootclasspath` or `--release` to constrain API usage. Kotlin 1.7 introduced `-Xjdk-release`, which acts like `javac --release` and restricts the JDK API to the specified version. Using it changed the bytecode to call the Kotlin stdlib's static helper instead of the interface method, fixing the crash.
 
-The article notes that Android plugin users do not need this flag because the android.jar already limits java.* APIs to compileSdk, and Gradle toolchains avoid the problem by using an old JDK, but at the cost of missing modern compiler improvements. A Gradle DSL for -Xjdk-release is still being tracked in KT-49746 [source].
+The article notes that the flag is essential for Kotlin JVM and multiplatform JVM targets to ensure compatibility with a minimum JVM. Android users typically don't need it because `android.jar` as the bootclasspath limits `java.*` APIs to the `compileSdk`. There is no official Gradle DSL for the flag yet, tracked in KT-49746. Toolchains are an alternative but require running an ancient JDK, which is generally discouraged.
 
-- Kotlin's jvmTarget only changes bytecode version, not the JDK APIs you can reference.
-- JDK 21 added removeFirst() to List, shadowing the Kotlin extension function and causing crashes on older platforms.
-- Use -Xjdk-release=<version> to restrict the JDK API surface alongside the target bytecode version.
-- Android projects with android.jar as bootclasspath are already protected and do not need this flag.
-- Gradle toolchains solve the issue but sacrifice modern compiler improvements.
+- Kotlin extension functions are only used when no matching member function exists; JDK 21's new `List.removeFirst()` member overrides the stdlib extension.
+- `jvmTarget` only sets bytecode version and does not restrict the JDK API that can be referenced, leading to crashes on older platforms.
+- The `-Xjdk-release` flag in Kotlin 1.7+ acts like `javac --release`, restricting the JDK API and ensuring correct extension resolution.
+- Android projects are protected by their `compileSdk` android.jar bootclasspath, but JVM and multiplatform targets need `-Xjdk-release` for cross-compilation safety.
+- Gradle toolchains avoid the issue by using an actual old JDK, but miss modern compiler improvements; a Gradle DSL for the flag is pending (KT-49746).

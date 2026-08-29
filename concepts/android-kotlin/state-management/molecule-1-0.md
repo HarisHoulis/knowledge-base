@@ -11,12 +11,10 @@ sources:
 
 # A stable, multiplatform Molecule 1.0
 
-Molecule 1.0 is a stable release of Cash App's Compose-based library for managing application state. The article highlights two major features added since the initial announcement: Kotlin multiplatform support (JVM, JS, native) and an immediate recomposition mode that removes the need for a frame clock. These features enable state-producing composables to be used outside of Compose UI, such as in Views, notifications, or widgets, by exposing state as a StateFlow or Flow.
+Molecule is a Compose-based library for managing application state, originally announced by Cash App. Version 1.0 is now stable and introduces two major features: support for Kotlin multiplatform targets (JVM, JS, and native) and an immediate recomposition mode that removes the need to supply a frame clock. These features enable state-producing composables to be separated from UI-rendering composables, increasing reuse across platforms and destinations.
 
-The article demonstrates how a simple counter composable can be migrated to a StateFlow using launchMolecule with ContextClock mode, or to a Flow using moleculeFlow with Immediate mode. This allows state logic to be unit tested with Turbine on the JVM, and run on platforms like iOS or web. Molecule is positioned as a tool for managing state using Compose across multiplatform projects.
-
-- Molecule 1.0 supports Kotlin multiplatform targets including JVM, JS, and native.
-- Immediate recomposition mode allows state production without relying on a frame clock.
-- State-producing composables can be exposed as StateFlow for use in non-Compose contexts.
-- Flow-based state can be unit tested with Turbine on the JVM.
-- Molecule enables state reuse across platforms like iOS and web.
+- Molecule 1.0 is the first stable release, adding Kotlin multiplatform support and immediate recomposition mode.
+- State logic written in Compose can be exposed as StateFlow for use in existing View-based Android apps.
+- Immediate mode recomposes on state changes, making it suitable for presenter-like use cases without UI frame timing.
+- The library supports all Kotlin targets supported by JetBrains Compose runtime, enabling unit tests on JVM and usage on iOS/web.
+- Unit testing is simplified with Turbine, as shown with a counter example.

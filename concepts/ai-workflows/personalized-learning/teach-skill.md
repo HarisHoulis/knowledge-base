@@ -12,9 +12,8 @@ sources:
 
 # My /teach skill is still insane
 
-The /teach skill is an AI-powered tool designed to help users master new concepts through personalized, tailored learning experiences. It adapts to the learner's pace and style, offering interactive explanations and quiz questions to reinforce understanding. The skill can be applied to a wide range of topics, from technical development practices to hands-on activities like land surveying or solving a Rubik's Cube, demonstrating its versatility across domains.
+The video introduces a /teach skill that enables personalized, tailored learning experiences. It demonstrates how the skill can help users understand complex topics such as land surveying, Rubik's Cubes, and development techniques through interactive explanations and quiz questions. The skill is positioned as a versatile AI tool for mastering new concepts across various domains.
 
-- The /teach skill delivers personalized learning by tailoring explanations to the user's needs.
-- It uses interactive explanations and quiz questions to reinforce comprehension.
-- The skill is versatile, covering both technical and practical subjects like surveying and Rubik's Cubes.
-- It can be accessed via AI Hero, with updates and community support available on Discord and Twitter.
+- The /teach skill provides personalized, tailored learning to users.
+- It covers diverse topics including land surveying, Rubik's Cubes, and development techniques.
+- Interactive explanations and quiz questions are used to reinforce understanding.

@@ -12,14 +12,14 @@ sources:
 
 # Understanding Gradle #08 – Declaring Dependencies
 
-The video explains how to declare dependencies in Gradle using group/name (GA) coordinates and the role of configurations as scopes or buckets. It emphasizes that dependencies are declared with coordinates like group:name:version, and configurations determine the visibility and usage of those dependencies. The video uses the Java Library plugin's configurations as an example, highlighting implementation, api, compileOnly, compileOnlyApi, runtimeOnly, and other configurations (Jendrik Johannes, 2021, 1:03).
+This video explains how to declare dependencies in Gradle using group and artifact coordinates, and introduces the concept of configurations as scopes or buckets for organizing dependencies. Configurations like `implementation`, `api`, `compileOnly`, and `runtimeOnly` are provided by the Java Library plugin, each serving a specific purpose in the build. The video demonstrates how these configurations affect dependency resolution and consumer visibility, using an included build project as an example.
 
-Key differences are illustrated: implementation vs api semantics affect transitive dependency exposure—implementation keeps dependencies internal to the module, while api exposes them to consumers. compileOnly/compileOnlyApi are for compile-time only, while runtimeOnly is for runtime-only. The video walks through a sample project and inspects dependency resolution results, then clarifies the terminology of configurations for declaring, resolving, and consuming (Jendrik Johannes, 2021, 8:56, 10:09). It underscores that Gradle's dependency management is based on configurations and that knowing which configuration to use is crucial for correct builds.
+Gradle's dependency management relies on configurations to determine how dependencies are used during compilation, runtime, and publication. The `implementation` configuration keeps dependencies internal to the module, while `api` exposes them to consumers. Other configurations like `compileOnly` and `runtimeOnly` handle compile-time-only and runtime-only dependencies respectively. The video also shows how to inspect dependency resolution results and emphasizes that Gradle uses this configuration information to know what to do with each dependency, including whether to include it in the published metadata.
 
-The video also touches on version handling, noting that versions can be omitted and managed centrally (as a preview to a related video). Overall, it provides a foundational understanding of dependency declaration in Gradle, setting the stage for more advanced topics like version conflicts and centralizing versions (Jendrik Johannes, 2021, 11:38, 12:59).
+Finally, the video touches on dependency versions, noting that they can be declared directly or managed through constraints and centralization. It sets the stage for further topics like version conflicts and dependency constraints, which are covered in subsequent videos in the series.
 
-- Configurations act as scopes/buckets for dependencies, controlling their visibility and usage.
-- Dependencies are declared using group, artifact name, and version coordinates (GA coordinates).
-- The `implementation` configuration keeps dependencies internal, while `api` exposes them to consumers.
-- `compileOnly` and `runtimeOnly` restrict dependencies to specific lifecycle phases (compile-time only and runtime-only, respectively).
-- Gradle distinguishes between configurations for declaring, resolving, and consuming dependencies, which is key to understanding dependency management.
+- Gradle dependencies are declared using group and artifact coordinates, creating a unique identifier for each dependency.
+- Configurations (e.g., `implementation`, `api`, `compileOnly`, `runtimeOnly`) define the scope and visibility of dependencies in the build.
+- The Java Library plugin provides standard configurations for declaring and consuming dependencies, affecting how they appear in published metadata.
+- Dependency resolution results can be inspected to understand what Gradle resolves and why.
+- Dependency versions can be declared explicitly or managed via constraints and centralization strategies.

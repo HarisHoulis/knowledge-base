@@ -12,9 +12,13 @@ sources:
 
 # Kotlin TDD - More Degrading
 
-In this session, the team works on a new requirement where items degrade twice as fast after their sell-by date. Previously, items decreased in quality by one per day; now, after the sell-by date, they must decrease by two per day. The team begins by refactoring existing tests to remove the list-level abstraction, testing the Item.updateBy method directly, which makes the test code simpler and more focused (Pairing with Duncan, 2022).
+In this pair-programming session, the team implements a requirement where items degrade in quality twice as fast after their sell-by date. Previously, items lost one quality per day before and after the sell-by date. The new behavior requires a loss of two per day once the date has passed. The work begins by refactoring existing tests to call the `updatedBy` method directly instead of testing a list-mapping wrapper, simplifying the test suite and focusing on the core behavior (Pairing with Duncan, 2022).
 
-- Refactored tests to call Item.updateBy directly instead of mapping over a list, simplifying test setup.
-- Introduced a LocalDate parameter to updateBy to explicitly pass the current date, avoiding reliance on the system clock and making time-dependent behavior testable.
-- Refactored the update logic to loop over each day, applying a degradation rate of 2 when the item is past its sell-by date, otherwise 1.
-- Followed a red-green-refactor TDD cycle: added a failing test for the new behavior, then implemented the minimal change to pass.
+To express the concept of "after sell-by date," the team adds a `LocalDate` parameter to the `updatedBy` method, representing the current date when the update is called. This allows tests to specify a concrete date and assert expected quality changes without relying on a clock. Initial production code passes the item's sell-by date as a temporary placeholder to keep compilation intact, then the implementation is reworked to loop over each day, applying a quality reduction of one per day normally and two per day after the sell-by date (Pairing with Duncan, 2022).
+
+The final implementation computes a degradation factor based on whether the current date is after the sell-by date, then repeats the daily degradation for the number of days updated. This keeps the logic explicit and testable, and aligns with test-driven development by first adding a failing test for the new behavior (Pairing with Duncan, 2022).
+
+- Refactor tests to target the core method directly, removing unnecessary list-mapping wrappers.
+- Introduce a `LocalDate` parameter to `updatedBy` so tests can control the current date and define 'after sell-by date'.
+- Implement degradation as a loop over days, reducing quality by one normally and two after the sell-by date.
+- Use a breaking test first to drive the implementation, following a TDD red-green-refactor cycle.
