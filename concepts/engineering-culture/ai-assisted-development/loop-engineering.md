@@ -12,14 +12,10 @@ sources:
 
 # From Chrome DevTools to AI Engineering, with Addy Osmani
 
-In a podcast episode summarized by Gergely Orosz, Addy Osmani shares his journey from building a web browser at age 16 to becoming a Director of Engineering at Google, where he worked on Chrome DevTools and Core Web Vitals before moving into AI developer experience. The conversation covers Google's engineering culture, the evolution of DevTools, and the growing role of AI in software development (Gergely Orosz, 2026).
+The article summarizes a podcast episode in which Gergely Orosz interviews Addy Osmani about his path from building a web browser at age 16 to becoming a Director of Engineering at Google. Osmani describes how publishing free educational materials about frontend development led to his hiring on the Chrome team, and how Chrome DevTools evolved from simple debugging tools into an IDE-like environment as web development grew more complex (Orosz, 2026).
 
-Osmani discusses the risk of 'cognitive surrender' in AI-assisted development, where engineers lose comprehension of their work by over-relying on AI agents. He recommends understanding every major decision an LLM makes and aiming for 'mutual amplification'—letting the agent log its decisions while the engineer reviews and internalizes them. He also introduces 'loop engineering' as a method for working with AI agents in iterative feedback loops.
-
-Osmani remains bullish on software engineering, arguing that AI will expand the market for building software. He notes that accountability will keep human engineers essential, and advises engineers to develop skills beyond coding—such as product sense, go-to-market understanding, and technical evangelism—concluding, 'Don't be just an engineer' (Gergely Orosz, 2026).
-
-- Addy Osmani built a web browser at 16, later joining Google to work on Chrome DevTools and Core Web Vitals.
-- Directors at Google are accountable on a weekly basis for top company goals; VPs and SVPs now code on weekends thanks to AI tools.
-- Cognitive surrender is a key risk of AI-assisted coding; engineers should review and understand major AI decisions.
-- Mutual amplification and loop engineering help developers improve alongside AI agents.
-- Engineers should broaden skills into product, go-to-market, and evangelism: 'Don't be just an engineer.'
+- Addy Osmani built a web browser at 16 and later joined Google through his published educational content.
+- Chrome DevTools expanded from basic debugging to source-map-aware debugging, mobile emulation, and service worker tooling.
+- A key risk of AI-assisted development is 'cognitive surrender'—losing comprehension of AI-generated code; engineers should review major AI decisions.
+- Osmani advocates 'loop engineering' for mutual amplification: AI agents log decisions while humans review and internalize the process.
+- He advises engineers to develop product, go-to-market, and other non-engineering skills, concluding 'Don't be just an engineer.'

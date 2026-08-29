@@ -7,19 +7,16 @@ sources:
   - title: "From Cloudwashing to O11ywashing"
     url: "https://charity.wtf/p/from-cloudwashing-to-o11ywashing"
     author: "Charity Majors"
-    date: "Mon, 24 Nov 2025 18:53:14 GMT"
+    date: "2025-11-24"
 ---
 
 # From Cloudwashing to O11ywashing
 
-Charity Majors recounts an executive panel where industry leaders claimed traditional observability tools handle availability but fail to measure product quality from each customer's perspective, leading them to build custom solutions. She argues this is a misunderstanding: true observability has always been about understanding each customer's experience, while what they call 'traditional observability' is actually monitoring—the three pillars of metrics, logs, and traces (Majors, 2025).
+In this article, Charity Majors argues that the term 'observability' has been co-opted by vendors, a phenomenon she calls 'o11ywashing'—analogous to the earlier 'cloudwashing' by IBM and others. She recounts a panel where an executive claimed traditional observability tools only detect whether systems are up or down, and that understanding customer experience requires building custom tooling. Majors points out that this executive is unknowingly describing the original definition of observability: the ability to understand service quality from each customer's perspective by unifying application, business, and system telemetry (Majors, 2025).
 
-Majors introduces the term 'o11ywashing,' analogous to cloudwashing, where vendors rebrand legacy telemetry products as observability to capture budget and attention. She cites IBM reclassifying its Z-series mainframe as 'cloud' in 2008 as a historical parallel. The problem persists because today's monitoring tools cannot combine app, business, and system telemetry in a unified way, so executives invest in custom solutions rather than recognizing that observability is a systems problem (Majors, 2025).
+Majors contrasts true observability with the traditional 'three pillars' of metrics, logs, and traces, which she says are monitoring tools, not observability. She warns that o11ywashing is rampant because vendors cannot solve the real problem with legacy architectures. To counter this, she urges practitioners to tell better stories to engineering executives, emphasizing outcomes and business value rather than data structures and algorithms. She concludes that observability is a systems problem and a powerful lever for improving software delivery, but only when properly understood and implemented (Majors, 2025).
 
-Reflecting on Honeycomb's decade-long journey, Majors emphasizes that engineers must tell outcome-focused stories to executives, not just explain technical concepts like cardinality and dimensionality. Observability should be the most powerful lever for disrupting doom loops, but only if buyers learn to distinguish true observability from o11ywashing. If your tooling doesn't help you understand the quality of your product from each customer's perspective, it's not observability—it's just monitoring dressed in marketing dollars (Majors, 2025).
-
-- Traditional observability tools are often just monitoring; true observability must enable understanding each customer's perspective.
-- O11ywashing is the observability equivalent of cloudwashing, with vendors rebranding monitoring as observability.
-- Executives need outcome-oriented storytelling, not just technical details, to understand the value of observability.
-- Observability is a systems problem requiring unified telemetry, not separate metrics, logs, and traces.
-- Any tool that cannot measure customer experience from an individual perspective is not observability.
+- Traditional monitoring tools (metrics, logs, traces) are often mislabeled as observability; true observability requires unifying app, business, and system telemetry to see each customer's perspective.
+- O11ywashing is the marketing practice of rebranding monitoring as observability, similar to IBM's cloudwashing of mainframes in 2008.
+- Engineering executives need to hear about outcomes and customer experience, not just technical features, to distinguish real observability from o11ywashing.
+- Observability is a systems problem that can create positive feedback loops, not just detect outages.
