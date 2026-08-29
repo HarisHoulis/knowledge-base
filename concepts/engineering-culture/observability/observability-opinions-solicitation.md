@@ -2,20 +2,20 @@
 domain: engineering-culture
 subdomain: observability
 concept: observability-opinions-solicitation
-title: Got opinions on observability? I could use your help (once more, with feeling)
+title: Got Opinions on Observability? I Could Use Your Help (Once More, with Feeling)
 sources:
   - title: "Got opinions on observability? I could use your help (once more, with feeling)"
     url: "https://charity.wtf/p/got-opinions-on-observability-i-could-use-your-help-once-more-with-feeling"
     author: "Charity Majors"
-    date: "2025-10-13"
+    date: "Mon, 13 Oct 2025 03:39:05 GMT"
 ---
 
-# Got opinions on observability? I could use your help (once more, with feeling)
+# Got Opinions on Observability? I Could Use Your Help (Once More, with Feeling)
 
-Charity Majors, in a blog post, solicits practitioner opinions on observability and software buying to inform the second edition of her book. She argues that vendor engineering is a subtle and high-leverage application of deep technical expertise, allowing staff+ engineers to develop executive-level skills while remaining individual contributors. She recounts that a previous call for help on buying software yielded valuable responses, and she is now pressing her luck with more questions before a deadline.
+Charity Majors, working on the second edition of her book, asks the engineering community for input on observability and software buying. She emphasizes that vendor engineering is a subtle and powerful application of deep technical expertise, offering staff+ engineers a rare path to executive-level leverage while staying individual contributors. The post is a follow-up to a previous request for software-buying advice, which received an overwhelming response [1].
 
-- Vendor engineering is one of the highest-leverage activities for engineers, impacting many other engineers and customers for little cost.
-- Majors asks for experiences migrating between observability vendors, including hardest parts and surprises.
-- She questions how to control costs in three-pillar systems (Datadog, Grafana, Chronosphere) and how to guide engineers on data placement and cardinality.
-- She seeks input on build vs buy, OpenTelemetry adoption decisions, instrumentation cognitive load, and tool consolidation vs proliferation.
-- She requests email responses within a week and asks permission to print names (without employers) if she uses material.
+- Vendor engineering is high-leverage work: decisions affect every engineer and customer for fractions of a penny per user.
+- The author seeks real-world stories about observability vendor migrations, cost control, and tool consolidation.
+- Key open questions include how to guide engineers on metrics/logs/traces/profiling, manage cardinality, and keep pillars in sync.
+- She is specifically interested in hearing from people happy with the three-pillars model to counter selection bias.
+- Questions cover tiered service, telemetry pipelines, observability team size, build vs buy, OpenTelemetry adoption, and instrumentation magic.

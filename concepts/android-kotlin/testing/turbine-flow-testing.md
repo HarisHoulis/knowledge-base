@@ -11,9 +11,9 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine is a library from Cash App for testing kotlinx.coroutines Flow and other push-based mechanisms. It converts push-based flows into pull-based suspend functions, simplifying asynchronous testing by allowing developers to await specific events like items, completion, or errors. The library's `test` function provides a concise API for asserting the sequence of events emitted by a Flow.
+Turbine is a library from Cash App for testing kotlinx.coroutines Flow, converting push-based flows into pull-based suspend functions. This allows developers to write deterministic tests by awaiting specific emissions with `awaitItem()` and completion with `awaitComplete()`, which throw AssertionError on unexpected events or timeouts. The library also supports standalone Turbine instances to test other push-based mechanisms like callbacks, making it versatile beyond Flow testing.
 
-- Turbine transforms Flow testing into pull-based suspend functions, making tests linear and readable.
-- awaitItem() and awaitComplete() suspend until the desired event occurs, throwing AssertionError on mismatch or timeout.
-- Standalone Turbine instances can adapt other push-based mechanisms, such as callbacks, for testing.
-- Turbine offers utilities for multiple flows, shared timeouts, and error aggregation for complex testing needs.
+- Turbine simplifies Flow testing by enabling pull-based assertions on emissions and completion.
+- The `test` function allows sequential `awaitItem()` and `awaitComplete()` calls that fail tests on unexpected events.
+- Standalone Turbines can adapt callbacks or other push-based sources for testing.
+- The library provides utilities for multiple turbines, shared timeouts, and error aggregation.

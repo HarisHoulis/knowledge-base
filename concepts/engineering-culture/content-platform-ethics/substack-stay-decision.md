@@ -7,15 +7,15 @@ sources:
   - title: "Hello World"
     url: "https://charity.wtf/p/hello-world-7b0"
     author: "Charity Majors"
-    date: "Fri, 19 Dec 2025 00:28:39 GMT"
+    date: "2025-12-19"
 ---
 
 # Hello World
 
-Charity Majors, in her article 'Hello World', explains her decision to stay on Substack after initially planning to migrate from WordPress, despite criticism that she would be 'supporting Nazis' by using the platform. She acknowledges the platform's governance issues but argues that Substack is on a continuum of grey, far from outright extremist platforms like Gab or Parler. Her primary motivation is to re-engage with the tech community, which she feels she has been neglecting, and to reduce friction in posting, as Substack feels more like writing an email than the heavyweight WordPress experience.
+Charity Majors explains her decision to move from Wordpress to Substack and then stay despite criticism that the platform supports Nazis. She acknowledges the concerns, cites research on LeaveSubstack, and conversations with experts and stakeholders. Her primary motivation is to re-engage with the technical mainstream, which she feels is a core part of her job but has been neglecting due to going dark on social media. She identifies X as the current mainstream but prefers to use LinkedIn and Substack to avoid returning to X.
 
-- Charity Majors decided to stay on Substack to rejoin the tech discussion and lower posting friction.
-- She believes Substack is not akin to platforms like Gab or Parler, and describes it as 'light dove grey' on a continuum of governance challenges.
-- She does not accept money from Substack to minimize ethical compromise, and will use RSS/email for distribution.
-- She respects those who choose to leave Substack but states this battle is not hers to fight.
-- Her primary goal is to be more active in the technical community, potentially also via LinkedIn, while avoiding X.
+- Charity Majors decided to stay on Substack despite criticism, citing a need to re-engage with the technical community as part of her job.
+- She believes Substack is a 'light dove grey' compared to platforms that exclusively platform Nazis, and feels more ethically compromised by her YouTube subscription than by Substack.
+- To minimize financial support to Substack, she does not accept paid subscriptions and promotes RSS and email as alternatives to the app.
+- She plans to auto-post from Substack to Wordpress to reduce friction for conscientious objectors.
+- She respects others' decisions to boycott Substack, acknowledging that everyone must choose their own battles.

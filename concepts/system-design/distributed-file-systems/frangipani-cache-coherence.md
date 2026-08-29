@@ -7,16 +7,19 @@ sources:
   - title: "Lecture 11: Cache Consistency: Frangipani"
     url: "https://www.youtube.com/watch?v=-pKNCjUhPjQ"
     author: "MIT 6.824: Distributed Systems"
-    date: "2020-03-14T16:28:35+00:00"
+    date: "2020-03-14"
 ---
 
 # Lecture 11: Cache Consistency: Frangipani
 
-Frangipani is an early distributed file system studied for its design around cache coherence, distributed transactions, and crash recovery. The system presents a standard file system interface to existing UNIX applications, running a Frangipani server on each user's workstation. Actual file system data structures—inodes, directories, file contents, and free-block metadata—are stored on a shared virtual disk called Petal, accessed via remote procedure calls. This separation allows workstations to cache data locally, but requires careful coherence mechanisms to ensure modifications are visible to all users (MIT 6.824 Lecture 11).
+Frangipani is a distributed file system designed for a small, trusted organization, intended to provide a shared file system for UNIX applications across multiple workstations. It uses a shared virtual disk called Petal for storage; all file system metadata and contents are stored on Petal, while each workstation runs a Frangipani module that implements file system logic and caches data locally. The architecture aims to achieve cache coherence so that modifications by one user are visible to others, and it relies on distributed transactions for complex updates to file system structures (MIT 6.824, 2020).
 
-The lecture motivates the design by describing a research lab of about 50 trusted users who need to share files and access their home directories from any workstation. This small, trusted context simplifies security concerns, allowing focus on core distributed systems challenges. The paper explores how cache coherence, distributed transactions, and crash recovery interact to maintain consistency in a system split across many servers. Key ideas include using Petal as a shared storage backend, running file system logic on clients, and coordinating updates through distributed transactions and recovery protocols (MIT 6.824 Lecture 11).
+The paper emphasizes three key mechanisms: cache coherence, distributed transactions, and crash recovery. Cache coherence ensures that if a user modifies a cached file, other caches eventually see the update. Distributed transactions are used to make complex updates to file system data structures atomic, which is critical because the file system is split across multiple servers. Crash recovery is also essential, as both workstations and Petal servers can fail, and the system must maintain consistency despite such failures (MIT 6.824, 2020).
 
-- Frangipani uses a shared virtual disk (Petal) for storage, while file system logic runs on client workstations.
-- The design targets a small, trusted user group, emphasizing cache coherence, distributed transactions, and crash recovery.
-- The lecture examines the interactions between these mechanisms to keep cached data consistent across workstations.
-- Frangipani presents a standard file system interface, allowing existing UNIX applications to work unchanged.
+The intended use case is a research lab of about 50 trusted users sharing files, which simplifies security considerations and focuses the design on consistency and availability. The separation of file system logic (in workstations) from storage (in Petal) allows each workstation to act as a cache for the shared disk, reducing network traffic and improving performance (MIT 6.824, 2020).
+
+- Frangipani provides a shared network file system with client-side caching, backed by a Petal virtual disk.
+- Cache coherence is a central design goal, ensuring updates are visible across all client caches.
+- Distributed transactions enable atomic updates to file system metadata and data structures.
+- Crash recovery handles failures of both workstations and storage servers to maintain consistency.
+- The system targets a small trusted user group, so security is not a primary focus.

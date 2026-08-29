@@ -12,10 +12,14 @@ sources:
 
 # GraphRAG: How AI Answers Questions Hidden Across Many Documents
 
-GraphRAG shifts significant cost to indexing: graph extraction alone is about 75% of total indexing cost, and merging descriptions across thousands of mentions is expensive. It offers multiple query modes (local, global, DRIFT, and basic vector search) to balance thoroughness and latency. Standard RAG remains simpler and cheaper for local queries, and GraphRAG is best suited for questions that require understanding the corpus as a whole (ByteByteGo, 2026).
+Standard RAG slices documents into chunks, embeds them, and retrieves by vector similarity. This works for local queries where the answer text resembles the question, but fails on global queries where the answer emerges only after surveying the whole corpus (ByteByteGo, 2026). Microsoft's GraphRAG documentation distinguishes local from global queries; a global query like 'which failure causes recur most often' cannot be answered by nearest-neighbor search because the answer is a distribution across documents, not a single text region.
 
-- Standard RAG fails on global queries because answers are spread across the corpus, not local to any similar chunk.
-- GraphRAG builds a knowledge graph with entities and relationships, then creates hierarchical community summaries.
-- Local search expands from entity matches; global search aggregates community reports to answer whole-corpus questions.
-- GraphRAG's index-time cost is high, especially entity/relationship extraction and merging, but it improves answer quality for global questions.
-- For local queries, standard RAG remains a simpler and more cost-effective option.
+GraphRAG constructs a knowledge graph by extracting entities and relationships with an LLM, merging duplicate entities, and optionally extracting claims. It then runs hierarchical Leiden clustering to partition the graph into communities at multiple levels, and generates a community report for each community. These reports summarize clusters and enable whole-collection reasoning during retrieval. The merge step and two LLM passes make indexing expensive; extraction is about 75% of indexing cost.
+
+Query modes are local and global. Local search starts from entities matching the query and expands to neighbor entities, relationships, text units, community reports, and claims. Global search maps over community reports, generates rated intermediate answers, then reduces them into a final answer. DRIFT search blends both. GraphRAG also includes basic vector search for simple lookups.
+
+- Standard RAG relies on similarity between query and answer text, which fails on global queries where answers are distributed across many documents.
+- GraphRAG builds a knowledge graph with entities and relationships extracted by an LLM, merged into a coherent structure.
+- Hierarchical Leiden clustering partitions the graph into communities, each with an LLM-generated report that acts as a pre-computed summary for global reasoning.
+- Local search expands from query-matched entities; global search aggregates community reports via map-reduce; DRIFT search combines both.
+- GraphRAG's indexing cost is significantly higher than standard RAG, with extraction consuming roughly 75% of the budget.

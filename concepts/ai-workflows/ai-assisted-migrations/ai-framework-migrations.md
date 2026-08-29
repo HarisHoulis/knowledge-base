@@ -12,11 +12,9 @@ sources:
 
 # The Pulse: We need to talk about migrations with AI
 
-The newsletter highlights how AI is transforming large-scale framework migrations. Asana needed to migrate off the testing framework Enzyme, which required rewriting extensive test cases. With AI, the project was completed in two weeks; without AI, the work would likely have been postponed indefinitely. Airbnb and Uber share similar migration success stories, suggesting AI is a particularly good fit for this type of mechanical but labor-intensive work.
+The article highlights how AI is transforming framework migrations, a task often deferred due to high manual effort. Asana needed to migrate off the testing framework Enzyme, which required a massive rewrite of test cases. With AI, the project was completed in two weeks; without AI, it would likely have been postponed indefinitely. Airbnb and Uber report similar successes, suggesting AI is a superb fit for framework migrations (Orosz, 2026).
 
-The article also covers shifting engineering leadership roles and the debate over Gartner's Magic Quadrant, which ranked AWS, Microsoft, and IBM above AI-native vendors like Anthropic, Cursor, and OpenAI. The author suggests the ranking may be influenced by vendor payments, as many AI startups refuse to pay the 'Gartner tax.' These developments indicate broader changes in how engineering work is executed and evaluated (Orosz, 2026).
-
-- Asana used AI to migrate off Enzyme, finishing a massive test-case rewrite in two weeks—work that would otherwise have been deferred.
-- Airbnb and Uber report similar successes, positioning AI as an excellent fit for framework migrations.
-- Engineering leadership roles (VPE/CTO) are evolving, offering opportunities to reorganize engineering teams for the AI era.
-- AI startups are challenging traditional analyst rankings like Gartner's Magic Quadrant, which still favor large incumbent vendors.
+- Asana completed an Enzyme migration in two weeks using AI, a task that would otherwise have been deferred.
+- Airbnb and Uber have seen similar success using AI for large-scale migrations.
+- AI is particularly well-suited for framework migrations, reducing manual rewrite effort.
+- The article also notes Gartner's AI code modernization rankings may be skewed by vendor payments, as AI startups refuse to pay the 'Gartner tax.'

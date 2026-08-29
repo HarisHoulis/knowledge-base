@@ -12,10 +12,10 @@ sources:
 
 # Now in Android #75
 
-Now in Android #75, authored by Manuel Vivo, opens 2023 with a roundup of Android development updates. It highlights the release of Android Studio stable, including improved Compose Preview automatic updates, layout inspector showing recomposition counts, visual XML linting, sync performance via parallel project imports, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring (Manuel Vivo, Now in Android #75).
+Now in Android #75, authored by Manuel Vivo, opens 2023 with a roundup of Android development updates. The latest stable release of Android Studio brings improvements such as automatically updating Compose Previews, recomposition counts in the layout inspector, visual XML linting for Views, parallel project imports for faster sync, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring. The article encourages developers to download the stable version to explore these features (Now in Android #75).
 
-- Android Studio stable adds Compose Preview auto-updates, recomposition counts, visual XML linting, parallel project imports, SDK Index, new logcat, resizable emulators, and device mirroring.
-- AppCompat 1.6.0 and Room 2.5.0 graduated to stable; Lifecycle 2.6.0-alpha04 promotes collectAsStateWithLifecycle and deprecates launchWhenX APIs.
-- New androidx.credentials library enables sign-in with stored passwords/passkeys; adservices and sdkruntime support Privacy Sandbox.
-- Featured guidance covers domain layer architecture, extending Android SDK, Wear OS media toolkit, HDR SurfaceView migration, and stylus low latency.
-- Videos cover app growth, CameraX, FLEDGE, and Attribution Reporting API; podcast talks Kotlin Multiplatform and Kotlin 2023.
+- Android Studio's new stable release includes Compose Preview auto-updates, recomposition counts, visual XML linting, and more.
+- AppCompat 1.6.0 and Room 2.5.0 graduated to stable, with Room's runtime rewritten from Java to Kotlin and new Upsert support.
+- New AndroidX libraries include androidx.credentials for passkeys/passwords, and privacy sandbox libraries (adservices, sdkruntime).
+- Featured articles cover domain layer architecture, extending the Android SDK, Wear OS media toolkit, HDR migration from TextureView to SurfaceView, and stylus low-latency libraries.
+- Videos and podcasts highlight app growth (paywall, push notifications), CameraX concepts, FLEDGE, Attribution Reporting API, and Kotlin Multiplatform/K2.

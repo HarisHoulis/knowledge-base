@@ -2,7 +2,7 @@
 domain: system-design
 subdomain: backend-migration
 concept: ruby-to-golang-migration
-title: How We Migrated the Parse API From Ruby to Golang (Resurrected)
+title: How We Migrated the Parse API From Ruby to Golang
 sources:
   - title: "How We Migrated the Parse API From Ruby to Golang (Resurrected)"
     url: "https://charity.wtf/p/how-we-migrated-the-parse-api-from-ruby-to-golang-resurrected"
@@ -10,15 +10,12 @@ sources:
     date: "2025-07-24"
 ---
 
-# How We Migrated the Parse API From Ruby to Golang (Resurrected)
+# How We Migrated the Parse API From Ruby to Golang
 
-Charity Majors details the two-year rewrite of Parse's core API from Ruby on Rails to Go. The original Rails setup used a one-process-per-request model with a fixed pool of Unicorn workers, which became a bottleneck as traffic exploded. Slow requests could fill the entire worker pool faster than auto-scaling could react, causing frequent outages and forcing the team to consider a fundamentally asynchronous architecture (Majors, 2025).
+The article is a retrospective by Charity Majors about the grueling two-year rewrite of Parse's core API from Ruby on Rails to Golang. Initially, Ruby enabled rapid iteration, but as Parse experienced hockey-stick growth, the one-process-per-request model of Rails proved unscalable. The fixed worker pool would fill with slow requests, causing cascading failures and requiring massive over-provisioning. The team realized they needed an asynchronous model and evaluated several options, ultimately choosing Go over JRuby, C++, and C# due to its built-in concurrency primitives, lightweight goroutines, excellent MongoDB driver, and team enthusiasm.
 
-The team evaluated several async options, including EventMachine, JRuby, C++, and C#, but ultimately chose Go because of its built-in concurrency primitive (goroutines), superior MongoDB driver, and ease of recruiting. The hardest part was preserving backward compatibility with Rails' 'be liberal in what you accept' philosophy. They used a live shadowing system: running each request against both the Go and Ruby servers backed by separate MongoDB replicas, then diffing responses field by field. This approach, powered by Scuba, caught undocumented behaviors and non-RFC-compliant requests that Rails had silently accepted (Majors, 2025).
-
-The rewrite drastically improved reliability: API-layer incidents dropped to nearly zero, server pool size shrank by ~90%, full deploy time dropped from 30 to 3 minutes, and the integration test suite fell from 25 to 2 minutes. The async model also made it possible to instrument everything without blocking operations, simplifying the architecture and improving co-tenancy for customers (Majors, 2025).
-
-- Rails' one-process-per-request model couldn't scale as Parse 10x'd in traffic, leading to worker pool exhaustion and outages.
-- Go was chosen over JRuby, C++, and C# for its lightweight goroutines, strong MongoDB support, and developer enthusiasm.
-- The migration used live shadowing and response diffing to ensure the Go API matched all of Rails' undocumented compatible behaviors.
-- The rewrite improved reliability by an order of magnitude, cut server pool size by ~90%, and reduced deploy time from 30 to 3 minutes.
+- Ruby on Rails allowed fast initial development but its one-process-per-request model became a critical bottleneck as traffic grew, leading to worker pool saturation and fragility.
+- Go was chosen after evaluating JRuby, C++, and C# because it offered native async operations, lightweight goroutines, a superior MongoDB driver, and a more productive developer experience.
+- The hardest challenge was preserving backward compatibility with undocumented and non-RFC-compliant requests that Rails middleware silently accepted; the team used live shadowing and response diffing to identify behavioral mismatches.
+- The rewrite yielded an order-of-magnitude reliability improvement, a 90% reduction in API server pool size, test suite time dropping from 25 to 2 minutes, and deploy time from 30 to 3 minutes.
+- The experience with diffing production traffic and the need for powerful observability tools directly inspired the creation of Honeycomb.

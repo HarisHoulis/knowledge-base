@@ -12,10 +12,9 @@ sources:
 
 # Understanding Gradle #04 – Tasks
 
-This video explains the core concept of tasks in Gradle, using a plain/empty project as a starting point. It shows how the Base plugin adds lifecycle tasks (like `build`) and how the Java Library plugin introduces additional actionable tasks. The key distinction is between lifecycle tasks, which orchestrate other tasks but perform no direct work, and actionable tasks that actually execute actions. Gradle tasks are incremental: they can reuse outputs from previous build runs or from the build cache, making builds faster by skipping unnecessary work. The video also demonstrates task dependencies, showing how Gradle constructs a task graph to determine execution order, and covers tasks added by the Application plugin for running applications.
+The video explains the basics of tasks in Gradle, comparing tasks found in a plain/empty project, a project with the Base plugin, and a project with the Java Library plugin. It highlights the difference between lifecycle tasks and actionable tasks, and how plugins add tasks to a build.
 
-- Gradle builds are organized around tasks, which are contributed by plugins.
-- Lifecycle tasks (e.g., `build`) do not perform work themselves but depend on actionable tasks.
-- Incremental builds and the build cache allow Gradle to reuse previous task outputs.
-- Tasks can have dependencies, forming a graph that Gradle executes in order.
-- Plugins like Base, Java Library, and Application provide pre-defined tasks for common workflows.
+- Gradle projects have different tasks depending on the plugins applied (e.g., Base, Java Library, Application).
+- Tasks are incremental and can reuse results from previous builds (UP-TO-DATE) or from the build cache (FROM-CACHE).
+- Dependencies exist between tasks, and the Application plugin adds additional tasks like run.
+- The video is part of a series covering Gradle fundamentals, with further episodes on lifecycle tasks and configuring inputs/outputs.
