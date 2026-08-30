@@ -12,10 +12,10 @@ sources:
 
 # Now in Android #75
 
-Now in Android #75, the first episode of 2023, highlights the latest Android Studio stable release, which includes Compose Preview auto-updates, layout inspector recomposition counts, visual XML linting, parallel project imports, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring. The article also covers notable AndroidX releases, such as AppCompat 1.6.0 with Android 13 support and predictive back, Room 2.5.0 converted to Kotlin with new Upsert annotation, and Lifecycle 2.6.0-alpha04 which stabilizes collectAsStateWithLifecycle.
+Now in Android #75, the first episode of 2023, covers the latest Android Studio stable release, which includes improvements to Compose Preview, layout inspector recomposition counts, visual XML linting, sync performance, SDK Index integration, a new logcat, resizable emulators, and physical device mirroring. The release also highlights several AndroidX updates: AppCompat 1.6.0 stabilizes with Android 13 support and per-language preferences; Room 2.5.0 is now Kotlin-based and adds Upsert and paging support; Lifecycle 2.6.0-alpha04 removes experimental status from collectAsStateWithLifecycle and deprecates launchWhenX APIs; and new alpha libraries include androidx.credentials, adservices, and sdkruntime for privacy sandbox and passkeys (source: sections on Android Studio and AndroidX releases).
 
-- Android Studio stable release brings many developer experience improvements, including automatic Compose Preview updates and recomposition counts in the layout inspector.
-- AndroidX releases include AppCompat 1.6.0, Room 2.5.0, and Lifecycle 2.6.0-alpha04, plus new libraries like androidx.credentials and privacy sandbox libraries.
-- The Now in Android app added a domain layer to improve readability, scalability, and portability.
-- Articles cover extending the Android SDK, a Wear OS media toolkit, HDR migration from TextureView to SurfaceView, and stylus low-latency libraries.
-- Videos and podcasts discuss app growth, CameraX concepts, the FLEDGE API, Attribution Reporting API, and Kotlin Multiplatform with an upcoming K2 frontend.
+- Android Studio stable introduces Compose Preview auto-updates, recomposition counts in layout inspector, visual XML linting, parallel project imports, SDK Index, new logcat, and resizable emulators.
+- AppCompat 1.6.0 and Room 2.5.0 are stable, with Room now Kotlin-based and supporting Upsert and RxJava/Guava paging.
+- Lifecycle 2.6.0-alpha04 promotes collectAsStateWithLifecycle to stable and deprecates pausing dispatcher and launchWhenX.
+- New libraries: androidx.credentials for passkeys, and privacy sandbox libraries adservices and sdkruntime.
+- Featured articles cover adding a domain layer, extending the Android SDK, Wear OS media toolkit, HDR migration from TextureView to SurfaceView, stylus low latency, and videos on CameraX, Attribution Reporting, paywall optimization, and push notifications.

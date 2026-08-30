@@ -6,16 +6,20 @@ title: Understanding Gradle #32 – Artifact Transforms
 sources:
   - title: "Understanding Gradle #32 – Artifact Transforms"
     url: "https://www.youtube.com/watch?v=T9U0BOlVc-c"
-    author: "Jendrik Johannes"
-    date: "2023-04-28"
+    author: "onepiece.Software by Jendrik Johannes"
+    date: "2023-04-28T08:11:15+00:00"
 ---
 
 # Understanding Gradle #32 – Artifact Transforms
 
-The video explains how Gradle's Artifact Transforms can convert legacy JAR files into Java Modules. When a library is not a real Java module, it can be placed on the module path as an automatic module, but this has limitations: automatic modules export all packages and require care with dependencies. The video demonstrates how to use Artifact Transforms to enhance JARs by adding module metadata, effectively turning old JARs into 'clean' Java modules (Jendrik Johannes, 2023).
+This video explains how Gradle Artifact Transforms can be used to turn legacy JAR files into Java Modules for the Java Module System (JPMS). The core challenge is that many libraries on the classpath or module path are not real modules, and simply placing them on the module path makes them automatic modules, which export all packages and derive module names from filenames—leading to fragile and opaque behavior. Artifact Transforms provide a mechanism to modify artifacts as they are resolved, allowing you to add proper module metadata or patch existing JARs before they are used as modules.
 
-- Artifact Transforms allow on-the-fly transformation of dependencies, such as turning JARs into Java Modules during resolution.
-- Automatic Modules are a workaround but have issues with encapsulation and dependency management.
-- A custom transform can be implemented by registering a TransformAction and specifying attributes that trigger it.
-- The extra-java-module-info plugin simplifies adding module information to existing JARs.
-- Artifact Transforms avoid permanently modifying JARs in the repository.
+The presenter demonstrates how to implement a custom Artifact Transform in Gradle, covering how transforms are registered, triggered by attributes, and wired into dependency resolution. He also contrasts the manual approach with the Extra Java Module Info plugin, which simplifies the task by letting you declare module-info metadata for external libraries without writing transforms yourself. The summary emphasizes that Artifact Transforms are a powerful tool for modernizing Java builds and integrating legacy dependencies into a module-based architecture.
+
+Key takeaways include the limitations of automatic modules, the mechanics of Gradle's transform registration and triggering, and the practical utility of the extra-java-module-info plugin for real-world projects.
+
+- Artifact Transforms allow you to modify artifacts during dependency resolution, e.g., adding module-info to legacy JARs.
+- Automatic modules are a quick fallback but have drawbacks: they export all packages and derive module names from file names.
+- Custom transforms are implemented in Gradle and triggered by requested attributes.
+- The Extra Java Module Info plugin provides a simpler, declarative way to add module metadata to non-modular libraries.
+- Using transforms helps integrate legacy JARs into the Java Module System cleanly.

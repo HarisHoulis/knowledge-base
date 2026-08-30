@@ -10,10 +10,14 @@ sources:
 
 # Kotlin's JDK release compatibility flag
 
-The article describes a runtime crash (`NoSuchMethodError`) caused by a Kotlin extension function being shadowed by a new JDK member function. When the build JDK was bumped to 21, the `List` interface gained `removeFirst()` and `removeLast()` as member methods, which took precedence over Kotlin's `kotlin.collections.removeFirst()` extension function. This led to the JVM bytecode invoking the member function, causing a crash on older Android versions that lack this API.
+The article describes a production crash caused by a `NoSuchMethodError` on `List.removeFirst()`. The Kotlin code was relying on a Kotlin extension function, but after upgrading the build JDK to 21, the new member function `removeFirst()` added to the `List` interface by JDK's sequenced collections took precedence, because member functions always win over extension functions. This illustrates a subtle cross-compilation hazard when building with a newer JDK against an older target.
 
-- Setting `jvmTarget` only controls the bytecode version, not the set of available JDK APIs, so references to newer methods can still slip in.
-- JDK 21 added `removeFirst()` and `removeLast()` to `List`, overriding Kotlin's extension functions and causing `NoSuchMethodError` at runtime on older platforms.
-- Kotlin's `-Xjdk-release` flag (introduced in Kotlin 1.7) acts like `javac --release`, restricting the JDK API surface to a specific version.
-- After enabling `-Xjdk-release`, the compiler resolves `removeFirst` to the Kotlin stdlib static helper, fixing the crash.
-- Android projects don't need this because `android.jar` already limits `java.*` APIs, but plain Kotlin/JVM and multiplatform JVM targets benefit from it.
+The author explains that setting Kotlin's `jvmTarget` to Java 8 only controls the emitted bytecode version, not the set of JDK APIs that can be referenced. Inspecting the compiled class showed major version 52 (Java 8) but still an `invokeinterface` directly calling `java.util.List.removeFirst()`. This is the same behavior as `javac -target` without a bootclasspath, which can lead to references to APIs unavailable on the runtime.
+
+The solution is `-Xjdk-release`, a Kotlin compiler flag introduced in Kotlin 1.7 that works like `javac --release`. It restricts the JDK API surface to the specified version, causing the extension function to resolve to the Kotlin standard library static helper instead of the JDK member. The article notes that Android plugin users don't need this flag because `android.jar` already limits the available `java.*` APIs, and that no Gradle DSL exists yet (tracked in KT-49746).
+
+- `jvmTarget` only sets bytecode version, not the JDK API level, so newer JDK methods can be accidentally referenced.
+- New JDK member functions shadow Kotlin extension functions, leading to `NoSuchMethodError` on older runtimes.
+- Use `-Xjdk-release` to align the JDK API with the target bytecode version, similar to `javac --release`.
+- The Kotlin Android plugin is already safe because `android.jar` restricts accessible APIs.
+- Gradle toolchains avoid the issue but force using an ancient JDK, losing compiler improvements.

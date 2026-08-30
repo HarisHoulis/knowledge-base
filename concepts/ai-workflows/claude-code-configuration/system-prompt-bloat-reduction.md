@@ -12,9 +12,11 @@ sources:
 
 # Claude Code's system tools are SO BLOATED
 
-Matt Pocock highlights that Claude Code's default system prompt is excessively large, containing many tools and features that are often unused. He demonstrates how customizing the global settings.json file to disable these unnecessary components can reduce the system prompt size from 25,000 tokens down to just 8,000 tokens. This significant reduction can improve context efficiency and reduce overhead for users.
+The video highlights that Claude Code's default system prompt is excessively large, containing many tools and features that may not be necessary for every user. This bloat increases token usage and may degrade performance. The presenter, Matt Pocock, demonstrates that the default prompt is approximately 25,000 tokens, which is significant for context-limited workflows.
 
-- Claude Code's default system prompt is around 25,000 tokens, largely due to bloat from unused tools and features.
-- By editing the global settings.json file, users can disable these unused features and tools.
-- This customization can shrink the system prompt to just 8,000 tokens, dramatically reducing token overhead.
-- The video references a guide for the detailed process.
+To address this, the video shows how to customize the global settings.json file to disable unused features and tools. By doing so, the system prompt can be reduced from 25,000 tokens down to just 8,000 tokens, a reduction of nearly 70%. This optimization can lead to more efficient interactions with Claude Code, lower API costs, and a more streamlined experience. The video also references a written guide for the customization process, and encourages viewers to follow the author for more tips (Pocock, 2026).
+
+- Claude Code's default system prompt is bloated, starting at around 25,000 tokens.
+- Editing the global settings.json file allows users to disable unused tools and features.
+- The system prompt can be reduced from 25,000 to 8,000 tokens, improving efficiency.
+- A written guide is available for following the customization steps.

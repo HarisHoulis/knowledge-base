@@ -12,9 +12,10 @@ sources:
 
 # AI Agents Are Just Distributed Systems Now
 
-Salman Munaf argues that the moment a language model starts calling external services, it ceases to be a model problem and becomes a distributed systems problem. He illustrates this with the example of a refund tool timing out: a timeout means unknown, not failure, so an agent's natural instinct to retry can result in a customer being refunded twice unless the system has request identifiers, idempotency keys, and status lookups.
+Salman Munaf, an SRE at TikTok, argues that once an AI model starts calling external services, it ceases to be a model problem and becomes a distributed systems problem. Using the example of a refund tool that times out, he explains that a timeout means unknown, not failure—so an agent's reflexive retry can double-refund a customer unless protected by request identifiers, idempotency keys, and status lookups. The agent is best understood as a probabilistic coordinator: unlike older decision-tree workflows, its behavior is nondeterministic, so determinism must be pushed into surrounding controls.
 
-- A timeout in an agent tool call means unknown, not failure; retries require idempotency keys and status lookup to avoid duplicate side effects.
-- An agent is best understood as a probabilistic coordinator: determinism must be enforced through circuit breakers, ceilings, compensating actions, and scoped credentials.
-- Context that influences an action is state, and should be treated as a cache with invalidation and provenance.
-- Human approval must be bound to a specific action, actor, and expiry, otherwise it can be stretched beyond its original scope.
+- A timeout means unknown, not failure; agents need idempotency keys and status lookups before retrying.
+- Treat an agent as a probabilistic coordinator—determinism must live in external controls like circuit breakers, rate limits, and spend/action ceilings.
+- Define compensating actions per step and scope credentials to separate reads from writes instead of granting blanket permissions.
+- Context that influences agent behavior is state; treat memory as a cache with invalidation and provenance.
+- Human approvals must bind to a specific action, actor, and expiry to prevent scope creep (e.g., approving $30 becoming $300).
