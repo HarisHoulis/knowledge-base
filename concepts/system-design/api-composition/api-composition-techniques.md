@@ -7,19 +7,19 @@ sources:
   - title: "A Detailed Guide to API Composition Techniques"
     url: "https://blog.bytebytego.com/p/a-detailed-guide-to-api-composition"
     author: "ByteByteGo"
-    date: "Thu, 13 Aug 2026 15:30:27 GMT"
+    date: "2026-08-13"
 ---
 
 # A Detailed Guide to API Composition Techniques
 
-The article explores API composition in service-based architectures, where a single screen requires data from multiple services. The core problem is that splitting data across services removes the ability to perform joins across a single database, so the merging of responses must happen elsewhere, such as in the client, a gateway, a backend for frontend, or an edge worker. The choice of composition point affects latency, availability, caching, and team ownership.
+API composition is the process of merging data from multiple services to fulfill a single client request. The article explains that this problem arises because services are organized around business capabilities while screens are organized around user journeys, so no single service can return the full payload. A composition point can be implemented in different locations—client, server, gateway, BFF, GraphQL resolver, or edge worker—each with distinct trade-offs (ByteByteGo, 2026).
 
-The author emphasizes that round-trip time is often the dominant factor in mobile performance compared to payload size, so reducing the number of round trips by composing on a server can be a net win even with an added network hop. The article distinguishes between aggregation (parallel calls) and orchestration (sequential calls), noting that aggregation yields lower latency but requires handling partial failures. Availability is also multiplicative: five services at 99.9% availability compose to roughly 99.5%, motivating the separation of required and optional dependencies.
+Key trade-offs include round-trip latency, payload size, availability, caching, and ownership. Client-side composition requires no extra infrastructure but suffers from slow mobile network round trips and limited observability. Moving composition to a server reduces total latency by trading one expensive mobile round trip for several cheap datacenter round trips, but introduces coordination and deployment concerns. The article distinguishes between aggregation (parallel calls) and orchestration (sequential calls), noting that availability is the product of upstream service availabilities when all calls are required, and that optional dependencies can be given fallbacks to improve resilience (ByteByteGo, 2026).
 
-Caching tradeoffs are highlighted: composed, personalized responses have poor cache hit rates, while fine-grained resource endpoints cache well. Patterns like API gateways centralize common infrastructure concerns but risk becoming a shared product layer, while Backends for Frontends (BFFs) offer client-specific composition at the cost of duplication. GraphQL provides a flexible query layer but introduces challenges like the N+1 problem. The article concludes by discussing ownership and versioning, arguing that the composition layer should be owned by the consuming client team to avoid coordination bottlenecks.
+The article evaluates server-side patterns: API gateways centralize infrastructure concerns but can become a shared product layer with cross-team coordination overhead; Backends for Frontends (BFFs) provide client-specific composition owned by the client team, at the cost of duplication and potential lack of platform expertise; GraphQL offers a flexible query layer but suffers from N+1 problems and caching challenges. Ultimately, the choice of composition pattern depends on personalization ratio, team ownership, and desired availability/caching behavior (ByteByteGo, 2026).
 
-- API composition is the merging of responses from multiple services; the location of composition (client, server, edge) determines tradeoffs in latency, availability, caching, and team coordination.
-- Round-trip time generally matters more than payload size for mobile users; reducing round trips via composition can significantly improve load times.
-- Aggregation (parallel calls) minimizes latency but requires handling partial failures, while orchestration (sequential calls) is slower and more fragile.
-- Availability degrades multiplicatively with each required upstream call; optional dependencies with fallbacks help maintain response availability.
-- BFFs and GraphQL layers reduce client complexity and decouple releases, but introduce duplication or N+1 issues that must be managed.
+- API composition is necessary when data is split across multiple services; the merge can happen at the client, gateway, BFF, GraphQL, or edge.
+- Moving composition to a server often reduces total latency despite adding a network hop, because datacenter round trips are far cheaper than mobile-to-server ones.
+- Aggregation (parallel calls) yields latency of the slowest call, while orchestration (sequential calls) sums latencies; availability is the product of upstream availabilities for required dependencies.
+- Caching is inversely related to personalization: fine-grained public endpoints cache well, while composed user-specific responses have near-zero cache hit rate.
+- BFFs avoid shared coordination by dedicating a backend layer per client, but risk duplicating logic; GraphQL provides flexible field selection but introduces N+1 and caching complexity.

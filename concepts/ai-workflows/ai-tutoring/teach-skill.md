@@ -12,9 +12,11 @@ sources:
 
 # My /teach skill is still insane
 
-The video introduces a custom AI skill called '/teach' that enables personalized learning on-demand. It demonstrates how the skill can break down complex topics like land surveying, Rubik's Cubes, and development techniques into interactive explanations and quiz questions, adapting to the user's pace and interests. The approach shifts learning from passive consumption to active engagement, using AI as a tailored tutor rather than a generic search engine. The author emphasizes the skill's versatility across vastly different domains, showing that the same pattern can be applied to any subject. By providing a link to download and use the skill, the video offers a concrete way for viewers to replicate this learning workflow themselves. Overall, the message is that AI-powered teaching tools can make mastery of unfamiliar subjects faster and more accessible, provided the prompts are structured effectively.
+Matt Pocock demonstrates a custom AI 'teach' skill designed to provide personalized, tailored learning experiences. The skill adapts to the user's pace and interests, using interactive explanations and quiz questions to make complex topics approachable. Examples include land surveying, Rubik's Cubes, and development techniques, showing the skill's versatility across domains.
 
-- The /teach skill delivers personalized, interactive explanations tailored to the learner's level.
-- It covers diverse topics from land surveying to development, showing general-purpose applicability.
-- Quiz questions and interactive dialogue are core features that reinforce understanding.
-- The skill is shared publicly, enabling others to adopt the same AI-driven tutoring workflow.
+The approach emphasizes active learning: rather than passively receiving content, users engage with the material through questioning and immediate feedback. The skill leverages AI to break down difficult subjects into digestible steps, making it useful for both technical and non-technical fields. The context suggests this is part of a broader library of AI skills that users can implement in their own workflows (Pocock, 2026).
+
+- The teach skill creates personalized, adaptive learning paths for any subject.
+- It uses interactive explanations and quiz questions to reinforce understanding.
+- Examples include land surveying, Rubik's Cubes, and development techniques.
+- The skill is part of a collection available through AI Hero (aihero.dev).

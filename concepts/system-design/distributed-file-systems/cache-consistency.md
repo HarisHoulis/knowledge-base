@@ -12,9 +12,12 @@ sources:
 
 # Lecture 11: Cache Consistency: Frangipani
 
-Frangipani is an old distributed file system paper studied in MIT 6.824 for its design ideas around cache coherence, distributed transactions, and crash recovery. The system is intended to provide a network file system that looks like a local file system to existing UNIX applications, similar to AFS, allowing users to access home and project directories from any workstation in a small research lab of about 50 trusted people. Security is essentially not addressed because all users and computers are trusted.
+Frangipani is a distributed file system designed to provide cache coherence, distributed transactions, and crash recovery in a shared network environment. The system consists of workstations running Frangipani servers that implement file system logic, while all data is stored on a shared virtual disk called Petal, accessed via remote procedure calls. Petal replicates data for fault tolerance, and workstations cache file blocks locally for performance. The key challenge is maintaining cache coherence: when one workstation modifies a cached block, others must see the update despite having local caches (MIT 6.824, 2020).
 
-- Frangipani uses a shared virtual disk called Petal for all file system data structures, including file contents, inodes, directories, and free-space information.
-- Each workstation runs a Frangipani software module that implements the file system and caches data locally, while Petal acts like a remote disk with read/write block operations.
-- The design focuses on supporting human users in a small organization, emphasizing shared file access and mobility across workstations.
-- Key topics include cache coherence (ensuring modifications are visible despite caching), distributed transactions for complex updates, and crash recovery across multiple servers.
+Distributed transactions are essential internally to the file system for making complex updates to file system data structures, such as inodes, directories, and free-block lists. Because the file system is split across multiple servers, crash recovery is critical to ensure consistency after failures. Frangipani's design is motivated by a small research lab of around 50 trusted users who need to share home directories and project files across any workstation; thus, security is not a primary concern and the system assumes all machines and users are trusted (MIT 6.824, 2020).
+
+- Frangipani uses a shared virtual disk (Petal) for storage, with workstations caching blocks for performance.
+- Cache coherence ensures that cached data reflects modifications made by other clients.
+- Distributed transactions manage complex updates to file system metadata across multiple servers.
+- Crash recovery is critical because the file system is distributed and must remain consistent after failures.
+- The system is designed for a small, trusted research group, so security is largely ignored.

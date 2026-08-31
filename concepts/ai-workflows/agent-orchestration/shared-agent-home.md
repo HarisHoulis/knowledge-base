@@ -12,14 +12,13 @@ sources:
 
 # How Kody Gives Your Agents a Shared Home
 
-In this video, Kent C. Dodds introduces Cody, a tool designed to give AI agents a shared home, enabling them to operate together, communicate, and maintain a common ecosystem of software, memories, and tasks. The core idea is to solve the context-switching problem: users can freely move between different agents (such as Cursor, Grok, and Devin) without losing context, because all agents can access a central repository of shared information via Cody (Dodds, 2026).
+In this video, Kent C. Dodds introduces Cody, a tool that gives AI agents a shared home—a central place where they can collaborate, communicate, and share memories, tasks, and software. This enables users to seamlessly context-switch between different agents like Cursor, Grok, and Devin, because each agent can access the same persistent context and resources (Dodds, 2026).
 
-Cody functions as an MCP server that agents query when they need information. For example, when Cursor needs to know what a user's favorite bot shipped on GitHub, it searches Cody for relevant secrets, packages, webhooks, and memories. The search returns a conversation ID, memory context, and search results, allowing Cursor to refine its actions. This metaphorically lets each agent "enter the user's home" and retrieve whatever it needs, whether that's a GitHub access token or a memory about a preferred bot (Dodds, 2026).
+Cody works through an MCP server that agents query when they lack context. For example, when Cursor is asked about a recent GitHub release, it searches Cody's shared memory and secrets. The search returns a conversation ID and relevant memory context, allowing subsequent tool calls to be correlated and efficient. Cody also executes agent-written code in an isolated worker environment, intercepting fetch calls to enforce security policies. Secrets are referenced via templates and swapped in by Cody, so agents never directly expose or access sensitive credentials (Dodds, 2026).
 
-Security is handled through an isolated execution environment. When an agent writes code to perform an action, it runs in a sandboxed worker. Secret placeholders in the code are resolved by Cody in the secure worker context, so the agent itself never directly accesses sensitive values. This allows agents to execute arbitrary code while keeping secrets confidential, and the worker environment spins up in milliseconds, making the process efficient (Dodds, 2026).
+The architecture supports a collaborative ecosystem where agents build and use software together, while maintaining strict security boundaries. The isolated worker spins up in milliseconds, making the shared home fast enough for real-time agent interactions. This approach allows multiple agents to work as a cohesive unit, solving the problem of fragmented context across different tools (Dodds, 2026).
 
-- Cody provides a shared home for multiple AI agents, allowing them to share memories, tasks, and software context.
-- Agents use Cody as an MCP server to search across secrets, packages, webhooks, and memories.
-- Conversation IDs and memory context maintain state across different agents and tool calls.
-- Code execution happens in an isolated worker environment, with secrets resolved server-side so agents never see raw credentials.
-- This setup reduces context-switching friction and enables a seamless multi-agent workflow.
+- Cody provides a shared home for AI agents, enabling cross-agent context switching and collaboration.
+- Agents use an MCP server to search Cody for memories, secrets, and packages, with conversation IDs tying together related tool calls.
+- Code execution happens in an isolated worker environment where fetch calls are intercepted and secrets are securely substituted by Cody.
+- The system supports an ecosystem of agents working together while keeping sensitive data inaccessible to any single agent.

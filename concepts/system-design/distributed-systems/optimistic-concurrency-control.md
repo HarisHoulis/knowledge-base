@@ -12,10 +12,10 @@ sources:
 
 # Lecture 14: Optimistic Concurrency Control
 
-Farm shards data across primary-backup pairs, with reads always going to the primary and no consensus protocol like Paxos for replica coordination. The use of RDMA severely restricts design options, which forces the adoption of optimistic concurrency control. The lecture contrasts this with Spanner, where the main bottleneck is speed-of-light delays across data centers, while Farm's bottleneck is CPU time on servers within a single data center (MIT 6.824, 2020).
+This lecture from MIT 6.824 introduces FaRM, a research prototype designed to explore the performance potential of RDMA networking in distributed transactions. FaRM is contrasted with Spanner: while Spanner focuses on geographic replication across data centers and prioritizes fault tolerance with transactions taking tens of milliseconds, FaRM assumes all replicas are in the same data center, eliminating wide-area network delays. As a result, FaRM achieves a simple transaction in 58 microseconds, about 100 times faster than Spanner's 10-100 milliseconds. The key design constraint is RDMA, which forces FaRM to use optimistic concurrency control. FaRM shards data across primary-backup replica pairs, with reads always served by the primary, and it uses Zookeeper for configuration management. The main bottleneck in FaRM is CPU time on servers rather than network latency, because RDMA minimizes network overhead.
 
-- Farm achieves 58-microsecond transactions, about 100x faster than Spanner's 10-100ms.
-- Optimistic concurrency control is used because RDMA constraints make other approaches difficult.
-- Farm assumes all replicas are in the same data center, not geographically distributed.
-- Replication uses primary-backup with reads from primary, not Paxos.
-- Farm targets CPU-bound bottlenecks, while Spanner targets network-latency bottlenecks.
+- FaRM is a research prototype targeting same-data-center deployments, unlike Spanner's geographic replication.
+- FaRM achieves 58 microsecond transactions, roughly 100x faster than Spanner.
+- RDMA networking restricts design options, leading FaRM to adopt optimistic concurrency control.
+- Data is sharded across primary-backup replica pairs; reads go to the primary.
+- The primary performance bottleneck is CPU time, not network delays.

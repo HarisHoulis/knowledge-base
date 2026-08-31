@@ -7,15 +7,15 @@ sources:
   - title: "Kotlin TDD - To Production At Last"
     url: "https://www.youtube.com/watch?v=UH7_kYAG-TE"
     author: "Pairing with Duncan"
-    date: "2022-03-05"
+    date: "2022-03-05T20:10:25+00:00"
 ---
 
 # Kotlin TDD - To Production At Last
 
-The team re-enables a disabled test that represents the requirement to view and update stock quantities in the browser. They move a Stock class from the test tree into the main tree so it can be used in production routes, replacing the direct stock file loading with the Stock class's stockList method, which handles updating quantities. To make the feature testable, they introduce a functional parameter called 'clock' that returns an Instant, allowing tests to control the current time instead of relying on Instant.now(). They refactor test fixtures to use Instant instead of LocalDate, deriving the 'today' value from the now instant, and pass a consistent clock into the system. The changes are committed as work-in-progress, with known issues to be fixed as development continues.
+In this TDD session, the team integrates a stock update feature into a Kotlin web application. They re-enable a previously disabled test that verifies stock quantities update when viewed in the browser, then move the Stock class from test code to production code and wire it into the route handler. Initially, the update logic uses Instant.now(), making it impossible to control time in tests. To solve this, they introduce a clock as a functional parameter (() -> Instant) injected into Stock, allowing tests to supply a fixed instant. They refactor test fixtures from LocalDate to Instant, deriving dates from the same instant to maintain consistency. This change makes the tests pass deterministically and demonstrates a key strategy for testing time-dependent behavior. The session ends with a work-in-progress commit, acknowledging further cleanup is needed, but the core integration is successfully completed (Pairing with Duncan, 2022).
 
-- Re-enable a disabled test to drive integration of the stock update feature.
-- Move the Stock class from test tree to main tree for production use.
-- Introduce a clock function parameter to make time injectable and tests deterministic.
-- Replace LocalDate with Instant in test fixtures to precisely control time.
-- Commit the integration as work-in-progress to be refined further.
+- Re-enable disabled tests to drive the implementation and confirm expected behavior.
+- Move production code from test tree to main tree to make it reusable.
+- Inject a clock function (() -> Instant) instead of relying on Instant.now() for testability.
+- Refactor test fixtures to use Instant and derive dates from the same instant to keep tests coherent.
+- Use TDD to guide refactoring and commit work-in-progress after passing tests.
