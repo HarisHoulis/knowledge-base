@@ -20,8 +20,10 @@ Compare the successful run [33279128383](https://github.com/HarisHoulis/knowledg
 ```
 23:35:08.124  https://github.com/HarisHoulis/knowledge-base/pull/224     <- gh pr create returns
 23:35:08.131  [daily-ingest] Enabling squash auto-merge...
-23:35:10.015  [daily-ingest] Done.                                        <- lookup succeeded
+23:35:10.015  [daily-ingest] Done.                                        <- no lookup error; auto-merge enabled
 ```
+
+(`Done.` at `daily-ingest.sh:94` prints unconditionally, so the success signal here is the **absence** of a `no pull requests found` line — confirmed by the `auto_squash_enabled` timeline event below, not by the `Done.` echo itself.)
 
 The PR timelines confirm the outcome: #214, #217, #219, #221, #224 each carry an `auto_squash_enabled` event; #228 does not, and its merge is recorded as a manual `merged` event by HarisHoulis ~4.7 h after creation.
 
@@ -33,7 +35,7 @@ The PR timelines confirm the outcome: #214, #217, #219, #221, #224 each carry an
 - If the result is empty, `gh` returns `NotFoundError: no pull requests found for branch "daily-ingest/2026-08-30"` and exits non-zero.
 - The `if ! $GH pr merge --auto --squash` guard in `scripts/daily-ingest.sh:89` treats any failure as best-effort: it logs `Warning: failed to enable auto-merge` and continues, per ADR-0006.
 
-GitHub does not guarantee that a just-created PR is immediately findable by the head-branch index; the lookup is eventually consistent. The gap between `gh pr create` returning and `gh pr merge` being issued is a matter of milliseconds (same process, no retry), so the race is tight: #224 won it, #228 lost it. There is no deterministic difference between the two runs — same script, same branch naming, same ~7 ms timing.
+GitHub does not guarantee that a just-created PR is immediately findable by the head-branch index; the lookup is eventually consistent. The direct evidence is the two runs themselves: the same script, branch naming, and ~7 ms timing produced opposite outcomes, so the query's freshness at that instant is nondeterministic — #224 won the race, #228 lost it. There is no deterministic difference between the two runs; a retry a second later would have found #228.
 
 ## 3. Fix recommendation
 
