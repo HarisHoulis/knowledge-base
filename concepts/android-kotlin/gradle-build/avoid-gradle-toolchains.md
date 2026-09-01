@@ -2,18 +2,20 @@
 domain: android-kotlin
 subdomain: gradle-build
 concept: avoid-gradle-toolchains
-title: Gradle Toolchains Are Rarely a Good Idea
+title: Gradle toolchains are rarely a good idea
 sources:
   - title: "Gradle toolchains are rarely a good idea"
     url: "https://jakewharton.com/gradle-toolchains-are-rarely-a-good-idea/"
     author: "Jake Wharton"
 ---
 
-# Gradle Toolchains Are Rarely a Good Idea
+# Gradle toolchains are rarely a good idea
 
-Jake Wharton argues that Gradle toolchains are rarely a good idea, despite being recommended by Gradle and Android documentation. He explains that toolchains force the use of old JDKs, which lack important features like searchable Javadoc (JEP 225), have poorer container resource awareness, contain more compiler bugs, and are slower. Modern JDKs can cross-compile to older Java versions using the `--release` flag (for Java) or `-Xjdk-release` flag (for Kotlin), making toolchains unnecessary for compilation. (Source: Jake Wharton, jakewharton.com)
+The article argues that Gradle toolchains, despite being recommended by Gradle and Android docs, are rarely a good idea for compilation. Toolchains force the use of old JDKs, which may be outdated, perform poorly in containerized environments, and have more compiler bugs. Newer JDKs can cross-compile to older targets via the `--release` flag (Java) or `-Xjdk-release` (Kotlin), making old JDKs unnecessary for compilation [source](https://jakewharton.com/gradle-toolchains-are-rarely-a-good-idea/).
 
-- Use `--release` for Java and `-Xjdk-release` for Kotlin instead of toolchains for compilation.
-- Old JDKs used by toolchains miss modern Javadoc features, container resource limits, and bug fixes.
-- Toolchains are still useful for running unit tests on older JVMs or isolating incompatible tools via JavaExec.
-- For Android, just set sourceCompatibility and jvmTarget; you don't need a toolchain.
+Toolchains also consume significant disk space and do not control the JDK used to run the Gradle build itself. However, toolchains still have utility for running unit tests against older JVM versions or for JVM-based tools that depend on unstable internals. The recommendation is to use toolchains only for such cases, not for compilation [source](https://jakewharton.com/gradle-toolchains-are-rarely-a-good-idea/).
+
+- Prefer the `--release` (Java) or `-Xjdk-release` (Kotlin) flags over toolchains for cross-compilation.
+- Old JDKs are often outdated, ignore container limits, and have more compiler bugs.
+- Toolchains can still be used for JVM unit tests and incompatible tools like Error-Prone or Google Java Format.
+- Toolchains do not control the JDK running the Gradle build itself and waste disk space.

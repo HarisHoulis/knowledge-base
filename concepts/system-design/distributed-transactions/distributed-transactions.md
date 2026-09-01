@@ -12,9 +12,10 @@ sources:
 
 # Lecture 12: Distributed Transactions
 
-This lecture from MIT 6.824 introduces distributed transactions, which are essential when data is sharded across multiple servers. For instance, a bank might split customer balances across servers, yet a transfer between accounts on different servers requires coordinated read/write operations. Distributed transactions combine two key pieces: concurrency control and atomic commit, to provide the appearance of a single, reliable unit of work despite distribution and failures.
+Distributed transactions are necessary when data is sharded across many servers, such as bank balances split across servers, and an operation like a transfer must read and write data on multiple servers. The lecture frames distributed transactions as composed of two main implementation pieces: concurrency control and atomic commit. Concurrency control manages interleaving of concurrent transactions to preserve correctness, while atomic commit ensures that all participating servers agree on the outcome even in the presence of failures.
 
-- Distributed transactions are built from two main components: concurrency control and atomic commit.
-- Transactions allow programmers to group operations (reads/writes) into a single unit with ACID guarantees.
-- Example: transferring $1 from account X to Y while an audit transaction reads both balances illustrates the need for atomicity and isolation.
-- Sharding data across servers for scalability creates the need for distributed transaction coordination.
+- Distributed transactions are motivated by systems that shard data across multiple servers, requiring operations that span multiple machines.
+- The two major building blocks are concurrency control and atomic commit.
+- Transactions provide ACID semantics, with atomicity ensuring that a transaction's operations are treated as a single unit.
+- The bank transfer example illustrates a transaction that modifies balances on potentially different servers, while an audit transaction reads all balances to verify the total is unchanged.
+- Correct execution must account for both concurrent execution and failures, ensuring only legal results are produced.

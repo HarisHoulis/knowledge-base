@@ -2,7 +2,7 @@
 domain: engineering-culture
 subdomain: ai-adoption
 concept: ai-cloud-parallel
-title: 2025 Was for AI What 2010 Was for Cloud
+title: 2025 was for AI what 2010 was for cloud
 sources:
   - title: "2025 was for AI what 2010 was for cloud"
     url: "https://charity.wtf/p/2025-was-for-ai-what-2010-was-for"
@@ -10,12 +10,13 @@ sources:
     date: "Mon, 22 Dec 2025 20:11:20 GMT"
 ---
 
-# 2025 Was for AI What 2010 Was for Cloud
+# 2025 was for AI what 2010 was for cloud
 
-Charity Majors draws a direct parallel between the mainstream adoption of cloud computing around 2010 and the state of AI in 2025. She recalls that at Linden Lab, cloud services like EC2 and S3 were initially experimental, used for problems like offloading asset storage to Amazon. Within a few years, cloud shifted from experimental to mainstream, while datacenters became legacy. She argues that AI has now undergone the same transition, at least in developer tools, and is no longer a satellite technology but foundational. Majors acknowledges there is certainly a bubble, just as there was with cloud and the internet, but insists that froth does not disprove underlying value. She also references a recent SREcon keynote with Fred Hebert, where they urged SREs to engage with AI despite its hype, because their realism and risk awareness are needed to ground the technology in expertise.
+Charity Majors draws a parallel between the adoption of cloud computing around 2010 and the state of AI in 2025, arguing that AI has shifted from experimental, satellite technology to a foundational part of mainstream developer tools. She recalls early cloud experiments at Linden Lab, where S3 was used as an experimental asset store, eventually becoming the center of gravity for engineering work. Similarly, she observes that AI is no longer separable from tech mainstream but is now embedded in the core of how builders work.
 
-- AI in 2025 is analogous to cloud in 2010: it has shifted from experimental to mainstream foundational technology.
-- Historical bubbles (cloud, internet) show hype and froth can coexist with real, lasting value.
-- SREs and skeptics should engage with AI rather than dismiss it, because their risk-aware perspective is essential.
-- The article draws on personal experience at Linden Lab to illustrate how quickly experimental infrastructure becomes standard.
-- Even eight months prior, AI felt separable from mainstream engineering, but by the end of 2025 that perception had shifted.
+Majors acknowledges the temptation to dismiss AI as another hype cycle, given the industry's history of bubbles like cloud, crypto, and web3. However, she emphasizes that the presence of froth does not disprove the existence of value. She notes her own evolving perspective, from co-delivering a skeptical SRECon keynote eight months prior to now feeling excited about the possibilities. She calls on SREs to engage deeply with AI so their critique remains grounded in expertise and risk awareness.
+
+- AI has become mainstream foundational technology in developer tools, analogous to cloud in 2010.
+- Early cloud experiments at Linden Lab (e.g., using S3) mirror the current experimental, then mainstream, adoption of AI.
+- Hype and bubbles have accompanied every major technological shift, but froth doesn't negate underlying value.
+- SREs and engineers should actively engage with AI to ensure their critique is relevant and informed.

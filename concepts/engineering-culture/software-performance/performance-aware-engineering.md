@@ -12,10 +12,10 @@ sources:
 
 # Why performant code matters (but gets widely ignored), with Casey Muratori
 
-In this podcast episode, Gergely Orosz interviews Casey Muratori about why software performance is critical yet widely overlooked in the industry. Muratori argues that performance directly impacts business bottom lines, citing evidence from leading software companies, but the prevailing attitude remains dismissive. He suggests that performance should be considered during system design, not bolted on later, and that profiler-driven optimization often finds only local minima. Instead, engineers should start by understanding the theoretical limits of hardware and work to close the gap to that level. (Orosz, 2026)
+In this episode of The Pragmatic Engineer, Gergely Orosz talks with Casey Muratori about why software performance is critical yet widely ignored in the industry. Muratori points out that despite overwhelming evidence from leading software companies showing performance impacts business outcomes, many developers dismiss it. He argues that the common approach of profiling and tweaking hotspots only finds local minima; instead, engineers should first establish what the hardware can theoretically do and then close the gap to that level (The Pragmatic Engineer, "Why performant code matters...").
 
-- Performance matters to business outcomes, yet is frequently ignored; evidence from top companies is often undisputed but does not change industry habits.
-- Profiler-driven optimization only finds local minima; instead, understand what the hardware can theoretically do and optimize toward that ceiling.
-- Learn to read basic assembly (20-30 instructions) and understand how CPUs move data, flow instructions, and schedule execution to make better performance decisions.
-- Beware of using 'premature optimization is the root of all evil' as an excuse; consider performance during design to avoid costly rewrites later.
-- Great engineers test received wisdom and focus on what actually works in practice, not dogma.
+- Performance optimization should start with understanding the theoretical hardware ceiling, not with profiling hotspots.
+- Learning to read assembly (about 20-30 instructions) is a key skill for writing performant code.
+- The conventional wisdom that "premature optimization is the root of all evil" is often misused to delay architectural decisions that hurt performance.
+- Understanding how CPUs work boils down to three pillars: data movement (load/store, caches), instruction flow (branch prediction, i-cache), and execution unit scheduling.
+- Test-driven development should be a cost/benefit decision, not a default practice; great engineers question received wisdom and test it in the real world.

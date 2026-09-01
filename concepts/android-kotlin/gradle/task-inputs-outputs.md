@@ -12,12 +12,14 @@ sources:
 
 # Understanding Gradle #06 – Configuring Task Inputs and Outputs
 
-Gradle tasks that perform work are 'actionable' tasks, and they should declare explicit inputs and outputs. This is the foundation for Gradle's incremental build support: when inputs and outputs are declared, Gradle can check whether they have changed and skip the task if they haven't (Jendrik Johannes, 2021). The video walks through configuring a custom packaging task from scratch, first by registering the task and then by adding inputs and outputs to package the start script, the classes, and the dependencies.
+The video explains how to configure a Gradle task from scratch, focusing on the concept of task inputs and outputs. Actionable tasks in Gradle must declare their inputs and outputs, which is essential for enabling incremental builds. When inputs and outputs are properly configured, Gradle can skip tasks that are already up-to-date, dramatically improving build performance.
 
-Each configuration step is followed by an incremental build run, showing that the task is skipped when nothing has changed. The video also demonstrates how to wire the task into the build lifecycle so it runs automatically during the build. The key takeaway is that declaring inputs and outputs is not just a formality—it is essential for making builds fast and correct: without them, Gradle cannot determine whether a task is up-to-date.
+The presenter walks through a practical example of packaging an application. He registers a custom task and then configures inputs and outputs step by step to package a start script, compiled classes, and dependencies. After each configuration, the incremental build is run to show how Gradle detects unchanged inputs and skips the task execution when nothing has changed.
 
-- Actionable tasks require explicit inputs and outputs to support incremental builds.
-- Use `inputs.file()`/`inputs.dir()` and `outputs.file()`/`outputs.dir()` to declare task inputs and outputs.
-- Configure your task in a `tasks.register` block or via a custom task class.
-- Run an incremental build after configuration to see the up-to-date behavior.
-- Wire custom tasks into the build lifecycle (e.g., with `dependsOn`) to include them in the build process.
+Finally, the task is wired into the build lifecycle, making it part of the standard build process. The key takeaway is that declaring task inputs and outputs is not just a best practice, but a fundamental requirement for scalable, efficient Gradle builds. The video cites official Gradle documentation for further reading on task configuration and inputs/outputs.
+
+- Actionable tasks must declare inputs and outputs for Gradle's incremental build to work.
+- Configuring inputs and outputs allows Gradle to skip tasks when their inputs haven't changed.
+- Packaging tasks can be broken down into start script, classes, and dependencies as separate inputs.
+- Wiring custom tasks into the build lifecycle integrates them with standard build phases.
+- Properly configured inputs/outputs are essential for fast, repeatable builds.

@@ -12,10 +12,9 @@ sources:
 
 # Kotlin and http4k - List Stock in a Browser
 
-In this episode, the team continues building a Gilded Rose inventory system. The customer requested the ability to view the stock list in a browser instead of the command line, so they decide to add an HTTP interface using the http4k library in Kotlin (source: https://www.youtube.com/watch?v=1XtSVSmu3BI). The work is test-driven: they begin by writing a test that creates a server from the stock list, then a client that requests the root URL and expects an HTML response body. This test drives the design of server and client abstractions that will integrate with http4k (source: https://www.youtube.com/watch?v=1XtSVSmu3BI). The team acknowledges that the immediate goal is only viewing the list, but they anticipate future requirements like automatically updating item quantities. The current milestone is a stepping stone toward a more interactive system (source: https://www.youtube.com/watch?v=1XtSVSmu3BI).
+In this video, Duncan continues working on the Gilded Rose Inc. project. The customer asks for the ability to view the stock list in a browser instead of the command line. Duncan plans to use the http4k library for HTTP handling and follows a test-driven development approach, starting with a test that requests the root URL and expects an HTML response body (source).
 
-- Use http4k to expose the stock list as an HTTP endpoint at the root URL.
-- Start with a test that expects an HTML body from a client request.
-- Build the server around the existing stock list data structure.
-- Browser viewing is a prerequisite for future automatic quantity updates.
-- Test-driven development drives the design of server and client abstractions.
+- Use http4k to build an HTTP server and client in Kotlin.
+- Write tests first to drive development of the server endpoint.
+- Expose the stock list at the root URL of the web server.
+- Abstract server and client interactions to make testing easier.

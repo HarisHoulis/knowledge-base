@@ -11,9 +11,9 @@ sources:
 
 # Flow testing with Turbine
 
-Turbine is a library by Cash App for testing kotlinx.coroutines Flow. It transforms push-based flows into pull-based suspend functions, enabling developers to assert on emitted items, completion, errors, and cancellation in a straightforward manner. The `test` extension suspends on `awaitItem()` and `awaitComplete()` calls, throwing `AssertionError` on mismatched events or timeouts. Standalone `Turbine` instances can also adapt other push-based mechanisms such as callbacks for testing, as demonstrated with a `FakeLogger` class. Turbine also offers utilities for handling multiple flows, aggregated errors, and shared timeouts. This post is part of Cash App's Summer of Kotlin Multiplatform series.
+Turbine is a library from Cash App for testing kotlinx.coroutines Flow. It transforms push-based Flows into pull-based suspend functions, simplifying assertions by letting developers await specific items, completions, or errors. The `test` function provides a concise API, as shown in the mealsFlow example, where each `awaitItem()` suspends until the next event arrives; mismatched events or timeouts cause AssertionError. Turbine can also be used as a standalone object to adapt other push-based mechanisms like callbacks, demonstrated through a FakeLogger that records log messages into a Turbine for later assertion. The library offers additional utilities for handling multiple Turbines, multiple Flows, shared timeouts, and aggregated errors, catering to growing testing needs.
 
-- Turbine converts push-based Flow into pull-based suspend functions for easier testing
-- Provides `awaitItem()`, `awaitComplete()`, and error handling with AssertionError on failures
-- Standalone Turbine can be used to test callback-based APIs
-- Includes utilities for multiple Turbines, multiple Flows, sharing timeouts, and aggregating errors
+- Turbine changes push-based Flows into pull-based suspend functions to simplify testing.
+- `awaitItem()` and `awaitComplete()` suspend until the desired event arrives, throwing AssertionError on mismatch or timeout.
+- Standalone Turbines can adapt other push-based mechanisms like callbacks for testing.
+- Utilities support multiple Turbines, multiple Flows, shared timeouts, and aggregated errors.
