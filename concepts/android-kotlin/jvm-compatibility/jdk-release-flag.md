@@ -11,14 +11,12 @@ sources:
 
 # Kotlin's JDK release compatibility flag
 
-The article explains a production crash caused by a `NoSuchMethodError` for `List.removeFirst()`. The issue arose because the code was compiled with JDK 21, where `List` gained a member method `removeFirst()`. In Kotlin, extension functions are statically resolved, but member functions always win if they match. Thus, the Kotlin stdlib's `removeFirst()` extension was ignored, and the compiler emitted a direct interface call to the JDK 21 method, which is absent on older Android versions.
+The article describes an Android crash caused by a `NoSuchMethodError` when calling `List.removeFirst()`. The code used Kotlin's extension function `removeFirst()`, but after upgrading the build JDK to 21, the JDK's new member method `removeFirst()` on `List` took precedence over the extension, as per Kotlin's rule that member functions always win over extensions. This happened despite setting `jvmTarget` to 1.8, because `jvmTarget` only controls the emitted bytecode version and does not restrict the set of JDK APIs available during compilation.
 
-Setting `jvmTarget` to 1.8 only controls the bytecode version, not the JDK API available at compile time. The article demonstrates that the classfile major version was 52 (Java 8), yet the bytecode still referenced the JDK 21 method. This mirrors `javac`'s `-target` flag, which also requires `-bootclasspath` or `--release` to constrain API usage. Kotlin 1.7 introduced `-Xjdk-release`, which acts like `javac --release` and restricts the JDK API to the specified version. Using it changed the bytecode to call the Kotlin stdlib's static helper instead of the interface method, fixing the crash.
+The author explains that `javac` has a similar limitation with `-target`, historically solved with `-bootclasspath` and later with the `--release` flag. Kotlin 1.7 introduced an equivalent flag, `-Xjdk-release`, which restricts the JDK API surface to the specified version. Configuring this flag causes the Kotlin compiler to resolve `removeFirst()` to the static extension function in `kotlin.collections.CollectionsKt` instead of the JDK member method, producing compatible bytecode. The article notes that Android users are already protected by using `android.jar` as the bootclasspath, and that there is no Gradle DSL yet but it is tracked in KT-49746.
 
-The article notes that the flag is essential for Kotlin JVM and multiplatform JVM targets to ensure compatibility with a minimum JVM. Android users typically don't need it because `android.jar` as the bootclasspath limits `java.*` APIs to the `compileSdk`. There is no official Gradle DSL for the flag yet, tracked in KT-49746. Toolchains are an alternative but require running an ancient JDK, which is generally discouraged.
-
-- Kotlin extension functions are only used when no matching member function exists; JDK 21's new `List.removeFirst()` member overrides the stdlib extension.
-- `jvmTarget` only sets bytecode version and does not restrict the JDK API that can be referenced, leading to crashes on older platforms.
-- The `-Xjdk-release` flag in Kotlin 1.7+ acts like `javac --release`, restricting the JDK API and ensuring correct extension resolution.
-- Android projects are protected by their `compileSdk` android.jar bootclasspath, but JVM and multiplatform targets need `-Xjdk-release` for cross-compilation safety.
-- Gradle toolchains avoid the issue by using an actual old JDK, but miss modern compiler improvements; a Gradle DSL for the flag is pending (KT-49746).
+- `jvmTarget` only sets the bytecode version, not the JDK API level, so newer JDK members can shadow Kotlin extensions and cause `NoSuchMethodError`.
+- Kotlin's `-Xjdk-release` flag behaves like `javac --release`, restricting the available JDK APIs to the target version.
+- Using `-Xjdk-release` ensures extension functions are resolved to the Kotlin standard library when a newer JDK adds colliding member methods.
+- Android projects are less affected because `android.jar` limits accessible `java.*` APIs, but Kotlin JVM and multiplatform JVM targets should adopt this flag.
+- There is no Gradle DSL for `-Xjdk-release` yet; it is tracked in JetBrains issue KT-49746.

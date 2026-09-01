@@ -11,10 +11,10 @@ sources:
 
 # A stable, multiplatform Molecule 1.0
 
-Molecule is a Compose-based library for managing application state, now releasing its first stable version 1.0. The library has gained two major features since its announcement: support for Kotlin multiplatform targets (JVM, JS, and native) and an immediate recomposition mode that removes the need for a frame clock. These features enable state-producing composables to run outside the context of Compose UI, exposing plain data as StateFlow or Flow for use in Views, notifications, widgets, or other platforms.
+Molecule is a Compose-based library for managing application state, originally announced two years ago. Today, version 1.0 is released as its first stable version. The library has gained two major features since its initial announcement: support for Kotlin multiplatform targets (JVM, JS, and native) in addition to Android, and an immediate recomposition mode that removes the need for a frame clock. These features make Molecule more flexible for separating state management from UI rendering.
 
-- Molecule 1.0 is stable and supports Kotlin multiplatform targets including JVM, JS, and native.
-- Immediate recomposition mode triggers recomposition on state changes without requiring a frame clock.
-- State logic can be exposed as StateFlow to Android Views or as Flow for reactive consumption.
-- Molecule enables unit testing of state composables using Turbine on the JVM.
-- It runs on any platform supported by the JetBrains Compose runtime, such as iOS SwiftUI or web DOM.
+- Molecule 1.0 is stable and supports Kotlin multiplatform targets (JVM, JS, native) plus Android.
+- It allows state-producing composables to run outside Compose UI, exposing results as StateFlow for use in View-based apps, notifications, and widgets.
+- The immediate recomposition mode triggers recomposition when there are new changes, which is useful for presenter-like usage.
+- Unit testing is simplified by exposing composable logic as Flow and testing with Turbine on the JVM.
+- Molecule can be used across platforms, e.g., running the same counter logic on web (DOM) or iOS with SwiftUI.

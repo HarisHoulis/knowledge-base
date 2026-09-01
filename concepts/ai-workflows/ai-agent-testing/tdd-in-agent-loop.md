@@ -11,9 +11,11 @@ sources:
 
 # TDD inside the agent loop - theater or actual value?
 
-The article examines whether instructing LLM-based coding agents to follow Test-Driven Development (TDD) genuinely improves outcomes or merely creates an illusion of rigor. Birgitta Böckeler, a Thoughtworks colleague, designed and ran experiments to test this question, driven by the industry's frequent advocacy of TDD for agent-driven software development. The investigation aims to determine if TDD is a substantive practice or performative theater in the context of AI-assisted coding. The article is part of a broader exploration of generative AI workflows at Thoughtworks, highlighting the need for empirical validation of widely recommended practices.
+The article, authored by Martin Fowler, addresses the question of whether test-driven development (TDD) provides genuine benefit when integrated into the workflow of LLM-based software agents, or if it is merely a superficial practice. The motivation stems from the widespread advocacy among Thoughtworks colleagues and industry practitioners for instructing agents to use TDD. Birgitta Böckeler, a Thoughtworks colleague, was curious about this and conducted a few experiments to investigate the real impact.
 
-- TDD is commonly recommended when using LLM agents for coding, but its real impact is uncertain.
-- Birgitta Böckeler conducted experiments to compare agent performance with and without TDD instructions.
-- The article questions whether TDD in agent loops provides actual value or is merely theatrical.
-- Empirical evidence is essential before adopting practices in AI-assisted development.
+Fowler's piece presents Böckeler's experimental exploration, framing the discussion around the dichotomy of "theater" versus "actual value." While the full results are not detailed in the opening, the article directly reports the existence of these experiments and the context that prompted them. The title and introduction suggest a critical evaluation of whether TDD instructions meaningfully alter agent behavior or simply give the illusion of rigor.
+
+- TDD is a widely recommended practice for guiding LLM agents in software development.
+- Birgitta Böckeler conducted experiments to determine whether TDD actually changes agent outcomes.
+- The article critically examines if TDD in agent workflows is substantive or performative.
+- The investigation is grounded in the Thoughtworks community's strong advocacy for TDD.

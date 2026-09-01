@@ -6,20 +6,20 @@ title: Understanding Gradle #09 – Centralizing Dependency Versions
 sources:
   - title: "Understanding Gradle #09 – Centralizing Dependency Versions"
     url: "https://www.youtube.com/watch?v=8044F5gc1dE"
-    author: "onepiece.Software by Jendrik Johannes"
+    author: "Jendrik Johannes"
     date: "2021-10-04"
 ---
 
 # Understanding Gradle #09 – Centralizing Dependency Versions
 
-In this video, Jendrik Johannes discusses the problem of hardcoding dependency versions directly in build scripts, which can lead to duplication and inconsistency across multi-project builds. He emphasizes that when the same dependency version is repeated in multiple places, upgrading one occurrence and forgetting the others creates version conflicts that Gradle must resolve, potentially causing issues at compile or runtime. The best approach is to centralize versions to avoid such conflicts in projects you control.
+The simplest way to define dependency versions in Gradle is to hardcode them in each dependency declaration. However, this approach leads to duplication and eventual inconsistencies in larger builds, as versions scattered across projects can be upgraded independently, resulting in dependency version conflicts. According to the video, conflicts can cause compile-time or runtime problems because Gradle resolves to a single version, so it's best to avoid them by centralizing versions in projects you control (Jendrik Johannes, 2021).
 
-The solution introduced is using dependency constraints declared in a convention plugin, which provides a central place for build information. By defining constraints once, Gradle applies them to all projects that apply the plugin, ensuring consistent versions. However, for regularly updated external dependencies, separating version information into a dedicated mechanism is beneficial. Gradle offers platforms, which are components that contain only dependency constraints, defined via the `java-platform` plugin. A platform can be a separate subproject or build, and can also pull in existing BOMs like the Jackson BOM or Spring Boot BOM, which provide curated version sets for widely used libraries.
+To centralize versions, Gradle offers dependency constraints, which act as additional inputs to the dependency resolution mechanism. These constraints can be defined in convention plugins, making the same versions available to all projects. The video introduces platforms as a dedicated mechanism: a platform is a separate component or build that applies the java-platform plugin and contains only dependency constraints. Projects depend on the platform to inherit those constraints. Platforms can also reference existing BOMs, such as Jackson BOM or Spring Boot BOM, which provide consistent version sets for libraries. A separate platform build can additionally manage Gradle plugin versions, keeping all version information in one focused place (Jendrik Johannes, 2021).
 
-Overall, the video outlines three mechanisms for version management: dependency constraints, platforms, and BOMs, which can be combined. Using a separate build for the platform also allows managing Gradle plugin versions centrally. This approach helps teams maintain a regular upgrade process and keeps build configuration clean and focused (onepiece.Software, 2021).
+The video highlights three mechanisms for version management: defining constraints directly in convention plugins, using platforms as separate components, and leveraging existing BOMs. It also suggests that because dependency versions change frequently due to security updates or other external factors, extracting them into a dedicated platform build helps establish a regular upgrade process without mixing versions with static build configuration (Jendrik Johannes, 2021).
 
-- Hardcoding versions in each build script causes duplication and risks dependency conflicts when upgrades are applied inconsistently.
-- Dependency constraints in a convention plugin centralize versions for all projects that apply the plugin.
-- Platforms (using the java-platform plugin) are separate components that aggregate dependency constraints and can be reused across builds.
-- Existing BOMs like Jackson or Spring Boot can be imported into a platform to provide consistent version combinations.
-- A separate build for the platform can also manage Gradle plugin versions centrally.
+- Hardcoding versions in dependency declarations leads to duplication and potential version conflicts in larger builds.
+- Dependency constraints can be declared in convention plugins to provide consistent versions across all projects.
+- Java platforms are separate components that centralize dependency constraints and can be included by projects as a dependency.
+- Platforms can pull in existing BOMs like Jackson or Spring Boot to get consistent version combinations.
+- A separate platform build can also manage Gradle plugin versions, further centralizing version management.
