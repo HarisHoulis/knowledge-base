@@ -12,11 +12,11 @@ sources:
 
 # My /teach skill is still insane
 
-Matt Pocock demonstrates a custom AI 'teach' skill designed to provide personalized, tailored learning experiences. The skill adapts to the user's pace and interests, using interactive explanations and quiz questions to make complex topics approachable. Examples include land surveying, Rubik's Cubes, and development techniques, showing the skill's versatility across domains.
+Matt Pocock demonstrates a custom AI skill called /teach that provides personalized, tailored learning experiences. The skill helps users master new concepts by generating interactive explanations and quiz questions, making complex topics like land surveying, Rubik's Cubes, and development techniques easier to understand.
 
-The approach emphasizes active learning: rather than passively receiving content, users engage with the material through questioning and immediate feedback. The skill leverages AI to break down difficult subjects into digestible steps, making it useful for both technical and non-technical fields. The context suggests this is part of a broader library of AI skills that users can implement in their own workflows (Pocock, 2026).
+The approach leverages AI to adapt to the learner's needs, offering a hands-on way to engage with material. The skill is available through AI Hero, and additional skills and community resources are linked for those interested in expanding their AI workflow toolkit.
 
-- The teach skill creates personalized, adaptive learning paths for any subject.
+- The /teach skill delivers personalized learning experiences for any topic.
 - It uses interactive explanations and quiz questions to reinforce understanding.
-- Examples include land surveying, Rubik's Cubes, and development techniques.
-- The skill is part of a collection available through AI Hero (aihero.dev).
+- Examples of mastered concepts include land surveying, Rubik's Cubes, and development techniques.
+- The skill is part of a broader collection of AI skills available through AI Hero.

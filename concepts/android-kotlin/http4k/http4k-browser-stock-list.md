@@ -12,12 +12,14 @@ sources:
 
 # Kotlin and http4k - List Stock in a Browser
 
-In this session, Duncan continues work on the Gilded Rose Inc. project, focusing on a new customer requirement: viewing the stock list in a browser instead of the command line. The customer previously saw value in printing stock and loading it from a file, but now wants a more accessible interface, with future plans for automatic updates. The team decides to use the http4k library to build an HTTP server that serves the stock list as HTML.
+The video demonstrates continuing development of a stock-list application for Gilded Rose Inc., using Kotlin and the http4k library. The customer previously could load stock from a file and print it, but now wants to view the stock list in a browser because printing from the command line is difficult. The session focuses on adding an HTTP server to serve the stock list as HTML, following a test-driven development approach (Pairing with Duncan, 2021, https://www.youtube.com/watch?v=1XtSVSmu3BI).
 
-Following test-driven development, Duncan starts by writing a test that expects a response from the server root. He creates a conceptual server and client, with the client making a request to the root and the response body containing HTML. Initially, the test expects a blank HTML document, which serves as a minimal first step. The approach is exploratory, roughing out the interfaces before integrating with http4k (Duncan, 2021).
+The developer starts by adding http4k dependencies to build.gradle, then writes a functional test that creates some stock, builds a server wrapping the stock list, and uses a client to make a request to the root URL. The test expects the response body to be a blank HTML document initially, which will be expanded later. This test drives the creation of server and client abstractions on top of http4k (Pairing with Duncan, 2021, https://www.youtube.com/watch?v=1XtSVSmu3BI).
 
-- Customer wants to view stock list in browser, moving away from command-line printing.
-- The team chooses http4k as the library for building the HTTP server.
-- Test-driven development: write a test that expects an HTML response from the server root.
-- The initial test targets an empty HTML document to establish the server-client interaction.
-- Future stories include automatic updates of stock qualities.
+The episode also highlights the team's incremental delivery and customer confidence. They note that the customer now understands they can edit the stock list in a text editor, but the next stories will involve updating quantities automatically. The development style is test-first, with duplication from previous printing tests accepted temporarily because the tests are unlikely to live long (Pairing with Duncan, 2021, https://www.youtube.com/watch?v=1XtSVSmu3BI).
+
+- Add http4k dependencies to build.gradle before implementing the HTTP server.
+- Start with a test that creates stock, spins up a server, and makes a client request to the root.
+- Expect a blank HTML response body initially, then expand to render the stock list.
+- Use test-driven development and reuse similar test structures from printing tests, accepting duplication as temporary.
+- The customer story is to view stock in a browser, with future stories for automatic quantity updates.

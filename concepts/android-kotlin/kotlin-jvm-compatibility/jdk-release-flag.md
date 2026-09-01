@@ -11,14 +11,12 @@ sources:
 
 # Kotlin's JDK release compatibility flag
 
-The article describes a production crash caused by a `NoSuchMethodError` when calling `removeFirst()` on a `List`. The issue arose after upgrading the build JDK to 21, which added `removeFirst()` as a member function to the `List` interface. In Kotlin, member functions take precedence over extension functions, so the previously resolved Kotlin extension function `kotlin.collections.removeFirst` was silently replaced by the JDK 21 member method, breaking compatibility with older Android versions ([source](https://jakewharton.com/kotlins-jdk-release-compatibility-flag/)).
+Jake Wharton describes a production crash caused by `NoSuchMethodError: List.removeFirst()` on Android. The Kotlin code used `removeFirst()` as an extension function from `kotlin.collections`, but after upgrading the build JDK to 21, the new `removeFirst()` member method on `java.util.List` took precedence per Kotlin's extension resolution rules. Setting `jvmTarget` to 1.8 only controls the emitted bytecode version, not the JDK API surface, so the compiler still emitted a direct interface call to the JDK 21 method (Jake Wharton, https://jakewharton.com/kotlins-jdk-release-compatibility-flag/).
 
-Setting `jvmTarget` to 1.8 only controls the bytecode version, not the JDK API surface used during compilation. The article demonstrates with `javap` that the classfile version was 52 (Java 8) but the bytecode still referenced `java/util/List.removeFirst()`. This mirrors `javac`'s behavior, where `-target` alone does not restrict API usage; `javac` uses `--release` to properly bind against the older JDK APIs. Kotlin's equivalent is `-Xjdk-release`, introduced in Kotlin 1.7, which should be set to the minimum supported Java version ([source](https://jakewharton.com/kotlins-jdk-release-compatibility-flag/)).
+The fix is the Kotlin compiler flag `-Xjdk-release`, which behaves like `javac --release` by restricting the available JDK APIs to the specified version. With this flag, `removeFirst()` resolves to the static `CollectionsKt.removeFirst` helper instead of the missing interface method. The article notes that Android projects using the Android plugin are already protected because `android.jar` limits `java.*` APIs, but Kotlin JVM and multiplatform JVM target users should apply this flag manually. It also advises against Gradle toolchains as a workaround, since they force the use of an old JDK compiler and lose modern compiler improvements.
 
-The article shows how adding `-Xjdk-release=1.8` to Kotlin compiler arguments changes the bytecode to call the static extension helper `CollectionsKt.removeFirst` instead of the interface method. Users of the Kotlin Android plugin or Android multiplatform targets do not need this flag because `android.jar` already restricts `java.*` APIs to the `compileSdk` level. The flag has no official Gradle DSL yet, but progress is tracked in [KT-49746](https://youtrack.jetbrains.com/issue/KT-49746/Support-Xjdk-release-in-gradle-toolchain).
-
-- Kotlin extension functions are overridden by same-signature member functions added in newer JDKs, causing binary incompatibility.
-- `jvmTarget` only sets bytecode version, not the JDK API level; `-Xjdk-release` is needed for proper cross-compilation.
-- `-Xjdk-release` behaves like `javac`'s `--release`, combining source/target compatibility with a restricted bootclasspath.
-- Android developers using `android.jar` already have API restriction, so they don't need this flag.
-- No Gradle DSL yet; use `kotlinOptions.freeCompilerArgs` to add `-Xjdk-release`.
+- `jvmTarget` only sets the bytecode version, not the JDK API surface; new JDK methods can still be referenced.
+- Kotlin extension functions are shadowed by member functions with the same signature, which can break older runtimes.
+- Use `-Xjdk-release=<version>` to restrict JDK APIs during Kotlin/JVM compilation.
+- Android plugin users are safe because `android.jar` already limits the API surface.
+- Gradle toolchains avoid the issue but at the cost of using outdated compiler versions.

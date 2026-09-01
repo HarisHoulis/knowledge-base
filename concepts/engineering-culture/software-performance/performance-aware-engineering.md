@@ -2,7 +2,7 @@
 domain: engineering-culture
 subdomain: software-performance
 concept: performance-aware-engineering
-title: Why Performant Code Matters (But Gets Widely Ignored), with Casey Muratori
+title: Why performant code matters (but gets widely ignored), with Casey Muratori
 sources:
   - title: "Why performant code matters (but gets widely ignored), with Casey Muratori"
     url: "https://newsletter.pragmaticengineer.com/p/why-performant-code-matters-but-gets"
@@ -10,16 +10,12 @@ sources:
     date: "Wed, 26 Aug 2026 15:59:59 GMT"
 ---
 
-# Why Performant Code Matters (But Gets Widely Ignored), with Casey Muratori
+# Why performant code matters (but gets widely ignored), with Casey Muratori
 
-In this episode, Casey Muratori discusses why software performance is often overlooked despite strong evidence that it matters to business outcomes. He points to products like File Pilot and Blick gaining popularity due to performance, and argues that the industry's default indifference to performance is a cultural problem rather than a technical one (Orosz, 2026). Muratori also shares history, such as how DirectX emerged from an unauthorized Microsoft project called WinG, showing that performance-focused work can succeed even without official approval.
+In this podcast episode, Gergely Orosz interviews Casey Muratori about why software performance is critical yet widely overlooked in the industry. Muratori argues that performance directly impacts business bottom lines, citing evidence from leading software companies, but the prevailing attitude remains dismissive. He suggests that performance should be considered during system design, not bolted on later, and that profiler-driven optimization often finds only local minima. Instead, engineers should start by understanding the theoretical limits of hardware and work to close the gap to that level. (Orosz, 2026)
 
-Muratori challenges common practices like profiler-driven optimization and the adage that 'premature optimization is the root of all evil.' He advocates for understanding the theoretical limits of hardware and designing systems with performance in mind from the start, rather than only patching hotspots. He also explains that reading assembly, along with understanding three key aspects of CPUs—data movement, instruction flow, and execution unit scheduling—can help developers reason about performance more effectively.
-
-The conversation also covers game industry evolution, the impact of licensable engines, and why Muratori is skeptical of 'clean code' and test-driven development. He emphasizes that received wisdom should be tested in practice, and that tests should be a cost/benefit decision, not a default. He also explains why he avoids AI in his own game development: he wants to program things himself, not just produce output (Orosz, 2026).
-
-- Performance is critical to business success but widely ignored; some newer products are winning on speed.
-- Profiler-driven optimization only finds local minima; effective optimization starts from knowing hardware's theoretical limits.
-- Learning to read assembly (about 20-30 instructions) and understanding three CPU pillars helps developers design performant systems.
-- The 'premature optimization' warning is overused; architectural performance choices must be made early to avoid rewrites.
-- Casey critiques clean code and TDD as unproven received wisdom, advocating for practical, cost/benefit-driven testing.
+- Performance matters to business outcomes, yet is frequently ignored; evidence from top companies is often undisputed but does not change industry habits.
+- Profiler-driven optimization only finds local minima; instead, understand what the hardware can theoretically do and optimize toward that ceiling.
+- Learn to read basic assembly (20-30 instructions) and understand how CPUs move data, flow instructions, and schedule execution to make better performance decisions.
+- Beware of using 'premature optimization is the root of all evil' as an excuse; consider performance during design to avoid costly rewrites later.
+- Great engineers test received wisdom and focus on what actually works in practice, not dogma.
