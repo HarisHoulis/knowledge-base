@@ -2,20 +2,19 @@
 domain: ai-workflows
 subdomain: ai-security
 concept: reasoning-trace-extraction
-title: How to Steal an AI Model's Private Thoughts
+title: How to Steal an AI Model’s Private Thoughts
 sources:
-  - title: "How to Steal an AI Model's Private Thoughts"
+  - title: "How to Steal an AI Model’s Private Thoughts"
     url: "https://blog.bytebytego.com/p/how-to-steal-an-ai-models-private"
     author: "ByteByteGo"
-    date: "2026-08-25"
+    date: "Tue, 25 Aug 2026 15:31:09 GMT"
 ---
 
-# How to Steal an AI Model's Private Thoughts
+# How to Steal an AI Model’s Private Thoughts
 
-The article discusses a security vulnerability discovered by researchers at MATS Research, the ELLIS Institute Tübingen, and the Max Planck Institute for Intelligent Systems. Modern frontier AI models generate a hidden reasoning trace before producing a visible answer. To keep their services stateless, providers like Anthropic, OpenAI, and Google encrypt this trace and return it to the client, which stores and resends it with each request. The researchers found that these encrypted blocks can be replayed across sessions, users, and even models, because they authenticate only the content, not the context in which they were produced.
+The article explains how AI model providers hide the full reasoning traces behind an encrypted envelope, returning it to the client to maintain statelessness while protecting confidentiality and integrity. Researchers at MATS Research, ELLIS Institute Tübingen, and Max Planck Institute for Intelligent Systems demonstrated that these encrypted reasoning blocks can be replayed into cheaper, less-protected models in the same family, which then output the hidden reasoning in plaintext. This cross-model compatibility exists because smaller models receive less anti-distillation training, making them act as fuzzy decoders.
 
-- Encrypted reasoning blocks are not bound to their origin; they can be replayed across sessions, users, and models.
-- Weaker models in the same family can act as fuzzy decoders to extract the strong model's hidden reasoning in plaintext.
-- The attack enables distillation, jailbreaking, prompt injection via shared logs, and mass leakage of secrets from public agent trajectories.
-- The root cause is that the AEAD envelope authenticates content but not the producing account or conversation.
-- Proposed mitigation includes embedding account and conversation identifiers in the authenticated envelope to prevent cross-user replay.
+- Encrypted reasoning blocks (e.g., signature, encrypted_content, thinkingSignature) are returned to clients for stateless multi-turn conversations, but they lack account and conversation authentication, enabling replay across users, sessions, and models.
+- Cross-model compatibility allows a strong model's encrypted reasoning to be decoded by a weaker model in the same family, effectively stealing the hidden chain-of-thought without triggering refusal or output filters.
+- A public scan of 6,708 agent sessions recovered 315,320 reasoning blocks, leaking 62 API keys, 33 passwords, 24 access tokens, 7 private keys, and 30 personal emails, despite visible-text sanitization.
+- The proposed fix is to embed account or session context into the authenticated envelope to prevent cross-user and cross-session replay, though cross-model compatibility may still need model-specific keys.

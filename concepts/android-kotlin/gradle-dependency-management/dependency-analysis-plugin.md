@@ -12,14 +12,14 @@ sources:
 
 # Understanding Gradle #28 – Clean Compile Classpaths with the Dependency Analysis Plugin
 
-The video explains how modularity in Java projects relies on keeping compile classpaths clean, and introduces the Dependency Analysis plugin for Gradle to automate this process. It demonstrates the plugin's ability to detect wrongly scoped dependencies (e.g., `api` vs `implementation`), unused dependencies, missing direct declarations, and cases where `runtimeOnly` is more appropriate. By applying the plugin to a sample project, the author shows how it generates reports and suggests fixes that help developers shrink compile classpaths and enforce proper module boundaries.
+This video from the Understanding Gradle series focuses on using the Dependency Analysis Plugin to keep compile classpaths clean in modular Java or Android projects. The presenter demonstrates how the plugin helps detect dependencies that are declared with the wrong scope, such as using 'api' where 'implementation' is sufficient, or vice versa. It also finds unused dependencies and missing dependency declarations that are accidentally resolved through transitive dependencies.
 
-The tutorial walks through applying the plugin in a root build file, running analysis tasks, and interpreting the results. It highlights the importance of using `api` only when a dependency's types appear in the module's public API, and `implementation` otherwise. The plugin also uncovers dependencies that are declared but not used, as well as those that are used but not declared, which can lead to fragile builds. The video further explores configuring the plugin and creating custom post-processing tasks to integrate the analysis into development workflows.
+The plugin provides analysis tasks that inspect the project's configurations and report issues. Examples show how it flags a dependency that should be 'implementation' instead of 'api' to shrink the compile classpath, and conversely, when a library needs to be exposed via 'api' because it appears in the public API. The video also covers detecting dependencies that are only needed at runtime and should be moved to 'runtimeOnly', and how to configure the plugin to create custom post-processing tasks based on the analysis results.
 
-Ultimately, the key takeaway is that clean compile classpaths improve build performance, reduce redundant recompilation, and make module dependencies explicit. The Dependency Analysis plugin serves as a practical tool to achieve this by providing actionable insights and automated checks. (Source: onepiece.Software by Jendrik Johannes, 2023)
+A key takeaway is that by applying this plugin, developers can better enforce modularity boundaries. The compile classpath is critical for compilation, and keeping it minimal avoids leaking internal dependencies to consumers. The plugin automates the review process, making it easier to refactor and maintain clean dependency declarations in Gradle builds.
 
-- The Dependency Analysis plugin detects wrong dependency scopes, including `api` vs `implementation` and `implementation` vs `runtimeOnly`.
-- It identifies unused dependencies that can be safely removed, and missing direct declarations that should be added to avoid transitive dependency issues.
-- Running the plugin's analysis tasks produces reports suggesting changes to shrink compile classpaths and improve build isolation.
-- The plugin can be configured to suit project needs, and supports custom post-processing tasks for tailored analysis output.
-- Clean compile classpaths enforce module boundaries and reduce compile overhead in multi-module Gradle builds.
+- The Dependency Analysis Plugin automatically detects issues with dependency declarations, such as wrong scope (api vs implementation), unused dependencies, and missing declarations.
+- Keeping compile classpaths clean is essential for modularity: 'api' exposes dependencies to consumers, while 'implementation' keeps them internal.
+- The plugin suggests moving dependencies from 'implementation' to 'api' when they appear in a module's public API, and to 'runtimeOnly' when they are only needed at runtime.
+- Analysis tasks produce reports that can be used as a basis for refactoring builds, and the plugin can be configured to run custom post-processing tasks.
+- The example projects are available in both Kotlin DSL and Groovy DSL on GitHub, demonstrating practical usage.

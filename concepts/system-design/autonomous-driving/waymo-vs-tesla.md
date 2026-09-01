@@ -12,10 +12,9 @@ sources:
 
 # Waymo vs Tesla: Two Ways to Build Self-Driving Cars
 
-Waymo and Tesla represent two divergent architectures for self-driving cars. Waymo's sixth-generation system uses a multi-modal sensing suite—13 cameras, four lidar units, six radar units, and external audio receivers—to achieve 500-meter coverage and redundancy in adverse conditions [1][2]. Tesla relies primarily on cameras with a pure vision approach, using neural networks for semantic segmentation, object detection, and monocular depth estimation, ultimately building a birds-eye-view representation through 48 networks taking nearly 70,000 GPU hours to train [6][9]. This difference extends to representation: Waymo maintains compact structured representations (explicit object lists and roadgraph elements) for verifiability and simulation efficiency, while Tesla's learned representation captures nuance but is less inspectable [3][6].
+Waymo and Tesla represent two divergent approaches to self-driving. Waymo uses a multimodal sensor suite with cameras, lidar, radar, and audio receivers, with overlapping coverage up to 500 meters, while Tesla relies on a pure vision approach using only cameras and neural networks [1][2][9]. Waymo's sixth-generation system carries 13 cameras, four lidar units, and six radar units, whereas Tesla's Model 3 and Model Y use camera-based Tesla Vision [2][9].
 
-- Waymo uses cameras, lidar, radar, and audio receivers; Tesla uses cameras only for its main FSD approach.
-- Waymo builds explicit, structured representations of the world; Tesla uses end-to-end learned representations from per-camera networks.
-- Waymo predicts multiple possible futures for each road user and validates trajectories via a separate onboard layer; Tesla's supervised FSD relies on an attentive driver, with a smaller driverless service under remote supervision.
-- Safety reporting differs: Waymo reports rider-only miles with no human in driver's seat, showing 94% reduction in serious injury crashes; Tesla compares supervised FSD vs manual driving, reporting 7x fewer collisions.
-- Both systems depend on machine learning but differ in how much is fixed in advance and how safety evidence is collected.
+- Waymo uses multimodal sensing (cameras, lidar, radar, audio) with sensor redundancy; Tesla uses pure vision with cameras only.
+- Waymo builds an interpretable structured world representation via a Foundation Model, enabling runtime validation, simulation, and verifiable training feedback; Tesla uses per-camera segmentation and birds-eye-view networks with no pre-mapping.
+- Waymo predicts multiple possible futures and validates generated trajectories with a separate onboard checker; Tesla's supervised FSD relies on a human driver as the safety fallback.
+- Waymo reports 220.6 million rider-only miles with 94% reduction in serious injury crashes vs human baseline; Tesla reports 7x fewer collisions with FSD engaged vs manual driving, but with a driver responsible and a 5-second engagement window.

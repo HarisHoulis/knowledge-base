@@ -12,10 +12,10 @@ sources:
 
 # Headed for the Exit: the Great Engineering Leader Career Break
 
-The article reports an unprecedented wave of engineering leaders—CTOs, VPs of Engineering, heads of engineering—opting out or taking long career breaks. Based on interviews with nearly 20 such leaders, Orosz identifies ten common reasons: the job getting much worse, startups losing value, not being AI-native enough, predecessors seeing the writing on the wall, long hours (rarely decisive), smaller teams requiring fewer leaders, preferring fractional CTO work, AI startups paying ICs more than executives, quitting to launch a business, and burnout.
+Gergely Orosz reports on an unprecedented trend of senior engineering leaders—including CTOs, VPs of Engineering, and heads of engineering—opting out of high-status roles or taking prolonged career breaks, often without a new job lined up. Drawing on interviews with nearly 20 such leaders, the article identifies ten common reasons: the job getting much worse, startup failure, the pressure to be AI-native, long hours, smaller team needs, fractional work preferences, higher pay for AI ICs, entrepreneurial ambitions, and burnout. A notable statistic is that 6 out of 10 CTO-level leaders spoken to privately were either considering or already on a career break, indicating a systemic shift rather than isolated cases (Orosz, 2026).
 
-- Ten common reasons drive engineering leaders to quit, with burnout and worsening job conditions among the top.
-- Founder 'AI psychosis' and unrealistic expectations—like shipping AI prototypes as products in weeks—make CTO/VPE roles increasingly difficult and low-ROI.
-- Equity in VC-funded startups often becomes worthless due to liquidation preferences, removing a financial reason to stay.
-- Leaders who want to stay relevant in AI may need to quit or take IC roles to gain hands-on experience, as Charity Majors advises.
-- Positive examples, like Matt Boyle's role at Gitpod (later Ona, acquired by OpenAI), show that joining companies genuinely committed to AI-driven change can make leadership rewarding.
+- A growing wave of senior engineering leaders is quitting or taking breaks due to burnout, equity concerns, and AI-driven pressure.
+- Unrealistic founder/CEO expectations around AI—like shipping slop PRs or demanding rapid transformation—make leadership roles increasingly frustrating and low-ROI.
+- Equity often proves worthless due to liquidation preferences and slow startup growth, removing a key financial incentive to stay.
+- Many leaders fear losing industry relevance without AI experience, with some advised to even move to IC roles to get it.
+- The 'founder mode' phenomenon and reduced craft/quality emphasis are contributing to a devaluation of VP/CTO positions.

@@ -7,14 +7,15 @@ sources:
   - title: "From Cloudwashing to O11ywashing"
     url: "https://charity.wtf/p/from-cloudwashing-to-o11ywashing"
     author: "Charity Majors"
-    date: "Mon, 24 Nov 2025 18:53:14 GMT"
+    date: "2025-11-24"
 ---
 
 # From Cloudwashing to O11ywashing
 
-Charity Majors argues that the term "observability" has been co-opted by traditional monitoring vendors, a phenomenon she calls "o11ywashing," analogous to "cloudwashing." She recounts an industry panel where an executive described "traditional observability" as only determining whether systems are up or down, while claiming that understanding customer experience from each customer's perspective required a custom solution. Majors points out that this is the original definition of observability, and that traditional three-pillar monitoring tools cannot solve it because they lack unified, high-dimensional telemetry.
+Charity Majors argues that the term "traditional observability" has been co-opted to mean basic monitoring, while the actual problem of understanding service quality from each customer's perspective remains unsolved. She recounts an executive who built a custom solution for this exact problem, unaware that it matches the original definition of observability. Majors attributes this to vendors selling "o11ywashing"—rebranding legacy monitoring tools as observability—and to the industry's failure to communicate observability as a systems problem to engineering executives (Majors, 2025).
 
-- Observability is not the same as monitoring; monitoring answers whether systems are up or down, while observability answers why customer experiences degrade from each customer's perspective.
-- Vendors are rebranding conventional monitoring tools as observability, a practice Majors calls 'o11ywashing' by analogy to 'cloudwashing.'
-- To combat o11ywashing, the industry must tell better stories to engineering executives about business outcomes, not just technical features.
-- Observability is a systems problem, not an operational one; it should be the most powerful lever for turning software doom spirals into positive feedback loops.
+- Traditional observability tools are really monitoring tools; they answer whether systems are up or down, not why customer experience degrades.
+- True observability requires unifying app, business, and system telemetry to understand each customer's perspective.
+- The industry is doing to observability what IBM did to cloud computing with the mainframe: o11ywashing.
+- Observability must be pitched to executives in terms of outcomes, not technical details like cardinality and dimensionality.
+- If your observability tool doesn't help you understand product quality per customer, it's just monitoring in marketing clothing.

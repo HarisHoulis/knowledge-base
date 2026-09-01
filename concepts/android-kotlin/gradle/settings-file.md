@@ -12,11 +12,12 @@ sources:
 
 # Understanding Gradle #01 – The Settings File
 
-The settings file is the entry point of every Gradle project. It defines the build's name, configures repositories for both dependencies and plugins, and establishes the overall project structure, including subprojects and composite builds. Without it, Gradle cannot determine what to build or where to fetch dependencies from (Jendrik, 2021).
+The settings file is the entry point of every Gradle project. According to the video, it is the first file to look at when starting a Gradle project from scratch. Its primary purposes include naming the Gradle build, specifying repositories for external libraries and plugin dependencies, and defining the structure of the build, such as which subprojects are included. The video also demonstrates how to use settings plugins to apply logic at the settings level, and notes that the settings file can contain arbitrary script code for customization.
 
-The video demonstrates starting a Gradle project from scratch, emphasizing that the settings file contains script code that runs during configuration. It also highlights the role of settings plugins, which can be applied early to influence the build setup. By centralizing repository declarations and project layout, the settings file provides a foundation for scalable multi-project builds (Jendrik, 2021).
+The tutorial emphasizes that repositories can be centralized in the settings file for both regular dependencies and plugin dependencies, which helps manage where Gradle looks for artifacts. Additionally, the settings file can include other builds via composite builds, enabling multi-project and multi-build setups. The video walks through each concept with examples, referencing the official Gradle documentation for further reading on declaring repositories, plugin repositories, including builds, and defining subprojects.
 
-- The settings file names the Gradle build and is required for every project.
-- It declares repositories for external libraries and for Gradle plugins separately.
-- It defines the structure of the build, including subprojects and included builds (composite builds).
-- The settings file can contain arbitrary script code and apply settings plugins to customize the build environment.
+- The settings file is the entry point of every Gradle project, used to name the build and configure repositories.
+- Repositories for both libraries and Gradle plugins can be defined in the settings file for centralized dependency management.
+- The settings file defines the build structure, including subprojects and composite/included builds.
+- Settings plugins can be applied to extend the build logic at the settings level.
+- The settings file is a Groovy or Kotlin script, allowing arbitrary code for advanced customization.

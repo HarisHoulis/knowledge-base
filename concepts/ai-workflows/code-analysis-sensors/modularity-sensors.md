@@ -2,18 +2,17 @@
 domain: ai-workflows
 subdomain: code-analysis-sensors
 concept: modularity-sensors
-title: Three more static code analysis sensors
+title: Three More Static Code Analysis Sensors
 sources:
   - title: "Three more static code analysis sensors"
     url: "https://martinfowler.com/articles/sensors-for-coding-agents.html#StaticCodeAnalysisDependencyRules"
     author: "Martin Fowler"
 ---
 
-# Three more static code analysis sensors
+# Three More Static Code Analysis Sensors
 
-Birgitta Böckeler discusses three additional sensors for static code analysis, focusing on checking and enforcing better modularity in codebases [1]. Computational sensors for dependency checks were effective at enforcing predefined rules, but the rules themselves were limited in scope [1]. Building a computational sensor for coupling data proved lackluster, yielding poor results [1]. In contrast, prompting an inferential sensor to review modularity was more effective, highlighting the potential of AI-driven analysis over purely rule-based computational approaches [1].
+The article, contributed by Birgitta Böckeler and published by Martin Fowler, explores three additional sensors for static code analysis that aim to improve modularity assessment in codebases. Computational sensors for dependency checks proved effective at enforcing predefined rules but were limited in their expressiveness, failing to capture more nuanced architectural concerns. Building a computational sensor to analyze coupling data was lackluster, yielding poor insights that did not justify the effort. In contrast, prompting an inferential sensor—likely an AI-based reviewer—to assess modularity was more effective, suggesting that inferred analysis can complement or even surpass computational metrics for evaluating architectural quality. This highlights the growing value of AI-driven approaches in code analysis workflows (source: https://martinfowler.com/articles/sensors-for-coding-agents.html#StaticCodeAnalysisDependencyRules).
 
-- Three new static code analysis sensors target modularity.
-- Computational dependency sensors enforce rules but are limited by rule expressiveness.
-- A computational sensor for coupling data performed poorly.
-- An inferential sensor for modularity review proved more effective.
+- Dependency-check computational sensors enforce modularity rules but are limited in what they can express.
+- A computational sensor for coupling data performed poorly, providing little actionable insight.
+- Prompting an inferential sensor to review modularity proved more effective, indicating AI's potential in code quality analysis.

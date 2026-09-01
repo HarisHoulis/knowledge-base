@@ -6,20 +6,20 @@ title: Understanding Gradle #12 – Publishing Libraries
 sources:
   - title: "Understanding Gradle #12 – Publishing Libraries"
     url: "https://www.youtube.com/watch?v=8z5KFCLZDd0"
-    author: "onepiece.Software by Jendrik Johannes"
+    author: "Jendrik Johannes"
     date: "2021-11-22T13:42:02+00:00"
 ---
 
 # Understanding Gradle #12 – Publishing Libraries
 
-In this video, Jendrik Johannes explains what a Maven repository is and how to publish libraries or components to it using Gradle. He starts by breaking down the Maven repository structure, which organizes artifacts by group, artifact ID, and version. He also introduces Gradle Module Metadata, a feature that enhances dependency resolution by publishing additional information about variants and dependencies beyond what Maven POM files provide (Jendrik, 2021).
+In this video, Jendrik Johannes explains the fundamentals of publishing libraries with Gradle. He starts by describing the Maven repository structure, which organizes artifacts by group, artifact, and version coordinates, and shows how Gradle creates and uploads these artifacts. The video emphasizes that a Maven repository is not just a folder but a standardized layout that clients can consume.
 
-The core of the video demonstrates how to configure publishing for library subprojects using Gradle's `maven-publish` plugin. Johannes walks through the DSL concepts of 'components' and 'publications'—where a publication is tied to a software component (like `java` or `java-library`) and describes how that component should be exposed. He then shows how to configure repositories to publish to, run the generated `publish` tasks, and consume the published versions from another project. The example also covers using timestamped versions for snapshot-like publication (Jendrik, 2021).
+A key concept introduced is Gradle Module Metadata, a JSON-based file that accompanies the POM and carries richer dependency information, including variant-aware details and capabilities. This metadata allows Gradle to resolve dependencies more accurately than POM alone. The video demonstrates how to configure publishing for library subprojects using Gradle's DSL, focusing on the concepts of components and publications.
 
-A key takeaway is that Gradle's publishing setup is flexible and designed for multi-project builds, making it straightforward to share libraries both internally and publicly. The video points to further resources on customizing publishing, managing credentials, and understanding consumable configurations for variant-aware dependency resolution (Jendrik, 2021).
+It then covers declaring repositories to publish to, whether remote or local, and running the associated publish tasks. Finally, it shows how to consume the published versions in another project as dependencies. The talk concludes with a summary and pointers to related videos and documentation.
 
-- Maven repositories store artifacts under group, artifact ID, and version coordinates.
-- Gradle publishes Module Metadata alongside POM files for richer dependency resolution.
-- Use the `maven-publish` plugin to define publications and repositories.
-- Publications are linked to Gradle components, allowing variant-aware publishing.
-- After running `publish`, the library can be consumed by other projects as a normal dependency.
+- Maven repository layout uses group, artifact, and version coordinates.
+- Gradle Module Metadata provides richer dependency and variant information than POM.
+- Publishing is configured via the `publishing` block with `publications` and `repositories`.
+- The `publish` tasks upload artifacts to the configured repositories.
+- Published libraries can be consumed as regular dependencies from another project.
