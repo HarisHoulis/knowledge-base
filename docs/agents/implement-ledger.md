@@ -43,5 +43,6 @@ Each finding is attributed to one class — the fix's root cause, not the surfac
 | 171 | 2026-08-23 | ✓ Preflight | ✓ seam | ✓ bounds | 0 asm | 0 esc | duplicated-code ×1 | 1 minor / 0 major / 0 blocker | spec-gap ×1 | [#171](https://github.com/HarisHoulis/knowledge-base/issues/171) |
 | 172 | 2026-08-24 | ✓ Preflight | ✓ seam | ✓ bounds | 0 asm | 0 esc | duplicated-code ×2, requirement-drift ×1 | 3 minor / 0 major / 0 blocker | spec-gap ×3 | pending |
 | 229 | 2026-09-03 | ✓ Preflight | ✓ seam | ✓ bounds | 3 asm | 0 esc | primitive-obsession ×1, spec-gap ×1, judgement-call ×1, unstated-decision ×1, requirement-drift ×1, tautological-test ×1 | 6 minor / 0 major / 0 blocker | unstated-decision ×2, bounding-box-gap ×3, spec-gap ×1 | [#243](https://github.com/HarisHoulis/knowledge-base/pull/243) |
+| 249 | 2026-09-03 | ✓ Preflight | ✓ seam | ✓ bounds | 4 asm | 0 esc | overclaim ×2, analysis-tension ×1, table-clarity ×1, evidence-mismatch ×1, verification-gap ×1 | 6 minor / 0 major / 0 blocker | spec-gap ×3, bounding-box-gap ×1, unstated-decision ×1, seam-gap ×1 | [#249](https://github.com/HarisHoulis/knowledge-base/issues/249) |
 
 **Signals** columns, per ticket: Pre-flight present (✓/✗), seam named (✓/✗), bounds stated (✓/✗), # assumptions, # escalations.
