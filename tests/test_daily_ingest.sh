@@ -76,8 +76,8 @@ assert_gh_pr_created() {
 }
 
 assert_gh_pr_merged() {
-    if ! grep -q "pr merge --auto --squash" "$1"; then
-        echo "  FAIL: expected gh pr merge --auto --squash, got: $(cat "$1")"
+    if ! grep -q "pr merge 1 --auto --squash" "$1"; then
+        echo "  FAIL: expected gh pr merge <n> --auto --squash, got: $(cat "$1")"
         return 1
     fi
 }
