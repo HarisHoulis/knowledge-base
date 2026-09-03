@@ -8,6 +8,7 @@ from .config import (
     LLM_API_KEY,
     LLM_API_URL,
     LLM_MODEL,
+    OUT_OF_SCOPE,
     SYSTEM_PROMPT,
     VALID_DOMAINS,
 )
@@ -21,7 +22,11 @@ def validate_llm_output(data: dict[str, Any]) -> list[str]:
     for field in required:
         if field not in data:
             errors.append(f"missing '{field}'")
-    if "domain" in data and data["domain"] not in VALID_DOMAINS:
+    if (
+        "domain" in data
+        and data["domain"] not in VALID_DOMAINS
+        and data["domain"] != OUT_OF_SCOPE
+    ):
         errors.append(f"invalid domain '{data['domain']}'")
     if "key_points" in data and not isinstance(data["key_points"], list):
         errors.append("'key_points' must be a list")

@@ -75,7 +75,10 @@ def make_promote_stub() -> tuple[list[Path], Any]:
 
 class TestAuditWithRetry:
     def test_all_audits_pass_first_try(self) -> None:
-        from kb_pipeline.pipeline import _audit_with_retry
+        from kb_pipeline.pipeline import (
+            PROMOTED,
+            _audit_with_retry,
+        )
 
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
@@ -93,12 +96,15 @@ class TestAuditWithRetry:
             escalation_fn=esc_fn,
         )
 
-        assert ok is True
+        assert ok == PROMOTED
         assert promote_calls == [SAMPLE_DRAFT]
         assert esc_calls == []
 
     def test_content_fails_once_then_passes(self) -> None:
-        from kb_pipeline.pipeline import _audit_with_retry
+        from kb_pipeline.pipeline import (
+            PROMOTED,
+            _audit_with_retry,
+        )
 
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
@@ -123,13 +129,16 @@ class TestAuditWithRetry:
             escalation_fn=esc_fn,
         )
 
-        assert ok is True
+        assert ok == PROMOTED
         assert promote_calls == [SAMPLE_DRAFT]
         assert esc_calls == []
         assert co_stub.call_count == 2
 
     def test_classification_fails_once_then_passes(self) -> None:
-        from kb_pipeline.pipeline import _audit_with_retry
+        from kb_pipeline.pipeline import (
+            PROMOTED,
+            _audit_with_retry,
+        )
 
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
@@ -154,13 +163,16 @@ class TestAuditWithRetry:
             escalation_fn=esc_fn,
         )
 
-        assert ok is True
+        assert ok == PROMOTED
         assert promote_calls == [SAMPLE_DRAFT]
         assert esc_calls == []
         assert ca_stub.call_count == 2
 
     def test_surgical_retry_only_failing_audit_reruns(self) -> None:
-        from kb_pipeline.pipeline import _audit_with_retry
+        from kb_pipeline.pipeline import (
+            PROMOTED,
+            _audit_with_retry,
+        )
 
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
@@ -186,14 +198,17 @@ class TestAuditWithRetry:
             escalation_fn=esc_fn,
         )
 
-        assert ok is True
+        assert ok == PROMOTED
         assert promote_calls == [SAMPLE_DRAFT]
         # classification ran once (not retried), content ran twice (failed then retried)
         assert ca_stub.call_count == 1
         assert co_stub.call_count == 2
 
     def test_always_fails_escalates(self) -> None:
-        from kb_pipeline.pipeline import _audit_with_retry
+        from kb_pipeline.pipeline import (
+            ESCALATED,
+            _audit_with_retry,
+        )
 
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
@@ -211,7 +226,7 @@ class TestAuditWithRetry:
             escalation_fn=esc_fn,
         )
 
-        assert ok is False
+        assert ok == ESCALATED
         assert promote_calls == []
         assert len(esc_calls) == 1
         esc_url, esc_path, esc_feedback = esc_calls[0]
@@ -219,7 +234,10 @@ class TestAuditWithRetry:
         assert esc_path == SAMPLE_DRAFT
 
     def test_max_retries_is_two(self) -> None:
-        from kb_pipeline.pipeline import _audit_with_retry
+        from kb_pipeline.pipeline import (
+            ESCALATED,
+            _audit_with_retry,
+        )
 
         promote_calls, promote_fn = make_promote_stub()
         esc_calls, esc_fn = make_escalation_stub()
@@ -247,11 +265,49 @@ class TestAuditWithRetry:
             escalation_fn=esc_fn,
         )
 
-        assert ok is False
+        assert ok == ESCALATED
         assert promote_calls == []
         assert len(esc_calls) == 1
         # initial + 2 retries = 3 calls, but the stub passes after exhausting
         assert co_stub.call_count == 3  # initial + retry 1 + retry 2
+
+
+class TestAuditRerollToOutOfScope:
+    def test_reroll_out_of_scope_rejects_and_removes_draft(self, tmp_path) -> None:
+        from kb_pipeline.config import OUT_OF_SCOPE
+        from kb_pipeline.pipeline import REJECTED, _audit_with_retry
+
+        (tmp_path / "sentinel").write_text("keep tmp_path alive")
+        draft = tmp_path / "drafts" / "b" / "c.md"
+        draft.parent.mkdir(parents=True)
+        draft.write_text("draft body")
+
+        promote_calls, promote_fn = make_promote_stub()
+        esc_calls, esc_fn = make_escalation_stub()
+
+        def reroll_out_of_scope(
+            text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
+        ) -> dict[str, Any]:
+            return dict(SAMPLE_RESULT, domain=OUT_OF_SCOPE)
+
+        outcome = _audit_with_retry(
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            draft,
+            classify_fn=reroll_out_of_scope,
+            ca_audit_fn=stub_audit_pass,
+            co_audit_fn=stub_audit_fail,
+            promote_fn=promote_fn,
+            escalation_fn=esc_fn,
+        )
+
+        assert outcome == REJECTED
+        assert promote_calls == []
+        assert esc_calls == []
+        assert not draft.exists()
+        assert not (tmp_path / "drafts" / "b").exists()
 
 
 class TestExtractYoutubeVideoId:
@@ -437,6 +493,46 @@ class TestRunPipelineLinkFallback:
 
         assert fetch_calls == []
         assert stats["written"] == 1
+
+
+class TestRunPipelineOutOfScope:
+    def test_out_of_scope_skip_writes_nothing_and_marks_url_processed(
+        self, monkeypatch, caplog
+    ) -> None:
+        from kb_pipeline.config import OUT_OF_SCOPE
+        from kb_pipeline.pipeline import run_pipeline
+
+        fixture = Path(__file__).parent / "fixtures" / "plain-rss.xml"
+        source = Source(id="test", type="rss", url=str(fixture))
+
+        def out_of_scope_classify(
+            text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
+        ) -> dict[str, Any]:
+            return dict(SAMPLE_RESULT, domain=OUT_OF_SCOPE)
+
+        def boom_write(*args: Any, **kwargs: Any) -> None:
+            raise AssertionError("no file write expected for out-of-scope content")
+
+        saved: list[dict[str, Any]] = []
+        monkeypatch.setattr("kb_pipeline.pipeline.write_entry", boom_write)
+        monkeypatch.setattr("kb_pipeline.pipeline.write_draft", boom_write)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.save_state", lambda state: saved.append(state)
+        )
+        caplog.set_level("INFO")
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[source],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=out_of_scope_classify,
+        )
+
+        assert stats["skipped"] == 1
+        assert stats["written"] == 0
+        assert "skipping (out-of-scope)" in caplog.text
+        assert len(saved) == 1
+        assert len(saved[0]["processed_hashes"]) == 1
 
 
 class TestRunPipelineWithTranscript:
@@ -1270,8 +1366,92 @@ class TestTaxonomyDomains:
 
         assert any("invalid domain" in e for e in errors)
 
+    def test_out_of_scope_domain_is_valid(self) -> None:
+        from kb_pipeline.config import OUT_OF_SCOPE
+        from kb_pipeline.llm import validate_llm_output
+
+        errors = validate_llm_output(self._classification(OUT_OF_SCOPE))
+
+        assert errors == []
+
     def test_system_prompt_advertises_both_new_domains(self) -> None:
         from kb_pipeline import config
 
         assert "java-tools" in config.SYSTEM_PROMPT
         assert "web-dev" in config.SYSTEM_PROMPT
+
+    def test_system_prompt_advertises_out_of_scope(self) -> None:
+        from kb_pipeline import config
+
+        assert "out-of-scope" in config.SYSTEM_PROMPT
+
+
+class TestEscalateFailureDedupe:
+    def _make_fake_run(
+        self,
+        calls: list[list[str]],
+        *,
+        listing_stdout: str = "",
+        view_body: str = "",
+        fail_on_list: bool = False,
+    ) -> Any:
+        def fake_run(cmd: list[str], **kwargs: Any) -> MagicMock:
+            calls.append(cmd)
+            if cmd[:2] == ["gh", "issue"] and cmd[2] == "list":
+                if fail_on_list:
+                    raise subprocess.CalledProcessError(1, cmd)
+                return MagicMock(stdout=listing_stdout, stderr="")
+            if cmd[:2] == ["gh", "issue"] and cmd[2] == "view":
+                return MagicMock(
+                    stdout=json.dumps({"body": view_body}), stderr=""
+                )
+            return MagicMock(stdout="", stderr="")
+
+        return fake_run
+
+    def test_open_matching_issue_suppresses_creation(self, monkeypatch, caplog) -> None:
+        from kb_pipeline.pipeline import _escalate_failure
+
+        calls: list[list[str]] = []
+        fake_run = self._make_fake_run(
+            calls,
+            listing_stdout="#42\tAudit exhaustion: test.md\topen\t",
+            view_body=f"**URL:** {SAMPLE_URL}\n",
+        )
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+        caplog.set_level("INFO")
+
+        _escalate_failure(SAMPLE_URL, SAMPLE_DRAFT, "feedback")
+
+        assert all(cmd[:3] != ["gh", "issue", "create"] for cmd in calls)
+        assert len(calls) == 2  # list + view, no create
+        assert "skipping creation" in caplog.text
+
+    def test_no_open_issue_creates_issue(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import _escalate_failure
+
+        calls: list[list[str]] = []
+        fake_run = self._make_fake_run(calls, listing_stdout="")
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+        _escalate_failure(SAMPLE_URL, SAMPLE_DRAFT, "feedback")
+
+        assert any(cmd[:3] == ["gh", "issue", "create"] for cmd in calls)
+        create = next(cmd for cmd in calls if cmd[:3] == ["gh", "issue", "create"])
+        title = create[create.index("--title") + 1]
+        body = create[create.index("--body") + 1]
+        assert title == f"Audit exhaustion: {SAMPLE_DRAFT.name}"
+        assert SAMPLE_URL in body
+
+    def test_gh_failure_degrades_to_creating_issue(self, monkeypatch, caplog) -> None:
+        from kb_pipeline.pipeline import _escalate_failure
+
+        calls: list[list[str]] = []
+        fake_run = self._make_fake_run(calls, fail_on_list=True)
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+        caplog.set_level("WARNING")
+
+        _escalate_failure(SAMPLE_URL, SAMPLE_DRAFT, "feedback")
+
+        assert any(cmd[:3] == ["gh", "issue", "create"] for cmd in calls)
+        assert "open-issue dedupe check failed" in caplog.text

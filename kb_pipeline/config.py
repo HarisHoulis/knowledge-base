@@ -26,6 +26,8 @@ VALID_DOMAINS = {
     "web-dev",
 }
 
+OUT_OF_SCOPE = "out-of-scope"
+
 
 @dataclass
 class Source:
@@ -62,5 +64,9 @@ output a JSON object with:
 citations to the source
 - "key_points": a list of 2-5 bullet-point takeaways
 - "sources": list of {"title": str, "url": str, "author": str, "date": str}
+
+When no listed domain fits the source text (e.g. a personal or off-topic post on a \
+mixed blog), set "domain": "out-of-scope" instead of forcing a domain; keep summary \
+short and set "key_points" to an empty list.
 
 Be concise. Strip fluff. Only include claims directly supported by the source text."""
