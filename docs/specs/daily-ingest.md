@@ -26,7 +26,7 @@ A scheduled GitHub Actions workflow runs the pipeline at 20:15 UTC daily, create
 ## Implementation Decisions
 
 - **Trigger**: `schedule` (cron: `15 20 * * *`, 20:15 UTC) plus `workflow_dispatch` with optional `dry_run` and `limit` inputs.
-- **State persistence**: `actions/cache@v4` with a static key (`kb-state-v1`) storing `~/.kb-pipeline/state.json`. Restore at start, save at end (even on failure via `if: always()`).
+- **State persistence**: an `actions/cache/restore@v4` / `actions/cache/save@v4` pair storing `~/.kb-pipeline/state.json`. The restore step runs before ingest with a run-scoped primary key (`kb-state-v2-${{ github.run_id }}`) and `restore-keys: kb-state-v2-`, so it falls back to the newest prior run's entry. The save step is the last job step with `if: always()`, writing under the fresh run-scoped key — the key never matches a restored entry, so state always advances even when the ingest step fails. Caveat: `github.run_id` is stable across manual reruns of a failed run, so a rerun exact-key-restores the failed attempt's entry and its own save to that key is rejected (a non-fatal warning); state advanced by a rerun only persists after a later run with a fresh `run_id`.
 - **Credentials**: `LLM_API_KEY` stored as a GitHub Actions secret; `LLM_API_URL` and `LLM_MODEL` set as non-sensitive repo variables. The existing `config.py` reads them from the environment.
 - **Wrapper script**: `scripts/daily-ingest.sh` — idempotent shell script that runs `python -m kb_pipeline`, checks `git status --porcelain`, and either creates a branch+PR or exits cleanly. The workflow calls this script.
 - **Branch naming**: `daily-ingest/YYYY-MM-DD` derived from the run date. Created only when `git status --porcelain` is non-empty after the pipeline run.
@@ -57,5 +57,5 @@ A scheduled GitHub Actions workflow runs the pipeline at 20:15 UTC daily, create
 ## Further Notes
 
 - First run on GH Actions will cold-start the cache and re-process all existing RSS entries. This is identical to the first local run behavior.
-- If the pipeline cadence ever drops below weekly, the `actions/cache` eviction window (7 days) becomes a risk. At that point, switch to committing `state.json` to the repo (Option 1 in the research doc). The change is limited to the workflow file — no pipeline code changes needed.
+- Each run restores the newest `kb-state-v2-*` entry and saves a fresh one under its own run-scoped key; entries not accessed within `actions/cache`'s 7-day window are evicted. If the pipeline cadence ever drops below weekly, that window becomes a cold-start risk. At that point, switch to committing `state.json` to the repo (Option 1 in the research doc). The change is limited to the workflow file — no pipeline code changes needed.
 - The `scripts/daily-ingest.sh` script should be `set -euo pipefail` for safety and work correctly when run locally (not just in Actions) so the user can invoke it manually for testing.

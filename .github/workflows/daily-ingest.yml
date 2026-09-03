@@ -34,10 +34,11 @@ jobs:
           pip install --upgrade pip
           pip install -e ".[dev]"
 
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
         with:
           path: ~/.kb-pipeline/state.json
-          key: kb-state-v1
+          key: kb-state-v2-${{ github.run_id }}
+          restore-keys: kb-state-v2-
 
       - name: Write YouTube cookies
         env:
@@ -68,5 +69,11 @@ jobs:
           fi
           ARGS="$ARGS --audit"
           bash scripts/daily-ingest.sh $ARGS
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: ~/.kb-pipeline/state.json
+          key: kb-state-v2-${{ github.run_id }}
 
 
