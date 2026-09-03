@@ -1,15 +1,17 @@
 import hashlib
+import json
 import logging
 import re
 import subprocess
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Optional
 
 from .audit import AuditResult, classification_audit, content_audit
-from .config import SOURCES, Source
+from .config import DRAFTS_DIR, KB_PATH, OUT_OF_SCOPE, SOURCES, Source
 from .fetcher import (
     ExtractionErrorCallback,
     ExtractionErrorType,
@@ -30,6 +32,19 @@ logger = logging.getLogger(__name__)
 
 
 MAX_RETRIES = 2
+
+
+class AuditOutcome(str, Enum):
+    """Terminal outcome of an audit-with-retry pass."""
+
+    PROMOTED = "promoted"
+    REJECTED = "rejected"
+    ESCALATED = "escalated"
+
+
+PROMOTED = AuditOutcome.PROMOTED
+REJECTED = AuditOutcome.REJECTED
+ESCALATED = AuditOutcome.ESCALATED
 
 
 @dataclass(frozen=True)
@@ -96,7 +111,66 @@ def _file_gh_issue(title: str, body: str, *, what: str) -> None:
         logger.warning("  %s failed: %s", what, e)
 
 
-def _escalate_failure(url: str, entry_path: Path, feedback: str) -> None:
+def _audit_issue_open(url: str) -> bool:
+    """Return True when an open ``Audit exhaustion`` issue body already has ``url``."""
+    try:
+        listing = subprocess.run(
+            [
+                "gh",
+                "issue",
+                "list",
+                "--search",
+                'in:title "Audit exhaustion"',
+                "--state",
+                "open",
+                "--limit",
+                "100",
+            ],
+            capture_output=True,
+            text=True,
+            check=True,
+            timeout=30,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        logger.warning("  open-issue dedupe check failed: %s", e)
+        return False
+
+    for line in listing.stdout.splitlines():
+        m = re.match(r"#(\d+)", line.strip())
+        if not m:
+            continue
+        try:
+            view = subprocess.run(
+                ["gh", "issue", "view", m.group(1), "--json", "body"],
+                capture_output=True,
+                text=True,
+                check=True,
+                timeout=30,
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            logger.warning("  open-issue dedupe check failed: %s", e)
+            return False
+        try:
+            body = json.loads(view.stdout).get("body", "")
+        except json.JSONDecodeError:
+            continue
+        if url in body:
+            return True
+    return False
+
+
+def _escalate_failure(
+    url: str,
+    entry_path: Path,
+    feedback: str,
+    *,
+    issue_open_fn: Callable[[str], bool] = _audit_issue_open,
+) -> None:
+    if issue_open_fn(url):
+        logger.info(
+            "  open Audit exhaustion issue exists for %s; skipping creation", url
+        )
+        return
     title = f"Audit exhaustion: {entry_path.name}"
     body = (
         f"## Pipeline halted — audit retries exhausted\n\n"
@@ -135,6 +209,23 @@ def _extract_youtube_video_id(url: str) -> Optional[str]:
     return m.group(1) if m else None
 
 
+def _remove_draft(draft_path: Path) -> None:
+    try:
+        draft_path.unlink(missing_ok=True)
+    except OSError:
+        return
+    for parent in [
+        draft_path.parent,
+        draft_path.parent.parent,
+        draft_path.parent.parent.parent,
+    ]:
+        try:
+            if parent != KB_PATH / DRAFTS_DIR and not any(parent.iterdir()):
+                parent.rmdir()
+        except OSError:
+            pass
+
+
 def _audit_with_retry(
     result: dict[str, Any],
     source_text: str,
@@ -147,7 +238,7 @@ def _audit_with_retry(
     co_audit_fn: Callable[..., AuditResult] = content_audit,
     promote_fn: Callable[[Path], None] = promote_draft,
     escalation_fn: Callable[[str, Path, str], None] = _escalate_failure,
-) -> bool:
+) -> AuditOutcome:
     ca_passed = False
     co_passed = False
     combined_feedback: list[tuple[str, AuditResult]] = []
@@ -160,6 +251,9 @@ def _audit_with_retry(
                     source_text, meta, audit_feedback=feedback_text
                 )
                 if new_result:
+                    if new_result.get("domain") == OUT_OF_SCOPE:
+                        _remove_draft(draft_path)
+                        return REJECTED
                     result = new_result
 
         if not ca_passed:
@@ -171,7 +265,7 @@ def _audit_with_retry(
 
         if ca_passed and co_passed:
             promote_fn(draft_path)
-            return True
+            return PROMOTED
 
         failing: list[tuple[str, AuditResult]] = []
         if not ca_passed:
@@ -199,7 +293,7 @@ def _audit_with_retry(
 
     all_feedback = _build_audit_feedback_text(combined_feedback)
     escalation_fn(url, draft_path, all_feedback)
-    return False
+    return ESCALATED
 
 
 def run_pipeline(
@@ -336,6 +430,16 @@ def run_pipeline(
                 stats["skipped"] += 1
                 continue
 
+            if result.get("domain") == OUT_OF_SCOPE:
+                logger.info(
+                    "  skipping (out-of-scope): %s", entry.get("title", "")[:60]
+                )
+                stats["skipped"] += 1
+                if not dry_run:
+                    processed.add(h)
+                count += 1
+                continue
+
             if dry_run:
                 logger.info(
                     "  would write: %s/%s/%s.md",
@@ -352,8 +456,10 @@ def run_pipeline(
                     )
             elif audit:
                 draft_path = write_draft(result, url)
-                ok = _audit_with_retry(result, text, url, entry, draft_path)
-                if not ok:
+                outcome = _audit_with_retry(result, text, url, entry, draft_path)
+                if outcome == REJECTED:
+                    logger.info("  rejected (out-of-scope): %s", url)
+                elif outcome == ESCALATED:
                     logger.warning("  audit exhausted for %s", url)
             else:
                 write_entry(result, url)
