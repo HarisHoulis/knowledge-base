@@ -1402,9 +1402,7 @@ class TestEscalateFailureDedupe:
                     raise subprocess.CalledProcessError(1, cmd)
                 return MagicMock(stdout=listing_stdout, stderr="")
             if cmd[:2] == ["gh", "issue"] and cmd[2] == "view":
-                return MagicMock(
-                    stdout=json.dumps({"body": view_body}), stderr=""
-                )
+                return MagicMock(stdout=json.dumps({"body": view_body}), stderr="")
             return MagicMock(stdout="", stderr="")
 
         return fake_run
