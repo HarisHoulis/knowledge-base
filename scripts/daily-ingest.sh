@@ -73,7 +73,9 @@ echo "[daily-ingest] Pushing branch $BRANCH..."
 git push origin "$BRANCH"
 
 echo "[daily-ingest] Creating pull request..."
-$GH pr create --fill --base main
+PR_URL=$($GH pr create --fill --base main)
+PR_NUMBER=${PR_URL##*/}
+echo "[daily-ingest] PR created: $PR_URL"
 
 INELIGIBLE=$(git show --name-only --format= HEAD | grep -vE '^(concepts/|drafts/).*\.md$' || true)
 if [ -n "$INELIGIBLE" ]; then
@@ -86,7 +88,7 @@ $(printf '%s\n' "$INELIGIBLE" | sed 's/^/- /')"; then
     fi
 else
     echo "[daily-ingest] Enabling squash auto-merge..."
-    if ! $GH pr merge --auto --squash; then
+    if ! $GH pr merge "$PR_NUMBER" --auto --squash; then
         echo "[daily-ingest] Warning: failed to enable auto-merge (best-effort)." >&2
     fi
 fi
