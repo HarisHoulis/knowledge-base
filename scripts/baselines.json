@@ -65,14 +65,14 @@
     "writer"
   ],
   "size_limits": {
-    "config": 84,
-    "audit": 127,
-    "llm": 81,
-    "cli": 45,
-    "pipeline": 359,
-    "writer": 72,
     "__main__": 3,
+    "audit": 127,
+    "cli": 45,
+    "config": 72,
     "fetcher": 243,
-    "state": 18
+    "llm": 86,
+    "pipeline": 482,
+    "state": 18,
+    "writer": 72
   }
 }
