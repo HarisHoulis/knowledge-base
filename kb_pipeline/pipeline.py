@@ -6,6 +6,7 @@ import subprocess
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Optional
 
@@ -32,9 +33,18 @@ logger = logging.getLogger(__name__)
 
 MAX_RETRIES = 2
 
-PROMOTED = "promoted"
-REJECTED = "rejected"
-ESCALATED = "exhausted"
+
+class AuditOutcome(str, Enum):
+    """Terminal outcome of an audit-with-retry pass."""
+
+    PROMOTED = "promoted"
+    REJECTED = "rejected"
+    ESCALATED = "escalated"
+
+
+PROMOTED = AuditOutcome.PROMOTED
+REJECTED = AuditOutcome.REJECTED
+ESCALATED = AuditOutcome.ESCALATED
 
 
 @dataclass(frozen=True)
@@ -228,7 +238,7 @@ def _audit_with_retry(
     co_audit_fn: Callable[..., AuditResult] = content_audit,
     promote_fn: Callable[[Path], None] = promote_draft,
     escalation_fn: Callable[[str, Path, str], None] = _escalate_failure,
-) -> str:
+) -> AuditOutcome:
     ca_passed = False
     co_passed = False
     combined_feedback: list[tuple[str, AuditResult]] = []
