@@ -2,19 +2,24 @@
 domain: ai-workflows
 subdomain: context-engineering
 concept: context-engineering
-title: Context Engineering in 2026
+title: Context engineering with Dex Horthy
 sources:
-  - title: "Context Engineering in 2026 — Louis-François Bouchard, Omar Solano & Samridhi Vaid, Towards AI"
-    url: "https://www.youtube.com/watch?v=WP3hjUXd918"
-    author: "AI Engineer"
-    date: "2026-08-17T16:26:35+00:00"
+  - title: "Context engineering with Dex Horthy"
+    url: "https://newsletter.pragmaticengineer.com/p/context-engineering-with-dex-horthy"
+    author: "Gergely Orosz"
+    date: "2026-07-15"
 ---
 
-# Context Engineering in 2026
+# Context engineering with Dex Horthy
 
-The video, presented by Louis-François Bouchard, Omar Solano, and Samridhi Vaid of Towards AI, discusses the challenges and solutions for context engineering in AI agents, particularly in the context of an AI tutor. The speakers identify two core problems: the finite context window, which degrades model performance and increases cost as it fills, and the stateless nature of models, which requires external mechanisms for continuity. They share their experiments to improve their AI tutor, focusing on compaction, memory retrieval, and grounding responses in course content. The talk emphasizes that context engineering in 2026 is not just about prompt design but managing the entire context lifecycle, including retrieval, summarization, and session handling. The team open-sourced their AI tutor and experiments, providing a practical resource for the community [1].
+In a Pragmatic Engineer podcast episode, Dex Horthy—CEO of HumanLayer and coiner of the term “context engineering”—shares practical lessons for building reliable LLM applications. He describes how his team's early experiment with fully unread AI-generated code failed within four months: production broke, models could not find the root cause, and re-onboarding took three weeks. His core advice is to keep humans in the loop where it matters, especially for design and architecture decisions, while using LLMs to speed up implementation (Orosz, 2026).
 
-- Context windows are finite: piling tokens degrades results and increases cost.
-- Models are stateless; memory and compaction are essential for long, coherent interactions.
-- Effective context engineering involves grounding responses in user-specific content (e.g., course materials).
-- The Towards AI team open-sourced their AI tutor and experiments to share best practices.
+Horthy introduces key concepts like the “dumb zone”—the point at which a model's performance degrades as its context window fills up—and recommends staying well below the maximum context size. He suggests frequent, intentional compaction: compressing long, noisy contexts into Markdown documents and starting fresh sessions. He also identifies the four factors that matter in a context window: size, information quality, missing information, and trajectory. Trajectory poisoning, where a model repeats mistakes after negative feedback, signals that it is time to start a new session.
+
+The article closes with three viable “software factory” models: turning the lights off and letting agents write unreviewed code (which Horthy tried and failed); reviewing all AI-generated code (yielding only a 30–50% productivity lift); or finding leverage by investing in planning, design, and architecture while letting agents generate code with less oversight—potentially achieving 2–3x speedups (Orosz, 2026).
+
+- Unreviewed AI-generated code can lead to serious production issues; Horthy's team had to throw out an entire system after four months of no human code review.
+- Models enter a “dumb zone” as context usage grows; larger context windows do not imply smarter models, and staying below a heuristic limit improves outcomes.
+- Frequent intentional compaction—compressing context into Markdown and starting new sessions—helps manage complex projects and avoids trajectory poisoning.
+- The four critical context-window factors are size, information quality, missing information, and trajectory; recognizing when a session is poisoned saves time and tokens.
+- Three software-factory approaches exist: unreviewed agentic coding (risky), full human review of AI code (modest gains), and leverage-focused human oversight with limited code review (best speedups).
