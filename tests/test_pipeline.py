@@ -1238,3 +1238,40 @@ class TestRunPipelineAuthStartupCheck:
         assert notify_calls == []
         assert stats["sources"] == 1
         assert stats["written"] == 1
+
+
+class TestTaxonomyDomains:
+    def _classification(self, domain: str) -> dict[str, Any]:
+        return dict(
+            SAMPLE_RESULT,
+            domain=domain,
+            title="Test title",
+            sources=[{"title": "Test", "url": SAMPLE_URL, "author": "", "date": ""}],
+        )
+
+    def test_java_tools_domain_is_valid(self) -> None:
+        from kb_pipeline.llm import validate_llm_output
+
+        errors = validate_llm_output(self._classification("java-tools"))
+
+        assert errors == []
+
+    def test_web_dev_domain_is_valid(self) -> None:
+        from kb_pipeline.llm import validate_llm_output
+
+        errors = validate_llm_output(self._classification("web-dev"))
+
+        assert errors == []
+
+    def test_unknown_domain_is_invalid(self) -> None:
+        from kb_pipeline.llm import validate_llm_output
+
+        errors = validate_llm_output(self._classification("not-a-domain"))
+
+        assert any("invalid domain" in e for e in errors)
+
+    def test_system_prompt_advertises_both_new_domains(self) -> None:
+        from kb_pipeline import config
+
+        assert "java-tools" in config.SYSTEM_PROMPT
+        assert "web-dev" in config.SYSTEM_PROMPT

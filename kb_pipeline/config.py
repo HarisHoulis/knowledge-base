@@ -22,6 +22,8 @@ VALID_DOMAINS = {
     "python-backend",
     "ai-workflows",
     "engineering-culture",
+    "java-tools",
+    "web-dev",
 }
 
 
@@ -52,7 +54,7 @@ SOURCES: list[Source] = load_sources()
 SYSTEM_PROMPT = """You are a knowledge-base curator. Given an article or transcript, \
 output a JSON object with:
 - "domain": one of ["android-kotlin", "system-design", "python-backend", \
-"ai-workflows", "engineering-culture"]
+"ai-workflows", "engineering-culture", "java-tools", "web-dev"]
 - "subdomain": a concise subdomain name
 - "concept": short kebab-case identifier (e.g. "structured-concurrency")
 - "title": human-readable title
