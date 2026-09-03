@@ -1,0 +1,45 @@
+name: Seed KB State Cache
+
+on:
+  workflow_dispatch:
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build state from promoted concepts
+        run: |
+          mkdir -p ~/.kb-pipeline
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import re
+          from pathlib import Path
+
+          urls: set[str] = set()
+          for md in Path("concepts").rglob("*.md"):
+              for line in md.read_text().splitlines():
+                  m = re.match(r'^\s*url:\s*"([^"]+)"\s*$', line)
+                  if m:
+                      urls.add(m.group(1))
+
+          hashes = sorted(hashlib.sha256(u.encode()).hexdigest()[:16] for u in urls)
+          Path.home().joinpath(".kb-pipeline/state.json").write_text(
+              json.dumps({"processed_hashes": hashes}, indent=2)
+          )
+          print(f"seeded {len(hashes)} processed_hashes")
+          PY
+
+      - uses: actions/cache/save@v4
+        with:
+          path: ~/.kb-pipeline/state.json
+          key: kb-state-v2-seed
