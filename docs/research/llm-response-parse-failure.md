@@ -8,13 +8,12 @@ Issue #249 — research why daily-ingest runs log `[!] LLM response parse failed
 
 ## 1. What the warning means
 
-The warning is raised exactly once in the codebase, in `classify_summarize` (`kb_pipeline/llm.py:85`), from a bare `json.loads(content)` at `llm.py:76`, where `content = body["choices"][0]["message"]["content"]`. The two observed messages decode as follows:
+The warning is raised exactly once in the codebase, in `classify_summarize` (`kb_pipeline/llm.py:85`), from a bare `json.loads(content)` at `llm.py:76`, where `content = body["choices"][0]["message"]["content"]`. Two distinct messages are observed:
 
-| Message | `json.loads` input | Meaning |
+| Message | What `json.loads` saw | Meaning |
 |---|---|---|
-| `Expecting value: line 1 column 1 (char 0)` | `""` (empty string) | Provider returned a `200` with an **empty** `content` field. |
-| `Expecting value: line 1 column 1 (char 0)` | string starting with a non-JSON char | `content` starts with prose or a markdown fence (`` ` ``), so the first token is not a JSON value. |
-| `Unterminated string starting at: line N column M (char NNNN)` | valid prefix, cut mid-string | `content` was **truncated before the JSON closed** — generation stopped mid-answer. |
+| `Expecting value: line 1 column 1 (char 0)` | `""` (empty) **or** leading non-JSON text | Provider returned a `200` with `content` that is **empty or does not start with a JSON value** (prose, a markdown fence, etc.). The two shapes are indistinguishable from the log line alone. |
+| `Unterminated string starting at: line N column M (char NNNN)` | a valid JSON prefix cut mid-string | `content` was **truncated before the JSON object closed** — generation stopped mid-answer. `(char NNNN)` is where the unterminated string *began*, not the total length. |
 
 Both happen only after the HTTP call succeeded: a network/provider error would surface as `LLM request failed` (`llm.py:83`) and a valid-but-nonconforming object as `LLM output validation failed` (`llm.py:79`). In the reference run there were **0** of those — every failure was a `200` whose payload could not be parsed.
 
@@ -45,11 +44,12 @@ The audits hit the same endpoint/params (`response_format: json_object`, thinkin
 ## 3. Evidence from the reference run
 
 - Mode: `workflow_dispatch` dry-run, `--limit=10 --audit`; 19 sources, 313 seen, 38 written, 275 skipped.
-- **13 parse failures total: 10× `Expecting value … (char 0)`, 3× `Unterminated string …`.** 0 request errors, 0 validation failures. Interleaved with successful parses in the same run → intermittent, endpoint-level.
+- **13 parse failures total: 10× `Expecting value … (char 0)`, 3× `Unterminated string …`.** 0 request errors, 0 validation failures. They cluster in contiguous bursts of 2–5 failures rather than spreading uniformly between successes — time-correlated, consistent with a transient endpoint condition rather than per-request randomness.
 - Timing: each failing call occupies ~16 s — a full completion attempt, not a fast error.
 - DeepSeek's official JSON Output guide documents both failure modes:
   - > "When using the JSON Output feature, the API may occasionally return empty content. We are actively working on optimizing this issue." ([JSON Output guide](https://api-docs.deepseek.com/guides/json_mode))
   - > "the message content may be partially cut off if `finish_reason="length"`, which indicates the generation exceeded `max_tokens`" ([chat-completions reference](https://api-docs.deepseek.com/api/create-chat-completion))
+- DeepSeek's API reference also lists stop reasons beyond `length` that truncate a response — `content_filter` (content omitted after a content-filter flag) and `insufficient_system_resource` (request interrupted by inference-system resource pressure). The pipeline code never reads `finish_reason`, so none can be ruled out from archived logs.
 
 ---
 
@@ -57,10 +57,10 @@ The audits hit the same endpoint/params (`response_format: json_object`, thinkin
 
 **Primary cause — the DeepSeek endpoint intermittently returns empty or truncated `content` on `200`, and the code treats any unparseable body as a hard failure.**
 
-Two documented DeepSeek behaviors explain the specific shapes:
+Two documented DeepSeek behaviors explain the observed shapes:
 
-1. **Empty `content` (`Expecting value … char 0`)** — DeepSeek explicitly acknowledges that JSON Output mode "may occasionally return empty content". This is the dominant signature (10/13) and requires no further local condition.
-2. **Truncated `content` (`Unterminated string`)** — generation hit the `max_tokens` ceiling (`finish_reason: "length"`) before the JSON object closed. `max_tokens: 2000` is the binding cap, and with thinking mode **on by default at high effort** the budget is shared between the chain-of-thought (`reasoning_content`, surfaced as `usage.completion_tokens_details.reasoning_tokens`) and the visible answer. Long, ambiguous 15k-char inputs provoke heavy reasoning, which starves the answer budget — consistent with a visible cut at ~2.8k chars (~700 visible tokens, the rest consumed by reasoning) and, at the extreme, an all-reasoning response with empty `content`.
+1. **Empty or non-JSON-leading `content` (`Expecting value … char 0`)** — DeepSeek explicitly acknowledges that JSON Output mode "may occasionally return empty content". This is the dominant signature (10/13) and the strongest candidate, though a prose/fence-prefixed reply cannot be excluded from logs alone (see §1).
+2. **Truncated `content` (`Unterminated string`)** — generation stopped before the JSON object closed. `max_tokens: 2000` is the binding cap, and with thinking mode **on by default at high effort** the budget is shared between the chain-of-thought (`reasoning_content`, surfaced as `usage.completion_tokens_details.reasoning_tokens`) and the visible answer. Long, ambiguous 15k-char sources provoke heavy reasoning, which starves the answer budget — so the visible cut can land well before 2000 visible tokens, and at the extreme the whole budget goes to reasoning leaving `content` empty. `finish_reason: "length"` is the most likely stop reason, but the documented `content_filter` / `insufficient_system_resource` stops (which also truncate) cannot be excluded because the code discards `finish_reason`.
 
 **Contributing factors**
 
@@ -74,18 +74,18 @@ Two documented DeepSeek behaviors explain the specific shapes:
 ## 5. Impact
 
 - **No permanent data loss.** A parse-failed URL is not added to `processed_hashes`, so it is retried on a later run while still in the feed window.
-- Per occurrence: ~16 s of run time and a wasted completion (~2k output tokens). At ~25% of classify attempts in the reference run, this meaningfully inflates run duration and cost and buries real warnings.
+- Per occurrence: ~16 s of run time and a wasted completion (~2k output-token budget). 13 occurrences in the reference run is a non-trivial share of completions, and their burst clustering points at a transient endpoint condition rather than per-entry randomness.
 - Persistent entries (one that reliably triggers high-effort reasoning) can log the warning every run indefinitely, which is how the operator noticed it.
 
 ---
 
 ## 6. Proposed solutions
 
-Options are ranked by leverage-per-effort. Items **A–C** are independent; **D/E** are follow-ups.
+Options are ordered by leverage-per-effort. **A–C** are independent and address the failure directly; **D** is optional insurance; **E** and **F** are separate follow-ups.
 
 ### A. Fix the DeepSeek request configuration (lowest effort, likely largest effect)
 
-Change the request in `classify_summarize` and `audit._call_llm`:
+Change the request parameters in `classify_summarize`, and apply the same request-parameter change in `audit._call_llm` (same endpoint defaults, so it suffers the same budget issue; note this is a request-parameter alignment only — the separate fail-open *semantics* of audits are item F):
 
 1. **Disable thinking for structured JSON output** — `thinking: {"type": "disabled"}` via `extra_body` (OpenAI SDK) / body field. This returns the full `max_tokens` budget to the answer, makes `temperature` effective again, and matches DeepSeek's documented toggle.
    - Trade-offs: loses chain-of-thought quality for the classification/summary step. For deterministic structured extraction that is an acceptable (arguably desirable) loss; if summary quality regresses, keep thinking on but combine with (2).
@@ -129,13 +129,13 @@ Change `audit._run_audit` to treat an unparseable audit response as a failed aud
 ## 7. What NOT to do
 
 - **Do not switch providers or model.** The failure is intermittent, documented upstream, and addressable client-side.
-- **Do not switch to `response_format: {"type": "json_schema"}`** — DeepSeek's API accepts only `text` and `json_object`; `json_schema` is rejected with a `400` ([chat-completions reference](https://api-docs.deepseek.com/api/create-chat-completion)).
+- **Do not switch to `response_format: {"type": "json_schema"}`** — DeepSeek documents only `text` and `json_object` as valid `response_format` values ([chat-completions reference](https://api-docs.deepseek.com/api/create-chat-completion)), so schema-enforced output is not an available knob on this endpoint.
 - **Do not "fix" data loss** — there is none to fix; the retry-on-next-run behavior is already correct and should be preserved.
 
 ---
 
 ## 8. Recommendation summary
 
-**Ship A(1) + A(2) + B together, validate with a dry-run, then add C.** The observed signatures are two documented DeepSeek JSON-mode failure modes, both aggravated by thinking-mode-on-by-default consuming the 2000-token budget and by the request not disabling it. Disabling thinking and raising the cap attack the mechanism directly; the logging improvement makes the fix verifiable from the next run's logs. E and F are worthwhile but separate tickets; D is optional insurance.
+**Ship A(1) + A(2) + B together, validate with a dry-run, then add C.** The observed signatures map to two documented DeepSeek JSON-mode failure modes, both aggravated by thinking-mode-on-by-default consuming the 2000-token budget. Disabling thinking and raising the cap attack the truncation mechanism directly; the logging improvement makes every remaining case attributable to `finish_reason`/`usage` on the next run. E and F are worthwhile but separate tickets; D is optional insurance.
 
-Verification: the same dry-run (`--limit=10 --audit`) after the change should show zero `LLM response parse failed` warnings and zero regression in "would write" counts; `B` makes the reason auditable if any remain.
+Verification: the same dry-run (`--limit=10 --audit`) after the change should show the parse-failure count drop materially — the truncated/`length` class in particular. If occasional empty-content (`char 0`) warnings persist, that is DeepSeek's documented intermittent JSON-mode issue rather than the budget problem, and B will have made each remaining case diagnosable instead of a bare `char 0`.
