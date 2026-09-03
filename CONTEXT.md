@@ -9,7 +9,7 @@ A single, tightly-scoped idea captured in one markdown file at `domain/subdomain
 _Avoid_: Entry, leaf-node entry, knowledge item
 
 **Domain**:
-A category of engineering knowledge, stored under `concepts/`. One of `android-kotlin`, `system-design`, `python-backend`, `ai-workflows`, `engineering-culture`.
+A category of engineering knowledge, stored under `concepts/`. One of `android-kotlin`, `system-design`, `python-backend`, `ai-workflows`, `engineering-culture`, `java-tools`, `web-dev`.
 
 **Subdomain**:
 A sub-category within a domain. Examples: `architecture`, `coroutines`, `fastapi`, `coding-agents`.
@@ -49,7 +49,12 @@ _Avoid_: Review, verification pass
 A concept file that has passed LLM generation but not yet cleared audit. Stored under `drafts/` in the KB tree. Moved into `domain/subdomain/concept.md` only after both audits pass.
 
 **Audit Loop**:
-The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 2 iterations). If still failing after max retries, the pipeline halts and notifies the user.
+The retry cycle: audit fails → surgical feedback to LLM → regenerate (up to 2 iterations). Ends one of three ways — the entry is promoted (audits pass), rejected (a re-roll classifies it out-of-scope; the draft is removed, nothing filed), or escalated (retries exhausted on in-scope content; the pipeline files an Audit exhaustion GitHub issue).
+_Avoid_: Retry loop, review cycle
+
+**Out-of-Scope**:
+A classifier verdict, `"domain": "out-of-scope"`, for source text not relevant to any listed domain (e.g. personal or faith posts from a mixed blog). The entry is skipped — no draft, no audit, no issue — and its URL is still marked processed on real runs. Not a publishable domain.
+_Avoid_: Off-topic, not applicable, other
 
 **Auth Cookie**:
 A browser session cookie required to access paywalled or authenticated content (e.g., Substack paid posts). Stored as an environment variable and referenced by `Source.cookie_env_var`, with surrounding whitespace stripped before use. Validated at pipeline startup; if missing or empty, the pipeline files a GitHub issue and skips only that source — all other sources continue. If an article extraction fails or returns empty mid-run, the result is recorded as a **Content Extraction Error** and the source's remaining entries are aborted for the run; a network/fetch failure is logged without being recorded. Neither case is labelled an auth failure.
@@ -137,3 +142,5 @@ _Avoid_: pipeline stages, workflow engine, orchestrator
 | Gergely Orosz | Engineering Culture | Substack |
 | ByteByteGo | System Design | Substack |
 | Matt Pocock | TypeScript | Newsletter, YouTube |
+| jjohannes | Java / Gradle | YouTube |
+| Kent C. Dodds | Web Development / AI | Blog, YouTube |
