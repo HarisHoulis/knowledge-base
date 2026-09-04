@@ -56,6 +56,13 @@ Issues live in this repo's GitHub Issues, managed via the `gh` CLI. See `docs/ag
 
 Single-context layout — root `CONTEXT.md` + ADRs in `docs/adr/`. See `docs/agents/domain.md`.
 
+### Learning metrics
+
+Interactive sessions record learning events (metrics line + three-field entry) to
+`~/learning-journal/knowledge-base.md` per `~/.config/opencode/rules/learning-loop.md`.
+The repo's `docs/agents/implement-ledger.md` is a different ledger — CI findings on
+implemented tickets, not learning metrics.
+
 ### Testing
 
 1. Injectable callables for deterministic unit tests; integration tests gated by marker and excluded from default runs. See `docs/agents/testing.md`.

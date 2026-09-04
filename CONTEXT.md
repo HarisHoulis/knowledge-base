@@ -2,6 +2,10 @@
 
 A curated repository of high-signal concepts synthesized from trusted sources, organized as a browsable directory tree.
 
+> This file is the knowledge-base **domain** context. The AI co-development
+> learning-system vocabulary (loaded before journal writes) lives in
+> `~/learning-journal/GLOSSARY.md` (canonical `~/learning-journal/CONTEXT.md`).
+
 ## Language
 
 **Concept**:
