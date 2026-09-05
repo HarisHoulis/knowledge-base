@@ -94,5 +94,15 @@
     "id": "kentcdodds-yt",
     "type": "youtube",
     "playlist": "PLV5CVI1eNcJhP4nrJt85L7PxHjebFpDfY"
+  },
+  {
+    "id": "infoq-architecture-design",
+    "type": "rss",
+    "url": "https://www.infoq.com/feed/architecture-design"
+  },
+  {
+    "id": "goto-conferences",
+    "type": "youtube",
+    "channel": "UCs_tLP3AiwYKwdUHpltJPuA"
   }
 ]
