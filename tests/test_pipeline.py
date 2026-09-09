@@ -598,6 +598,10 @@ def test_all_current_sources_migrate_with_selectors() -> None:
         "jjohannes-control-gradle": {"playlist": "PLWQK2ZdV4Yl1LpnMvbbC07pFxggprujwH"},
         "kentcdodds": {"url": "https://kentcdodds.com/blog/rss.xml"},
         "kentcdodds-yt": {"playlist": "PLV5CVI1eNcJhP4nrJt85L7PxHjebFpDfY"},
+        "infoq-architecture-design": {
+            "url": "https://www.infoq.com/feed/architecture-design"
+        },
+        "goto-conferences": {"channel": "UCs_tLP3AiwYKwdUHpltJPuA"},
     }
     by_id = {s.id: s for s in SOURCES}
     assert set(by_id) == set(expected)
@@ -616,6 +620,8 @@ def test_new_sources_expose_expected_types() -> None:
         "jjohannes-control-gradle": "youtube",
         "kentcdodds": "rss",
         "kentcdodds-yt": "youtube",
+        "infoq-architecture-design": "rss",
+        "goto-conferences": "youtube",
     }
     by_id = {s.id: s for s in SOURCES}
     for src_id, expected_type in expected_types.items():
