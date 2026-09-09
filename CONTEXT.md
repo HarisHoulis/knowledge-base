@@ -73,6 +73,9 @@ A failure to extract article text from fetched content. Two distinct types:
 
 All errors collected during a single Pipeline run are surfaced as one cumulative GitHub issue, so the operator can triage failing Sources in one place.
 
+**LLM Response Failure**:
+An HTTP 200 whose LLM `content` cannot be parsed as the requested JSON. Observable sub-types logged by the Pipeline: **empty** (`""`), **truncated** (JSON cut mid-object, `finish_reason: length`), **fenced/wrong-shape** (non-JSON-leading text). Distinct from a request error (`LLM request failed`) or a schema-validation failure (`LLM output validation failed`). On current Pipeline behavior a parse-failed Source is dropped for the run and retried while still in the feed — no State change, no permanent loss.
+
 **Fitness Function**:
 A CI-gated check in `scripts/check-fitness.py` that mechanically enforces the `kb_pipeline/` architecture against versioned baselines. Three axes: dependency matrix, module-set coverage, per-module size limits.
 _Avoid_: Architecture check, quality gate
