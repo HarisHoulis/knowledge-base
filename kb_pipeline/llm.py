@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import requests
 
@@ -37,11 +37,15 @@ def classify_summarize(
     text: str,
     meta: dict[str, Any],
     audit_feedback: Optional[str] = None,
+    *,
+    post_fn: Optional[Callable[..., Any]] = None,
 ) -> Optional[dict[str, Any]]:
     if not LLM_API_KEY:
         logger.warning("  [!] LLM_API_KEY not set, skipping LLM")
         return None
 
+    body: Any = {}
+    content = ""
     prompt = (
         f"Title: {meta.get('title', '')}\n"
         f"Author: {meta.get('author', '')}\n"
@@ -55,7 +59,8 @@ def classify_summarize(
             f"{audit_feedback}"
         )
     try:
-        r = requests.post(
+        call = post_fn or requests.post
+        r = call(
             f"{LLM_API_URL}/chat/completions",
             headers={"Authorization": f"Bearer {LLM_API_KEY}"},
             json={
@@ -73,6 +78,7 @@ def classify_summarize(
         r.raise_for_status()
         body = r.json()
         content = body["choices"][0]["message"]["content"]
+        content = content if isinstance(content, str) else ""
         data = json.loads(content)
         errors = validate_llm_output(data)
         if errors:
@@ -81,6 +87,20 @@ def classify_summarize(
         return data
     except requests.RequestException as e:
         logger.warning("  [!] LLM request failed: %s", e)
-    except (json.JSONDecodeError, KeyError, IndexError, TypeError) as e:
+    except json.JSONDecodeError as e:
+        c0 = (body.get("choices") or [{}])[0]
+        usage = body.get("usage") or {}
+        excerpt = (content[:200] + "...") if len(content) > 200 else content
+        logger.warning(
+            "  [!] LLM response parse failed: %s | title=%r | finish_reason=%r | "
+            "len(content)=%d | usage=%s | content_excerpt=%r",
+            e,
+            meta.get("title", ""),
+            c0.get("finish_reason"),
+            len(content),
+            usage,
+            excerpt,
+        )
+    except (KeyError, IndexError, TypeError) as e:
         logger.warning("  [!] LLM response parse failed: %s", e)
     return None
