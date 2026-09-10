@@ -6,6 +6,22 @@ Inject a callable (`*, audit_fn=None`) rather than mocking third-party libraries
 
 This keeps tests deterministic, fast, and free of environment dependencies.
 
+## Assertion shape
+
+Assert the complete expected value in one equality, not its parts.
+
+```python
+# Do
+assert result == {"pass": False}
+
+# Don't
+assert result != {"pass": True}
+assert result.get("pass") is False
+```
+
+Partial assertions are valid only when the full value isn't the contract
+(non-deterministic fields, or a value another test owns).
+
 ## Test directories
 
 | Suite | Location | Marker | Requires | Run with |
