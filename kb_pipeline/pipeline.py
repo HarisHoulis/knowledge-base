@@ -33,6 +33,8 @@ logger = logging.getLogger(__name__)
 
 MAX_RETRIES = 2
 
+LLM_FAILURE_RATE_THRESHOLD = 0.5
+
 
 class AuditOutcome(str, Enum):
     """Terminal outcome of an audit-with-retry pass."""
@@ -53,6 +55,13 @@ class ExtractionFailure:
     title: str
     url: str
     error_type: ExtractionErrorType
+
+
+@dataclass(frozen=True)
+class LLMFailure:
+    source_id: str
+    title: str
+    url: str
 
 
 def _create_gh_issue(title: str, body: str) -> bool:
@@ -79,6 +88,14 @@ def _report_extraction_failures(failures: list[ExtractionFailure]) -> None:
     )
     if _create_gh_issue(title, body):
         logger.info("  extraction failures issue created (%d entries)", len(failures))
+
+
+def _report_llm_failures(failures: list[LLMFailure]) -> None:
+    day = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    title = f"LLM response failures: {day} ({len(failures)} entries)"
+    body = "\n".join(f"- **{f.source_id}** | {f.title} | {f.url}" for f in failures)
+    if _create_gh_issue(title, body):
+        logger.info("  LLM failures issue created (%d entries)", len(failures))
 
 
 def _build_audit_feedback_text(
@@ -179,6 +196,10 @@ def _escalate_failure(
         f"### Combined audit feedback\n\n```\n{feedback}\n```"
     )
     _file_gh_issue(title, body, what="escalation")
+
+
+def _should_report_llm_failures(failed: int, attempted: int) -> bool:
+    return failed > 0 and failed / attempted >= LLM_FAILURE_RATE_THRESHOLD
 
 
 def _notify_auth_failure(source_id: str, env_var: str) -> None:
@@ -310,12 +331,22 @@ def run_pipeline(
     notify_fn: Callable[[str, str], None] = _notify_auth_failure,
     classify_fn: Callable[..., Optional[dict[str, Any]]] = classify_summarize,
     report_fn: Callable[[list[ExtractionFailure]], None] = _report_extraction_failures,
+    llm_report_fn: Callable[[list[LLMFailure]], None] = _report_llm_failures,
 ) -> dict[str, int]:
     sources = sources or SOURCES
     state = load_state()
     processed: set[str] = set(state["processed_hashes"])
-    stats = {"sources": 0, "seen": 0, "written": 0, "skipped": 0, "failed": 0}
+    stats = {
+        "sources": 0,
+        "seen": 0,
+        "written": 0,
+        "skipped": 0,
+        "failed": 0,
+        "llm_failed": 0,
+    }
     failures: list[ExtractionFailure] = []
+    llm_failures: list[LLMFailure] = []
+    classify_attempts = 0
 
     for src in sources:
         logger.info("[%s]", src.id)
@@ -425,9 +456,16 @@ def run_pipeline(
                 stats["skipped"] += 1
                 continue
 
+            classify_attempts += 1
             result = classify_fn(text, entry)
             if not result:
-                stats["skipped"] += 1
+                stats["llm_failed"] += 1
+                llm_failures.append(LLMFailure(src.id, entry.get("title", ""), url))
+                logger.warning(
+                    "  [!] LLM response failure for %s: %s",
+                    entry.get("title", ""),
+                    url,
+                )
                 continue
 
             if result.get("domain") == OUT_OF_SCOPE:
@@ -476,7 +514,10 @@ def run_pipeline(
         save_state(state)
 
     stats["failed"] = len(failures)
-    if not dry_run and failures:
-        report_fn(failures)
+    if not dry_run:
+        if failures:
+            report_fn(failures)
+        if _should_report_llm_failures(len(llm_failures), classify_attempts):
+            llm_report_fn(llm_failures)
 
     return stats
