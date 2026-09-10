@@ -44,7 +44,7 @@ For plan verification on multi-step tasks: @docs/agents/plan-execution.md
 - **Terminal Safety:** Never run recursive or forced deletions (`rm -rf`) via terminal tools without printing the explicit target path first.
 - **Python:** This system has no `python` binary — always use `python3` (e.g. `python3 -m pytest`). Never use bare `python` in shell commands.
 - **Git Workflow:** Format commit messages strictly to Conventional Commits: `<type>(<scope>): <short summary>`. (e.g., `feat`, `fix`, `refactor`). Keep descriptions present-tense and imperative.
-- **Branches:** Never push or force push to a branch.
+- **Branches:** Never push or force push to a branch unless the user explicitly asks, or a headless CI run with no HITL must (normal push only — never force).
 
 ## Agent skills
 
