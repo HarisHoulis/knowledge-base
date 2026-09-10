@@ -46,5 +46,6 @@ Each finding is attributed to one class — the fix's root cause, not the surfac
 | 249 | 2026-09-03 | ✓ Preflight | ✓ seam | ✓ bounds | 4 asm | 0 esc | overclaim ×2, analysis-tension ×1, table-clarity ×1, evidence-mismatch ×1, verification-gap ×1 | 6 minor / 0 major / 0 blocker | spec-gap ×3, bounding-box-gap ×1, unstated-decision ×1, seam-gap ×1 | [#249](https://github.com/HarisHoulis/knowledge-base/issues/249) |
 | 254 | 2026-09-08 | ✓ Preflight | ✓ seam | ✓ bounds | 2 asm | 0 esc | duplicated-code ×1, tautological-test ×1, unstated-decision ×1 | 3 minor / 0 major / 0 blocker | spec-gap ×3 | pending |
 | 262 | 2026-09-09 | ✓ Preflight | ✓ seam | ✓ bounds | 3 asm | 0 esc | doc-standard ×2, spec-gap ×1 | 3 minor / 0 major / 0 blocker | spec-gap ×3 | pending |
+| 263 | 2026-09-10 | ✓ Preflight | ✓ seam | ✓ bounds | 3 asm | 0 esc | duplicated-code ×2, mysterious-name ×2, unstated-decision ×1 | 5 minor / 0 major / 0 blocker | seam-gap ×2, unstated-decision ×3 | pending |
 
 **Signals** columns, per ticket: Pre-flight present (✓/✗), seam named (✓/✗), bounds stated (✓/✗), # assumptions, # escalations.
