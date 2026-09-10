@@ -124,4 +124,4 @@ def _run_audit(
         ConnectionError,
     ) as e:
         logger.warning("audit failed: %s", e)
-        return {"pass": True}
+        return {"pass": False}
