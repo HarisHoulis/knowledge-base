@@ -39,13 +39,11 @@ class TestClassificationAudit:
 
     def test_malformed_json_is_not_a_pass(self):
         result = classification_audit(DATA, TEXT, audit_fn=stub_malformed)
-        assert result != {"pass": True}
-        assert result.get("pass") is False
+        assert result == {"pass": False}
 
     def test_exception_is_not_a_pass(self):
         result = classification_audit(DATA, TEXT, audit_fn=stub_exception)
-        assert result != {"pass": True}
-        assert result.get("pass") is False
+        assert result == {"pass": False}
 
     def test_prompt_contains_classification_fields(self):
         prompts = []
@@ -76,13 +74,11 @@ class TestContentAudit:
 
     def test_malformed_json_is_not_a_pass(self):
         result = content_audit(DATA, TEXT, audit_fn=stub_malformed)
-        assert result != {"pass": True}
-        assert result.get("pass") is False
+        assert result == {"pass": False}
 
     def test_exception_is_not_a_pass(self):
         result = content_audit(DATA, TEXT, audit_fn=stub_exception)
-        assert result != {"pass": True}
-        assert result.get("pass") is False
+        assert result == {"pass": False}
 
     def test_prompt_contains_summary(self):
         prompts = []
