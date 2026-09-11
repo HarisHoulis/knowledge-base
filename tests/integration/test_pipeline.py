@@ -37,7 +37,7 @@ class TestPipelineIntegration:
         text = extract_text(content)
 
         result = classify_summarize(text, entry)
-        assert result is not None
+        assert isinstance(result, dict)
 
         missing = EXPECTED_KEYS - set(result.keys())
         assert not missing, f"LLM output missing keys: {missing}"

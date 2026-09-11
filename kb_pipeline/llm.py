@@ -1,6 +1,8 @@
 import json
 import logging
-from typing import Any, Callable, Optional
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Callable, Optional, Union
 
 import requests
 
@@ -14,6 +16,19 @@ from .config import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class ClassifyFailureKind(str, Enum):
+    NO_API_KEY = "no_api_key"
+    REQUEST = "request"
+    PARSE = "parse"
+    VALIDATION = "validation"
+
+
+@dataclass(frozen=True)
+class ClassifyFailure:
+    kind: ClassifyFailureKind
+    detail: str = ""
 
 
 def validate_llm_output(data: dict[str, Any]) -> list[str]:
@@ -39,10 +54,10 @@ def classify_summarize(
     audit_feedback: Optional[str] = None,
     *,
     post_fn: Optional[Callable[..., Any]] = None,
-) -> Optional[dict[str, Any]]:
+) -> Union[dict[str, Any], ClassifyFailure]:
     if not LLM_API_KEY:
         logger.warning("  [!] LLM_API_KEY not set, skipping LLM")
-        return None
+        return ClassifyFailure(ClassifyFailureKind.NO_API_KEY, "LLM_API_KEY not set")
 
     body: Any = {}
     content = ""
@@ -82,11 +97,13 @@ def classify_summarize(
         data = json.loads(content)
         errors = validate_llm_output(data)
         if errors:
-            logger.warning("  [!] LLM output validation failed: %s", "; ".join(errors))
-            return None
+            detail = "; ".join(errors)
+            logger.warning("  [!] LLM output validation failed: %s", detail)
+            return ClassifyFailure(ClassifyFailureKind.VALIDATION, detail)
         return data
     except requests.RequestException as e:
         logger.warning("  [!] LLM request failed: %s", e)
+        return ClassifyFailure(ClassifyFailureKind.REQUEST, str(e))
     except json.JSONDecodeError as e:
         c0 = (body.get("choices") or [{}])[0]
         usage = body.get("usage") or {}
@@ -101,6 +118,7 @@ def classify_summarize(
             usage,
             excerpt,
         )
+        return ClassifyFailure(ClassifyFailureKind.PARSE, str(e))
     except (KeyError, IndexError, TypeError) as e:
         logger.warning("  [!] LLM response parse failed: %s", e)
-    return None
+        return ClassifyFailure(ClassifyFailureKind.PARSE, str(e))
