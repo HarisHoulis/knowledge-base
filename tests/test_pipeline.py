@@ -9,6 +9,7 @@ import pytest
 
 from kb_pipeline.audit import AuditResult
 from kb_pipeline.config import SOURCES, Source
+from kb_pipeline.llm import ClassifyFailure, ClassifyFailureKind
 
 SAMPLE_TEXT = "some source text"
 SAMPLE_URL = "https://example.com/article"
@@ -42,8 +43,29 @@ def stub_classify_ok(
 
 def stub_classify_fail(
     text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
-) -> None:
-    return None
+) -> ClassifyFailure:
+    return ClassifyFailure(ClassifyFailureKind.PARSE, "parse failed")
+
+
+def stub_classify_request_fail(
+    text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
+) -> ClassifyFailure:
+    return ClassifyFailure(ClassifyFailureKind.REQUEST, "connection reset")
+
+
+def make_one_failure_classify() -> Any:
+    calls = 0
+
+    def one_failure_classify(
+        text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
+    ) -> Any:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            return ClassifyFailure(ClassifyFailureKind.PARSE, "parse failed")
+        return dict(SAMPLE_RESULT)
+
+    return one_failure_classify
 
 
 class CountedAuditStub:
@@ -1104,43 +1126,104 @@ class TestRunPipelineLLMFailures:
 
         _patch_live_run(monkeypatch)
         self._patch_long_extract(monkeypatch)
+        entries = [
+            _rss_entry(f"https://example.com/{i}", f"Post {i}") for i in range(11)
+        ]
         monkeypatch.setattr(
             "kb_pipeline.pipeline.fetch_rss",
-            _make_rss_fetch_stub(
-                [
-                    _rss_entry("https://example.com/a", "Alpha"),
-                    _rss_entry("https://example.com/b", "Beta"),
-                    _rss_entry("https://example.com/c", "Gamma"),
-                ]
-            ),
+            _make_rss_fetch_stub(entries),
         )
 
         reported: list[list[Any]] = []
-        calls = 0
-
-        def one_failure_classify(
-            text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
-        ) -> Optional[dict[str, Any]]:
-            nonlocal calls
-            calls += 1
-            return None if calls == 1 else dict(SAMPLE_RESULT)
 
         stats = run_pipeline(
             dry_run=False,
             sources=[Source(id="test", type="rss", url="https://example.com/feed")],
             fetch_url_text_fn=lambda url: "",
-            classify_fn=one_failure_classify,
+            classify_fn=make_one_failure_classify(),
             report_fn=lambda failures: None,
             llm_report_fn=lambda failures: reported.append(failures),
         )
 
         assert stats == {
             "sources": 1,
-            "seen": 3,
-            "written": 2,
+            "seen": 11,
+            "written": 10,
             "skipped": 0,
             "failed": 0,
             "llm_failed": 1,
+        }
+        assert reported == []
+
+    def test_failure_rate_at_threshold_files_issue(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import LLMParseFailureEntry, run_pipeline
+
+        _patch_live_run(monkeypatch)
+        self._patch_long_extract(monkeypatch)
+        monkeypatch.setattr("kb_pipeline.pipeline.LLM_FAILURE_RATE_THRESHOLD", 0.5)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub(
+                [
+                    _rss_entry("https://example.com/a", "Alpha"),
+                    _rss_entry("https://example.com/b", "Beta"),
+                ]
+            ),
+        )
+
+        reported: list[list[Any]] = []
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[Source(id="test", type="rss", url="https://example.com/feed")],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=make_one_failure_classify(),
+            report_fn=lambda failures: None,
+            llm_report_fn=lambda failures: reported.append(failures),
+        )
+
+        assert stats == {
+            "sources": 1,
+            "seen": 2,
+            "written": 1,
+            "skipped": 0,
+            "failed": 0,
+            "llm_failed": 1,
+        }
+        assert reported == [
+            [LLMParseFailureEntry("test", "Alpha", "https://example.com/a")]
+        ]
+
+    def test_request_failure_counts_as_skipped_not_llm_failed(
+        self, monkeypatch
+    ) -> None:
+        from kb_pipeline.pipeline import run_pipeline
+
+        _patch_live_run(monkeypatch)
+        self._patch_long_extract(monkeypatch)
+        monkeypatch.setattr(
+            "kb_pipeline.pipeline.fetch_rss",
+            _make_rss_fetch_stub([_rss_entry("https://example.com/a", "Alpha")]),
+        )
+
+        reported: list[list[Any]] = []
+
+        stats = run_pipeline(
+            dry_run=False,
+            sources=[Source(id="test", type="rss", url="https://example.com/feed")],
+            fetch_url_text_fn=lambda url: "",
+            classify_fn=stub_classify_request_fail,
+            report_fn=lambda failures: None,
+            llm_report_fn=lambda failures: reported.append(failures),
+        )
+
+        assert stats == {
+            "sources": 1,
+            "seen": 1,
+            "written": 0,
+            "skipped": 1,
+            "failed": 0,
+            "llm_failed": 0,
         }
         assert reported == []
 
@@ -1178,15 +1261,19 @@ class TestRunPipelineLLMFailures:
 
 class TestReportLLMFailures:
     def test_issue_title_and_body_list_failures(self, monkeypatch) -> None:
-        from kb_pipeline.pipeline import LLMFailure, _report_llm_failures
+        from kb_pipeline.pipeline import LLMParseFailureEntry, _report_llm_failures
 
         calls: list[list[str]] = []
         _patch_gh_run(monkeypatch, calls)
 
         _report_llm_failures(
             [
-                LLMFailure("bytebytego", "The Paywalled Post", "https://example.com/1"),
-                LLMFailure("jake-wharton", "Kotlin Bits", "https://example.com/2"),
+                LLMParseFailureEntry(
+                    "bytebytego", "The Paywalled Post", "https://example.com/1"
+                ),
+                LLMParseFailureEntry(
+                    "jake-wharton", "Kotlin Bits", "https://example.com/2"
+                ),
             ]
         )
 
@@ -1204,7 +1291,7 @@ class TestReportLLMFailures:
         ]
 
     def test_gh_failure_is_logged_not_raised(self, monkeypatch, caplog) -> None:
-        from kb_pipeline.pipeline import LLMFailure, _report_llm_failures
+        from kb_pipeline.pipeline import LLMParseFailureEntry, _report_llm_failures
 
         def fake_run(cmd, **kwargs):
             raise subprocess.CalledProcessError(1, cmd)
@@ -1212,7 +1299,9 @@ class TestReportLLMFailures:
         monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
         caplog.set_level("WARNING")
 
-        _report_llm_failures([LLMFailure("test", "Alpha", "https://example.com/a")])
+        _report_llm_failures(
+            [LLMParseFailureEntry("test", "Alpha", "https://example.com/a")]
+        )
 
         assert "escalation failed" in caplog.text
 
