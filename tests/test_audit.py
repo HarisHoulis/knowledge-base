@@ -118,6 +118,15 @@ class TestClassificationAudit:
         assert result == {"pass": False}
         assert "```json" in caplog.text
 
+    def test_prose_leading_content_surfaces_excerpt(self, caplog):
+        content = 'Here is the audit result: {"pass": true}'
+        body = _body(content)
+        result = classification_audit(
+            DATA, TEXT, post_fn=lambda *a, **k: _StubPost(body)
+        )
+        assert result == {"pass": False}
+        assert "Here is the audit result" in caplog.text
+
     def test_audit_fn_takes_precedence_over_post_fn(self):
         def post_should_not_run(*args, **kwargs):
             raise AssertionError("post_fn should not be called")
