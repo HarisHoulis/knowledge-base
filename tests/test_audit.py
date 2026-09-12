@@ -165,6 +165,13 @@ class TestContentAudit:
         assert result == {"pass": False}
         assert "audit failed" in caplog.text
 
+    def test_body_missing_message_is_not_a_pass(self, caplog):
+        result = content_audit(
+            DATA, TEXT, post_fn=lambda *a, **k: _StubPost({"choices": [{}]})
+        )
+        assert result == {"pass": False}
+        assert "audit failed" in caplog.text
+
     def test_valid_body_returns_dict_no_warning(self, caplog):
         body = _body(json.dumps({"pass": True}))
         result = content_audit(DATA, TEXT, post_fn=lambda *a, **k: _StubPost(body))

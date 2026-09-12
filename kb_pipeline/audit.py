@@ -123,23 +123,26 @@ def _run_audit(
         content = raw
         result: AuditResult = json.loads(raw)
         return result
-    except requests.RequestException as e:
+    except (
+        requests.RequestException,
+        KeyError,
+        IndexError,
+        TypeError,
+        ConnectionError,
+    ) as e:
         logger.warning("audit failed: %s", e)
         return {"pass": False}
     except json.JSONDecodeError as e:
-        c0 = (body.get("choices") or [{}])[0]
+        choice = (body.get("choices") or [{}])[0]
         usage = body.get("usage") or {}
         excerpt = (content[:200] + "...") if len(content) > 200 else content
         logger.warning(
             "audit failed: %s | finish_reason=%r | len(content)=%d | usage=%s | "
             "content_excerpt=%r",
             e,
-            c0.get("finish_reason"),
+            choice.get("finish_reason"),
             len(content),
             usage,
             excerpt,
         )
-        return {"pass": False}
-    except (KeyError, IndexError, TypeError, ConnectionError) as e:
-        logger.warning("audit failed: %s", e)
         return {"pass": False}
