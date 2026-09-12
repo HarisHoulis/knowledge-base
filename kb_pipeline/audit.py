@@ -56,35 +56,12 @@ or
 "specific issue"}}]}}"""
 
 
-def _call_llm(prompt: str) -> str:
-    r = requests.post(
-        f"{LLM_API_URL}/chat/completions",
-        headers={"Authorization": f"Bearer {LLM_API_KEY}"},
-        json={
-            "model": LLM_MODEL,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "You are a precise auditor. Output only JSON.",
-                },
-                {"role": "user", "content": prompt},
-            ],
-            "response_format": {"type": "json_object"},
-            "temperature": 0.1,
-            "max_tokens": 500,
-        },
-        timeout=60,
-    )
-    r.raise_for_status()
-    body = r.json()
-    return body["choices"][0]["message"]["content"]
-
-
 def classification_audit(
     data: dict[str, Any],
     source_text: str,
     *,
     audit_fn: Optional[Callable[[str], str]] = None,
+    post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
     prompt = CLASSIFICATION_AUDIT_PROMPT.format(
         source_text=source_text[:15000],
@@ -92,7 +69,7 @@ def classification_audit(
         subdomain=data.get("subdomain", ""),
         concept=data.get("concept", ""),
     )
-    return _run_audit(prompt, audit_fn)
+    return _run_audit(prompt, audit_fn, post_fn)
 
 
 def content_audit(
@@ -100,28 +77,69 @@ def content_audit(
     source_text: str,
     *,
     audit_fn: Optional[Callable[[str], str]] = None,
+    post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
     summary = data.get("summary", "")
     prompt = CONTENT_AUDIT_PROMPT.format(
         source_text=source_text[:15000], summary=summary
     )
-    return _run_audit(prompt, audit_fn)
+    return _run_audit(prompt, audit_fn, post_fn)
 
 
 def _run_audit(
-    prompt: str, audit_fn: Optional[Callable[[str], str]] = None
+    prompt: str,
+    audit_fn: Optional[Callable[[str], str]] = None,
+    post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
+    body: Any = {}
+    content = ""
     try:
-        raw = audit_fn(prompt) if audit_fn else _call_llm(prompt)
+        if audit_fn:
+            raw = audit_fn(prompt)
+        else:
+            call = post_fn or requests.post
+            r = call(
+                f"{LLM_API_URL}/chat/completions",
+                headers={"Authorization": f"Bearer {LLM_API_KEY}"},
+                json={
+                    "model": LLM_MODEL,
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "You are a precise auditor. Output only JSON.",
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.1,
+                    "max_tokens": 500,
+                },
+                timeout=60,
+            )
+            r.raise_for_status()
+            body = r.json()
+            raw = body["choices"][0]["message"]["content"]
+            raw = raw if isinstance(raw, str) else ""
+        content = raw
         result: AuditResult = json.loads(raw)
         return result
-    except (
-        requests.RequestException,
-        json.JSONDecodeError,
-        KeyError,
-        IndexError,
-        TypeError,
-        ConnectionError,
-    ) as e:
+    except requests.RequestException as e:
+        logger.warning("audit failed: %s", e)
+        return {"pass": False}
+    except json.JSONDecodeError as e:
+        c0 = (body.get("choices") or [{}])[0]
+        usage = body.get("usage") or {}
+        excerpt = (content[:200] + "...") if len(content) > 200 else content
+        logger.warning(
+            "audit failed: %s | finish_reason=%r | len(content)=%d | usage=%s | "
+            "content_excerpt=%r",
+            e,
+            c0.get("finish_reason"),
+            len(content),
+            usage,
+            excerpt,
+        )
+        return {"pass": False}
+    except (KeyError, IndexError, TypeError, ConnectionError) as e:
         logger.warning("audit failed: %s", e)
         return {"pass": False}

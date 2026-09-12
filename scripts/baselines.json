@@ -66,7 +66,7 @@
   ],
   "size_limits": {
     "__main__": 3,
-    "audit": 127,
+    "audit": 145,
     "cli": 45,
     "config": 72,
     "fetcher": 243,
