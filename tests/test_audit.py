@@ -1,5 +1,6 @@
 import json
 
+import pytest
 import requests
 
 from kb_pipeline.audit import classification_audit, content_audit
@@ -117,6 +118,15 @@ class TestClassificationAudit:
         assert result == {"pass": False}
         assert "```json" in caplog.text
 
+    def test_audit_fn_takes_precedence_over_post_fn(self):
+        def post_should_not_run(*args, **kwargs):
+            raise AssertionError("post_fn should not be called")
+
+        result = classification_audit(
+            DATA, TEXT, audit_fn=stub_pass, post_fn=post_should_not_run
+        )
+        assert result == {"pass": True}
+
 
 class TestContentAudit:
     def test_returns_pass(self):
@@ -158,17 +168,15 @@ class TestContentAudit:
         assert "boom" in caplog.text
         assert "content_excerpt" not in caplog.text
 
-    def test_malformed_body_is_not_a_pass(self, caplog):
-        result = content_audit(
-            DATA, TEXT, post_fn=lambda *a, **k: _StubPost({"usage": {}})
-        )
+    @pytest.mark.parametrize("body", [{"usage": {}}, {"choices": [{}]}])
+    def test_malformed_body_is_not_a_pass(self, caplog, body):
+        result = content_audit(DATA, TEXT, post_fn=lambda *a, **k: _StubPost(body))
         assert result == {"pass": False}
         assert "audit failed" in caplog.text
 
-    def test_body_missing_message_is_not_a_pass(self, caplog):
-        result = content_audit(
-            DATA, TEXT, post_fn=lambda *a, **k: _StubPost({"choices": [{}]})
-        )
+    def test_non_string_content_is_not_a_pass(self, caplog):
+        body = _body(None)
+        result = content_audit(DATA, TEXT, post_fn=lambda *a, **k: _StubPost(body))
         assert result == {"pass": False}
         assert "audit failed" in caplog.text
 
