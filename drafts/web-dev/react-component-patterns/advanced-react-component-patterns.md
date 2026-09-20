@@ -2,24 +2,24 @@
 domain: web-dev
 subdomain: react-component-patterns
 concept: advanced-react-component-patterns
-title: Updated Advanced React Component Patterns
+title: Advanced React Component Patterns
 sources:
-  - title: "💯 UPDATED: Advanced React Component Patterns ⚛️"
-    url: "https://kentcdodds.com/blog/updated-advanced-react-component-patterns"
+  - title: "Advanced React Component Patterns"
+    url: "https://kentcdodds.com/blog/advanced-react-component-patterns"
     author: "Kent C. Dodds"
-    date: "2018-06-01"
+    date: "2017-12-05"
 ---
 
-# Updated Advanced React Component Patterns
+# Advanced React Component Patterns
 
-Kent C. Dodds announces that his Advanced React Component Patterns course has been completely updated and re-recorded, with a follow-along CodeSandbox (source). The update was prompted by React 16.3.0, whose new APIs improved the usability of several component patterns (source).
+The post announces two egghead.io courses, The Beginner's Guide to ReactJS and Advanced React Component Patterns, totaling about 2.5 hours of content with 18 videos each, and previews the patterns taught in the advanced course [source](https://kentcdodds.com/blog/advanced-react-component-patterns). The course starts from a simple toggle component and evolves it through each pattern so learners can see trade-offs and when each pattern is appropriate.
 
-The biggest change is the Context API, which makes compound components more flexible and enables lessons on validating Context Consumers and preventing unnecessary rerenders of consumers (source). Render props lessons were also re-recorded, and prop collections and prop getters remain because they are still useful (source).
+Patterns covered include compound components that share implicit state like HTML's <select> and <option>, using React.Children.map and then context; higher order components (HOCs), which return a component and are widely used by react-redux; and render props, which the author calls his favorite pattern and which delegates rendering responsibility to the user while providing state and functions [source](https://kentcdodds.com/blog/advanced-react-component-patterns).
 
-The update adds a new state reducer pattern, which Dodds implemented in downshift, plus expanded and simplified control props lessons (source). The provider pattern is now covered in a single lesson because the Context API is a built-in implementation of it, and Higher Order Components are simplified using React.forwardRef (source). The course is 20 minutes shorter than the previous version despite extra lessons, because React keeps getting better at enabling these patterns (source).
+The course also covers prop collections and getters for bundling common accessibility or interactivity props, state initializers with a reset helper, controlled components that move internal state into props, and the provider pattern using context and react-broadcast so it works through shouldComponentUpdate. It concludes by refactoring the toggle component into a redux component called "Rendux" [source](https://kentcdodds.com/blog/advanced-react-component-patterns).
 
-- The course was fully re-recorded and updated for React 16.3.0.
-- The Context API improves compound components, consumer validation, and rerender control.
-- A new state reducer pattern is added, based on downshift, along with expanded control props lessons.
-- The provider pattern is condensed into one lesson because Context API is a built-in provider pattern.
-- Higher Order Components are updated to use React.forwardRef.
+- The course uses a single toggle component and refactors it through each pattern to highlight trade-offs.
+- Compound components share implicit state like HTML's <select> and <option>, implemented with React.Children.map and context.
+- Render props is the author's favorite pattern; HOCs are widespread but require extra work to hide implementation details.
+- Other patterns include prop collections/getters, state initializers, controlled components, and provider.
+- The course ends by refactoring the toggle component to a redux component called "Rendux".
