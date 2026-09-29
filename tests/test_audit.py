@@ -148,6 +148,12 @@ class TestRunAuditPostFn:
 
         assert _run_audit("p", post_fn=post) == {"pass": False}
 
+    def test_post_fn_unparseable_content_is_not_a_pass(self):
+        def post(*args, **kwargs):
+            return _StubPost(_body("not json"))
+
+        assert _run_audit("p", post_fn=post) == {"pass": False}
+
     def test_post_fn_exception_is_not_a_pass(self):
         def post(*args, **kwargs):
             raise requests.RequestException("boom")
