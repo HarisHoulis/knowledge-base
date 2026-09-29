@@ -56,7 +56,9 @@ or
 "specific issue"}}]}}"""
 
 
-def _call_llm(prompt: str, *, post_fn: Optional[Callable[..., Any]] = None) -> str:
+def _call_llm(
+    prompt: str, *, post_fn: Optional[Callable[..., Any]] = None
+) -> dict[str, Any]:
     call = post_fn or requests.post
     r = call(
         f"{LLM_API_URL}/chat/completions",
@@ -78,8 +80,7 @@ def _call_llm(prompt: str, *, post_fn: Optional[Callable[..., Any]] = None) -> s
         timeout=60,
     )
     r.raise_for_status()
-    body = r.json()
-    return body["choices"][0]["message"]["content"]
+    return r.json()
 
 
 def classification_audit(
@@ -116,17 +117,38 @@ def _run_audit(
     *,
     post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
+    body: Any = {}
+    content = ""
     try:
-        raw = audit_fn(prompt) if audit_fn else _call_llm(prompt, post_fn=post_fn)
+        if audit_fn:
+            raw = audit_fn(prompt)
+        else:
+            body = _call_llm(prompt, post_fn=post_fn)
+            raw = body["choices"][0]["message"]["content"]
+            raw = raw if isinstance(raw, str) else ""
+        content = raw
         result: AuditResult = json.loads(raw)
         return result
     except (
         requests.RequestException,
-        json.JSONDecodeError,
         KeyError,
         IndexError,
         TypeError,
         ConnectionError,
     ) as e:
         logger.warning("audit failed: %s", e)
+        return {"pass": False}
+    except json.JSONDecodeError as e:
+        choice = (body.get("choices") or [{}])[0]
+        usage = body.get("usage") or {}
+        excerpt = (content[:200] + "...") if len(content) > 200 else content
+        logger.warning(
+            "audit failed: %s | finish_reason=%r | len(content)=%d | usage=%s | "
+            "content_excerpt=%r",
+            e,
+            choice.get("finish_reason"),
+            len(content),
+            usage,
+            excerpt,
+        )
         return {"pass": False}
