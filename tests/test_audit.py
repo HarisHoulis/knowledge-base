@@ -1,6 +1,9 @@
 import json
 
-from kb_pipeline.audit import classification_audit, content_audit
+import requests
+
+from kb_pipeline.audit import _run_audit, classification_audit, content_audit
+from kb_pipeline.config import LLM_API_KEY, LLM_API_URL
 
 
 def stub_pass(prompt: str) -> str:
@@ -19,6 +22,21 @@ def stub_malformed(prompt: str) -> str:
 
 def stub_exception(prompt: str) -> str:
     raise ConnectionError("test error")
+
+
+class _StubPost:
+    def __init__(self, body):
+        self._body = body
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._body
+
+
+def _body(content: str):
+    return {"choices": [{"message": {"content": content}}]}
 
 
 DATA = {"domain": "a", "subdomain": "b", "concept": "c", "summary": "some summary"}
@@ -90,3 +108,48 @@ class TestContentAudit:
         content_audit(DATA, TEXT, audit_fn=capture)
         assert len(prompts) == 1
         assert "some summary" in prompts[0]
+
+
+class TestRunAuditPostFn:
+    def test_post_fn_receives_request_params(self):
+        calls = []
+
+        def post(*args, **kwargs):
+            calls.append((args, kwargs))
+            return _StubPost(_body(json.dumps({"pass": True})))
+
+        _run_audit("audit prompt", post_fn=post)
+        assert len(calls) == 1
+        args, kwargs = calls[0]
+        assert args == (f"{LLM_API_URL}/chat/completions",)
+        assert kwargs["headers"] == {"Authorization": f"Bearer {LLM_API_KEY}"}
+        assert kwargs["json"]["messages"][1] == {
+            "role": "user",
+            "content": "audit prompt",
+        }
+        assert kwargs["timeout"] == 60
+
+    def test_audit_fn_is_used_and_post_fn_is_not_called(self):
+        def post(*args, **kwargs):
+            raise AssertionError("post_fn must not be called when audit_fn is given")
+
+        result = _run_audit("p", audit_fn=stub_pass, post_fn=post)
+        assert result == {"pass": True}
+
+    def test_post_fn_valid_json_returns_pass(self):
+        def post(*args, **kwargs):
+            return _StubPost(_body(json.dumps({"pass": True})))
+
+        assert _run_audit("p", post_fn=post) == {"pass": True}
+
+    def test_post_fn_empty_content_is_not_a_pass(self):
+        def post(*args, **kwargs):
+            return _StubPost(_body(""))
+
+        assert _run_audit("p", post_fn=post) == {"pass": False}
+
+    def test_post_fn_exception_is_not_a_pass(self):
+        def post(*args, **kwargs):
+            raise requests.RequestException("boom")
+
+        assert _run_audit("p", post_fn=post) == {"pass": False}
