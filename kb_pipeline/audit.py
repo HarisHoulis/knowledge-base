@@ -72,7 +72,8 @@ def _call_llm(prompt: str, *, post_fn: Optional[Callable[..., Any]] = None) -> s
             ],
             "response_format": {"type": "json_object"},
             "temperature": 0.1,
-            "max_tokens": 500,
+            "max_tokens": 1000,
+            "thinking": {"type": "disabled"},
         },
         timeout=60,
     )
