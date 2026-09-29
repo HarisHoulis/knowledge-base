@@ -129,6 +129,28 @@ class TestRunAuditPostFn:
         }
         assert kwargs["timeout"] == 60
 
+    def test_post_fn_body_disables_thinking_and_raises_max_tokens(self):
+        bodies = []
+
+        def post(*args, **kwargs):
+            bodies.append(kwargs["json"])
+            return _StubPost(_body(json.dumps({"pass": True})))
+
+        _run_audit("audit prompt", post_fn=post)
+        assert len(bodies) == 1
+        assert bodies[0]["thinking"] == {"type": "disabled"}
+        assert bodies[0]["max_tokens"] == 1000
+        assert bodies[0]["response_format"] == {"type": "json_object"}
+        assert bodies[0]["temperature"] == 0.1
+
+    def test_post_fn_valid_fail_json_returns_it_verbatim(self):
+        issues = [{"field": "summary", "description": "test issue"}]
+
+        def post(*args, **kwargs):
+            return _StubPost(_body(json.dumps({"pass": False, "issues": issues})))
+
+        assert _run_audit("p", post_fn=post) == {"pass": False, "issues": issues}
+
     def test_audit_fn_is_used_and_post_fn_is_not_called(self):
         def post(*args, **kwargs):
             raise AssertionError("post_fn must not be called when audit_fn is given")
