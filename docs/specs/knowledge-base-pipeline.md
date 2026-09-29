@@ -38,6 +38,7 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 - **No RAG / vector DB**: Filesystem tree is the canonical store. Search is via `grep` or file browser.
 - **Audit flow**: LLM output is written to `drafts/domain/subdomain/concept.md`. Classification Audit + Content Audit run concurrently on the draft. On pass, the file is moved to `domain/subdomain/concept.md` and `drafts/` is cleaned up. On fail, structured JSON feedback is fed into the LLM retry.
 - **Audit feedback format**: `{"pass": false, "issues": [{"field": "domain", "description": "should be android-kotlin, not system-design"}]}`. Minimum tokens, directly feedable into the retry prompt.
+- **Audit request config**: Audit calls disable model thinking (`{"thinking": {"type": "disabled"}}`) and cap output at `max_tokens: 1000`, so the verdict is not consumed by hidden reasoning. `response_format: {"type": "json_object"}` and temperature 0.1 are unchanged.
 - **Retry strategy**: Up to 2 iterations total. Only the failing audit re-runs per cycle (e.g., if Classification passes but Content fails, only Content re-runs on retry).
 - **Escalation**: After 2 failed retries, the pipeline halts and creates a GitHub issue via `gh issue create` with the entry path and combined audit feedback.
 

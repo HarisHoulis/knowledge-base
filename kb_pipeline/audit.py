@@ -56,12 +56,38 @@ or
 "specific issue"}}]}}"""
 
 
+def _call_llm(
+    prompt: str, *, post_fn: Optional[Callable[..., Any]] = None
+) -> dict[str, Any]:
+    call = post_fn or requests.post
+    r = call(
+        f"{LLM_API_URL}/chat/completions",
+        headers={"Authorization": f"Bearer {LLM_API_KEY}"},
+        json={
+            "model": LLM_MODEL,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": "You are a precise auditor. Output only JSON.",
+                },
+                {"role": "user", "content": prompt},
+            ],
+            "response_format": {"type": "json_object"},
+            "temperature": 0.1,
+            "max_tokens": 1000,
+            "thinking": {"type": "disabled"},
+        },
+        timeout=60,
+    )
+    r.raise_for_status()
+    return r.json()
+
+
 def classification_audit(
     data: dict[str, Any],
     source_text: str,
     *,
     audit_fn: Optional[Callable[[str], str]] = None,
-    post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
     prompt = CLASSIFICATION_AUDIT_PROMPT.format(
         source_text=source_text[:15000],
@@ -69,7 +95,7 @@ def classification_audit(
         subdomain=data.get("subdomain", ""),
         concept=data.get("concept", ""),
     )
-    return _run_audit(prompt, audit_fn, post_fn)
+    return _run_audit(prompt, audit_fn)
 
 
 def content_audit(
@@ -77,18 +103,18 @@ def content_audit(
     source_text: str,
     *,
     audit_fn: Optional[Callable[[str], str]] = None,
-    post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
     summary = data.get("summary", "")
     prompt = CONTENT_AUDIT_PROMPT.format(
         source_text=source_text[:15000], summary=summary
     )
-    return _run_audit(prompt, audit_fn, post_fn)
+    return _run_audit(prompt, audit_fn)
 
 
 def _run_audit(
     prompt: str,
     audit_fn: Optional[Callable[[str], str]] = None,
+    *,
     post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
     body: Any = {}
@@ -97,27 +123,7 @@ def _run_audit(
         if audit_fn:
             raw = audit_fn(prompt)
         else:
-            call = post_fn or requests.post
-            r = call(
-                f"{LLM_API_URL}/chat/completions",
-                headers={"Authorization": f"Bearer {LLM_API_KEY}"},
-                json={
-                    "model": LLM_MODEL,
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "You are a precise auditor. Output only JSON.",
-                        },
-                        {"role": "user", "content": prompt},
-                    ],
-                    "response_format": {"type": "json_object"},
-                    "temperature": 0.1,
-                    "max_tokens": 500,
-                },
-                timeout=60,
-            )
-            r.raise_for_status()
-            body = r.json()
+            body = _call_llm(prompt, post_fn=post_fn)
             raw = body["choices"][0]["message"]["content"]
             raw = raw if isinstance(raw, str) else ""
         content = raw
