@@ -56,8 +56,9 @@ or
 "specific issue"}}]}}"""
 
 
-def _call_llm(prompt: str) -> str:
-    r = requests.post(
+def _call_llm(prompt: str, *, post_fn: Optional[Callable[..., Any]] = None) -> str:
+    call = post_fn or requests.post
+    r = call(
         f"{LLM_API_URL}/chat/completions",
         headers={"Authorization": f"Bearer {LLM_API_KEY}"},
         json={
@@ -109,10 +110,13 @@ def content_audit(
 
 
 def _run_audit(
-    prompt: str, audit_fn: Optional[Callable[[str], str]] = None
+    prompt: str,
+    audit_fn: Optional[Callable[[str], str]] = None,
+    *,
+    post_fn: Optional[Callable[..., Any]] = None,
 ) -> AuditResult:
     try:
-        raw = audit_fn(prompt) if audit_fn else _call_llm(prompt)
+        raw = audit_fn(prompt) if audit_fn else _call_llm(prompt, post_fn=post_fn)
         result: AuditResult = json.loads(raw)
         return result
     except (
