@@ -11,7 +11,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Optional, Union
 
-from .audit import AuditResult, classification_audit, content_audit
+from .audit import AuditFailure, AuditResult, classification_audit, content_audit
 from .config import DRAFTS_DIR, KB_PATH, OUT_OF_SCOPE, SOURCES, Source
 from .fetcher import (
     ExtractionErrorCallback,
@@ -103,7 +103,7 @@ def _report_llm_failures(failures: list[LLMParseFailureEntry]) -> None:
 
 
 def _build_audit_feedback_text(
-    audit_results: list[tuple[str, AuditResult]],
+    audit_results: list[tuple[str, dict[str, Any]]],
 ) -> str:
     lines: list[str] = []
     for audit_name, result in audit_results:
@@ -116,6 +116,10 @@ def _build_audit_feedback_text(
                 lines.append(f"- {field}: {desc}")
             lines.append("")
     return "\n".join(lines).strip()
+
+
+def _build_audit_error_text(audit_errors: list[tuple[str, str]]) -> str:
+    return "\n".join(f"[{name}] {reason}" for name, reason in audit_errors).strip()
 
 
 def _file_gh_issue(title: str, body: str, *, what: str) -> None:
@@ -184,6 +188,7 @@ def _escalate_failure(
     url: str,
     entry_path: Path,
     feedback: str,
+    errors: str = "",
     *,
     issue_open_fn: Callable[[str], bool] = _audit_issue_open,
 ) -> None:
@@ -199,6 +204,8 @@ def _escalate_failure(
         f"- **URL:** {url}\n\n"
         f"### Combined audit feedback\n\n```\n{feedback}\n```"
     )
+    if errors:
+        body += f"\n\n### Audit errors\n\n```\n{errors}\n```"
     _file_gh_issue(title, body, what="escalation")
 
 
@@ -262,11 +269,12 @@ def _audit_with_retry(
     ca_audit_fn: Callable[..., AuditResult] = classification_audit,
     co_audit_fn: Callable[..., AuditResult] = content_audit,
     promote_fn: Callable[[Path], None] = promote_draft,
-    escalation_fn: Callable[[str, Path, str], None] = _escalate_failure,
+    escalation_fn: Callable[[str, Path, str, str], None] = _escalate_failure,
 ) -> AuditOutcome:
     ca_passed = False
     co_passed = False
-    combined_feedback: list[tuple[str, AuditResult]] = []
+    combined_feedback: list[tuple[str, dict[str, Any]]] = []
+    combined_errors: list[tuple[str, str]] = []
 
     for retry in range(MAX_RETRIES + 1):
         if retry > 0:
@@ -283,41 +291,43 @@ def _audit_with_retry(
 
         if not ca_passed:
             ca_result = ca_audit_fn(result, source_text)
-            ca_passed = ca_result.get("pass", False)
+            if not isinstance(ca_result, AuditFailure):
+                ca_passed = ca_result.get("pass", False)
         if not co_passed:
             co_result = co_audit_fn(result, source_text)
-            co_passed = co_result.get("pass", False)
+            if not isinstance(co_result, AuditFailure):
+                co_passed = co_result.get("pass", False)
 
         if ca_passed and co_passed:
             promote_fn(draft_path)
             return PROMOTED
 
-        failing: list[tuple[str, AuditResult]] = []
+        combined_feedback = []
+        combined_errors = []
         if not ca_passed:
-            failing.append(
-                (
-                    "Classification",
-                    ca_result if ca_result is not None else {"pass": False},
-                )
-            )
+            if isinstance(ca_result, AuditFailure):
+                combined_errors.append(("Classification", ca_result.reason))
+            else:
+                combined_feedback.append(("Classification", ca_result))
         if not co_passed:
-            failing.append(
-                ("Content", co_result if co_result is not None else {"pass": False})
-            )
-        combined_feedback = failing
+            if isinstance(co_result, AuditFailure):
+                combined_errors.append(("Content", co_result.reason))
+            else:
+                combined_feedback.append(("Content", co_result))
 
         if retry < MAX_RETRIES:
             logger.info(
                 "  retry %d/%d: %d audit(s) failing",
                 retry + 1,
                 MAX_RETRIES,
-                len(failing),
+                len(combined_feedback) + len(combined_errors),
             )
 
     logger.warning("  audit exhausted after %d retries for %s", MAX_RETRIES, url)
 
     all_feedback = _build_audit_feedback_text(combined_feedback)
-    escalation_fn(url, draft_path, all_feedback)
+    all_errors = _build_audit_error_text(combined_errors)
+    escalation_fn(url, draft_path, all_feedback, all_errors)
     return ESCALATED
 
 

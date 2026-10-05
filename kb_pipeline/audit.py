@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import Any, Callable, Optional
+from dataclasses import dataclass
+from typing import Any, Callable, Optional, Union
 
 import requests
 
@@ -8,7 +9,13 @@ from .config import LLM_API_KEY, LLM_API_URL, LLM_MODEL
 
 logger = logging.getLogger(__name__)
 
-AuditResult = dict[str, Any]
+
+@dataclass(frozen=True)
+class AuditFailure:
+    reason: str
+
+
+AuditResult = Union[dict[str, Any], AuditFailure]
 
 CLASSIFICATION_AUDIT_PROMPT = """You are a classification audit assistant. Your job \
 is to verify that the assigned domain, subdomain, and concept are appropriate \
@@ -127,7 +134,7 @@ def _run_audit(
             raw = body["choices"][0]["message"]["content"]
             raw = raw if isinstance(raw, str) else ""
         content = raw
-        result: AuditResult = json.loads(raw)
+        result: dict[str, Any] = json.loads(raw)
         return result
     except (
         requests.RequestException,
@@ -137,7 +144,7 @@ def _run_audit(
         ConnectionError,
     ) as e:
         logger.warning("audit failed: %s", e)
-        return {"pass": False}
+        return AuditFailure(str(e))
     except json.JSONDecodeError as e:
         choice = (body.get("choices") or [{}])[0]
         usage = body.get("usage") or {}
@@ -151,4 +158,4 @@ def _run_audit(
             usage,
             excerpt,
         )
-        return {"pass": False}
+        return AuditFailure(str(e))
