@@ -64,7 +64,7 @@ jobs:
           DEEPSEEK_API_KEY: ${{ secrets.LLM_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.PAT_AGENT }}
         with:
-          model: deepseek/deepseek-v4-flash
+          model: ${{ vars.LLM_MODEL }}
           use_github_token: true
           share: false
           prompt: /auto-implement ${{ steps.find-issue.outputs.issue_number }}
