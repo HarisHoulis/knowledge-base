@@ -122,6 +122,19 @@ def _build_audit_error_text(audit_errors: list[tuple[str, str]]) -> str:
     return "\n".join(f"[{name}] {reason}" for name, reason in audit_errors).strip()
 
 
+def _partition_audit_results(
+    audit_results: list[tuple[str, AuditResult]],
+) -> tuple[list[tuple[str, dict[str, Any]]], list[tuple[str, str]]]:
+    feedback: list[tuple[str, dict[str, Any]]] = []
+    errors: list[tuple[str, str]] = []
+    for audit_name, result in audit_results:
+        if isinstance(result, AuditFailure):
+            errors.append((audit_name, result.reason))
+        else:
+            feedback.append((audit_name, result))
+    return feedback, errors
+
+
 def _file_gh_issue(title: str, body: str, *, what: str) -> None:
     try:
         subprocess.run(
@@ -302,18 +315,12 @@ def _audit_with_retry(
             promote_fn(draft_path)
             return PROMOTED
 
-        combined_feedback = []
-        combined_errors = []
+        pending: list[tuple[str, AuditResult]] = []
         if not ca_passed:
-            if isinstance(ca_result, AuditFailure):
-                combined_errors.append(("Classification", ca_result.reason))
-            else:
-                combined_feedback.append(("Classification", ca_result))
+            pending.append(("Classification", ca_result))
         if not co_passed:
-            if isinstance(co_result, AuditFailure):
-                combined_errors.append(("Content", co_result.reason))
-            else:
-                combined_feedback.append(("Content", co_result))
+            pending.append(("Content", co_result))
+        combined_feedback, combined_errors = _partition_audit_results(pending)
 
         if retry < MAX_RETRIES:
             logger.info(
