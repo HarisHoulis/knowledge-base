@@ -130,9 +130,15 @@ def _partition_audit_results(
     for audit_name, result in audit_results:
         if isinstance(result, AuditFailure):
             errors.append((audit_name, result.reason))
-        else:
+        elif isinstance(result, dict):
             feedback.append((audit_name, result))
+        else:
+            errors.append((audit_name, f"unexpected audit result: {result!r}"))
     return feedback, errors
+
+
+def _audit_passed(result: AuditResult) -> bool:
+    return isinstance(result, dict) and bool(result.get("pass", False))
 
 
 def _file_gh_issue(title: str, body: str, *, what: str) -> None:
@@ -201,8 +207,8 @@ def _escalate_failure(
     url: str,
     entry_path: Path,
     feedback: str,
-    errors: str = "",
     *,
+    errors: str = "",
     issue_open_fn: Callable[[str], bool] = _audit_issue_open,
 ) -> None:
     if issue_open_fn(url):
@@ -282,7 +288,7 @@ def _audit_with_retry(
     ca_audit_fn: Callable[..., AuditResult] = classification_audit,
     co_audit_fn: Callable[..., AuditResult] = content_audit,
     promote_fn: Callable[[Path], None] = promote_draft,
-    escalation_fn: Callable[[str, Path, str, str], None] = _escalate_failure,
+    escalation_fn: Callable[..., None] = _escalate_failure,
 ) -> AuditOutcome:
     ca_passed = False
     co_passed = False
@@ -304,12 +310,10 @@ def _audit_with_retry(
 
         if not ca_passed:
             ca_result = ca_audit_fn(result, source_text)
-            if not isinstance(ca_result, AuditFailure):
-                ca_passed = ca_result.get("pass", False)
+            ca_passed = _audit_passed(ca_result)
         if not co_passed:
             co_result = co_audit_fn(result, source_text)
-            if not isinstance(co_result, AuditFailure):
-                co_passed = co_result.get("pass", False)
+            co_passed = _audit_passed(co_result)
 
         if ca_passed and co_passed:
             promote_fn(draft_path)
@@ -334,7 +338,7 @@ def _audit_with_retry(
 
     all_feedback = _build_audit_feedback_text(combined_feedback)
     all_errors = _build_audit_error_text(combined_errors)
-    escalation_fn(url, draft_path, all_feedback, all_errors)
+    escalation_fn(url, draft_path, all_feedback, errors=all_errors)
     return ESCALATED
 
 

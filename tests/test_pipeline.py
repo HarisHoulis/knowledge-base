@@ -39,6 +39,10 @@ def stub_audit_error(data: Any, source_text: str) -> AuditResult:
     return AuditFailure("audit call broke")
 
 
+def stub_audit_none(data: Any, source_text: str) -> Any:
+    return None
+
+
 def stub_classify_ok(
     text: str, meta: dict[str, Any], audit_feedback: Optional[str] = None
 ) -> dict[str, Any]:
@@ -313,6 +317,32 @@ class TestAuditWithRetry:
         assert "audit call broke" in errors
         assert "[Classification]" in errors
         assert "[Content]" in errors
+
+    def test_unexpected_audit_result_is_treated_as_error(self) -> None:
+        from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
+
+        promote_calls, promote_fn = make_promote_stub()
+        esc_calls, esc_fn = make_escalation_stub()
+        classify = TrackingClassify()
+
+        ok = _audit_with_retry(
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
+            classify_fn=classify,
+            ca_audit_fn=stub_audit_none,
+            co_audit_fn=stub_audit_none,
+            promote_fn=promote_fn,
+            escalation_fn=esc_fn,
+        )
+
+        assert ok == ESCALATED
+        assert classify.calls == []
+        _, _, feedback, errors = esc_calls[0]
+        assert feedback == ""
+        assert "unexpected audit result" in errors
 
     def test_genuine_rejection_reclassifies_with_issues_only_feedback(self) -> None:
         from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
@@ -1861,7 +1891,7 @@ class TestEscalateFailureDedupe:
             SAMPLE_URL,
             SAMPLE_DRAFT,
             "test issue",
-            "[Classification] audit call broke",
+            errors="[Classification] audit call broke",
         )
 
         create = next(cmd for cmd in calls if cmd[:3] == ["gh", "issue", "create"])

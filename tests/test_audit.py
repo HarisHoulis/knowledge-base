@@ -5,6 +5,7 @@ import requests
 
 from kb_pipeline.audit import (
     AuditFailure,
+    AuditResult,
     _run_audit,
     classification_audit,
     content_audit,
@@ -12,7 +13,7 @@ from kb_pipeline.audit import (
 from kb_pipeline.config import LLM_API_KEY, LLM_API_URL
 
 
-def assert_audit_failure(result):
+def assert_audit_failure(result: AuditResult) -> None:
     assert isinstance(result, AuditFailure)
     assert result.reason
 
