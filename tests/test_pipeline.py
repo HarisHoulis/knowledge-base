@@ -283,7 +283,10 @@ class TestAuditWithRetry:
         esc_url, esc_path, esc_feedback, esc_errors = esc_calls[0]
         assert esc_url == SAMPLE_URL
         assert esc_path == SAMPLE_DRAFT
-        assert "test issue" in esc_feedback
+        assert esc_feedback == (
+            "[Classification]\n- summary: test issue\n\n"
+            "[Content]\n- summary: test issue"
+        )
         assert esc_errors == ""
 
     def test_audit_failure_counts_as_not_passed_and_records_error(self) -> None:
@@ -314,9 +317,9 @@ class TestAuditWithRetry:
         assert len(esc_calls) == 1
         _, _, feedback, errors = esc_calls[0]
         assert feedback == ""
-        assert "audit call broke" in errors
-        assert "[Classification]" in errors
-        assert "[Content]" in errors
+        assert errors == (
+            "[Classification] audit call broke\n[Content] audit call broke"
+        )
 
     def test_unexpected_audit_result_is_treated_as_error(self) -> None:
         from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
@@ -342,7 +345,10 @@ class TestAuditWithRetry:
         assert classify.calls == []
         _, _, feedback, errors = esc_calls[0]
         assert feedback == ""
-        assert "unexpected audit result" in errors
+        assert errors == (
+            "[Classification] unexpected audit result: None\n"
+            "[Content] unexpected audit result: None"
+        )
 
     def test_genuine_rejection_reclassifies_with_issues_only_feedback(self) -> None:
         from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
@@ -393,13 +399,11 @@ class TestAuditWithRetry:
 
         assert ok == ESCALATED
         assert len(classify.calls) == 2
-        first_feedback = classify.calls[0]
-        assert first_feedback is not None
-        assert "test issue" in first_feedback
+        expected_feedback = "[Content]\n- summary: test issue"
+        assert classify.calls == [expected_feedback, expected_feedback]
         _, _, feedback, errors = esc_calls[0]
-        assert "test issue" in feedback
-        assert "audit call broke" in errors
-        assert "test issue" not in errors
+        assert feedback == expected_feedback
+        assert errors == "[Classification] audit call broke"
 
     def test_max_retries_is_two(self) -> None:
         from kb_pipeline.pipeline import (

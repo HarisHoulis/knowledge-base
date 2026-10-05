@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional, Protocol, Union
 
 from .audit import AuditFailure, AuditResult, classification_audit, content_audit
 from .config import DRAFTS_DIR, KB_PATH, OUT_OF_SCOPE, SOURCES, Source
@@ -66,6 +66,17 @@ class LLMParseFailureEntry:
 
 
 ClassifyResult = Union[dict[str, Any], ClassifyFailure]
+
+
+class EscalationFn(Protocol):
+    def __call__(
+        self,
+        url: str,
+        entry_path: Path,
+        feedback: str,
+        *,
+        errors: str = ...,
+    ) -> None: ...
 
 
 def _create_gh_issue(title: str, body: str) -> bool:
@@ -288,7 +299,7 @@ def _audit_with_retry(
     ca_audit_fn: Callable[..., AuditResult] = classification_audit,
     co_audit_fn: Callable[..., AuditResult] = content_audit,
     promote_fn: Callable[[Path], None] = promote_draft,
-    escalation_fn: Callable[..., None] = _escalate_failure,
+    escalation_fn: EscalationFn = _escalate_failure,
 ) -> AuditOutcome:
     ca_passed = False
     co_passed = False
