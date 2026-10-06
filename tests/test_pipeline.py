@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from kb_pipeline.audit import AuditResult
+from kb_pipeline.audit import AuditFailure, AuditResult
 from kb_pipeline.config import SOURCES, Source
 from kb_pipeline.llm import ClassifyFailure, ClassifyFailureKind
 
@@ -33,6 +33,14 @@ def stub_audit_fail(data: Any, source_text: str) -> AuditResult:
         "pass": False,
         "issues": [{"field": "summary", "description": "test issue"}],
     }
+
+
+def stub_audit_error(data: Any, source_text: str) -> AuditResult:
+    return AuditFailure("audit call broke")
+
+
+def stub_audit_none(data: Any, source_text: str) -> Any:
+    return None
 
 
 def stub_classify_ok(
@@ -83,11 +91,26 @@ class CountedAuditStub:
         return self.results[idx]
 
 
-def make_escalation_stub() -> tuple[list[tuple[str, Path, str]], Any]:
-    calls: list[tuple[str, Path, str]] = []
+class TrackingClassify:
+    def __init__(self, result: Optional[dict[str, Any]] = None) -> None:
+        self.calls: list[Optional[str]] = []
+        self._result = result if result is not None else dict(SAMPLE_RESULT)
 
-    def stub(url: str, entry_path: Path, feedback: str) -> None:
-        calls.append((url, entry_path, feedback))
+    def __call__(
+        self,
+        text: str,
+        meta: dict[str, Any],
+        audit_feedback: Optional[str] = None,
+    ) -> dict[str, Any]:
+        self.calls.append(audit_feedback)
+        return self._result
+
+
+def make_escalation_stub() -> tuple[list[tuple[str, Path, str, str]], Any]:
+    calls: list[tuple[str, Path, str, str]] = []
+
+    def stub(url: str, entry_path: Path, feedback: str, errors: str = "") -> None:
+        calls.append((url, entry_path, feedback, errors))
 
     return calls, stub
 
@@ -257,9 +280,130 @@ class TestAuditWithRetry:
         assert ok == ESCALATED
         assert promote_calls == []
         assert len(esc_calls) == 1
-        esc_url, esc_path, esc_feedback = esc_calls[0]
+        esc_url, esc_path, esc_feedback, esc_errors = esc_calls[0]
         assert esc_url == SAMPLE_URL
         assert esc_path == SAMPLE_DRAFT
+        assert esc_feedback == (
+            "[Classification]\n- summary: test issue\n\n"
+            "[Content]\n- summary: test issue"
+        )
+        assert esc_errors == ""
+
+    def test_audit_failure_counts_as_not_passed_and_records_error(self) -> None:
+        from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
+
+        promote_calls, promote_fn = make_promote_stub()
+        esc_calls, esc_fn = make_escalation_stub()
+        classify = TrackingClassify()
+
+        ok = _audit_with_retry(
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
+            classify_fn=classify,
+            ca_audit_fn=stub_audit_error,
+            co_audit_fn=stub_audit_error,
+            promote_fn=promote_fn,
+            escalation_fn=esc_fn,
+        )
+
+        assert ok == ESCALATED
+        assert promote_calls == []
+        # A broken audit supplies no actionable feedback, so reclassification
+        # must never run; the same call is retried instead.
+        assert classify.calls == []
+        assert len(esc_calls) == 1
+        _, _, feedback, errors = esc_calls[0]
+        assert feedback == ""
+        assert errors == (
+            "[Classification] audit call broke\n[Content] audit call broke"
+        )
+
+    def test_unexpected_audit_result_is_treated_as_error(self) -> None:
+        from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
+
+        promote_calls, promote_fn = make_promote_stub()
+        esc_calls, esc_fn = make_escalation_stub()
+        classify = TrackingClassify()
+
+        ok = _audit_with_retry(
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
+            classify_fn=classify,
+            ca_audit_fn=stub_audit_none,
+            co_audit_fn=stub_audit_none,
+            promote_fn=promote_fn,
+            escalation_fn=esc_fn,
+        )
+
+        assert ok == ESCALATED
+        assert classify.calls == []
+        _, _, feedback, errors = esc_calls[0]
+        assert feedback == ""
+        assert errors == (
+            "[Classification] unexpected audit result: None\n"
+            "[Content] unexpected audit result: None"
+        )
+
+    def test_genuine_rejection_reclassifies_with_issues_only_feedback(self) -> None:
+        from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
+
+        promote_calls, promote_fn = make_promote_stub()
+        esc_calls, esc_fn = make_escalation_stub()
+        classify = TrackingClassify()
+
+        ok = _audit_with_retry(
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
+            classify_fn=classify,
+            ca_audit_fn=stub_audit_fail,
+            co_audit_fn=stub_audit_pass,
+            promote_fn=promote_fn,
+            escalation_fn=esc_fn,
+        )
+
+        assert ok == ESCALATED
+        expected = "[Classification]\n- summary: test issue"
+        assert classify.calls == [expected, expected]
+        _, _, feedback, errors = esc_calls[0]
+        assert errors == ""
+        assert feedback == expected
+
+    def test_mixed_failure_reclassifies_on_issues_and_records_error(self) -> None:
+        from kb_pipeline.pipeline import ESCALATED, _audit_with_retry
+
+        promote_calls, promote_fn = make_promote_stub()
+        esc_calls, esc_fn = make_escalation_stub()
+        classify = TrackingClassify()
+
+        ok = _audit_with_retry(
+            SAMPLE_RESULT,
+            SAMPLE_TEXT,
+            SAMPLE_URL,
+            SAMPLE_META,
+            SAMPLE_DRAFT,
+            classify_fn=classify,
+            ca_audit_fn=stub_audit_error,
+            co_audit_fn=stub_audit_fail,
+            promote_fn=promote_fn,
+            escalation_fn=esc_fn,
+        )
+
+        assert ok == ESCALATED
+        assert len(classify.calls) == 2
+        expected_feedback = "[Content]\n- summary: test issue"
+        assert classify.calls == [expected_feedback, expected_feedback]
+        _, _, feedback, errors = esc_calls[0]
+        assert feedback == expected_feedback
+        assert errors == "[Classification] audit call broke"
 
     def test_max_retries_is_two(self) -> None:
         from kb_pipeline.pipeline import (
@@ -1739,6 +1883,41 @@ class TestEscalateFailureDedupe:
         body = create[create.index("--body") + 1]
         assert title == f"Audit exhaustion: {SAMPLE_DRAFT.name}"
         assert SAMPLE_URL in body
+
+    def test_audit_errors_render_in_distinct_section(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import _escalate_failure
+
+        calls: list[list[str]] = []
+        fake_run = self._make_fake_run(calls, listing_stdout="")
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+        _escalate_failure(
+            SAMPLE_URL,
+            SAMPLE_DRAFT,
+            "test issue",
+            errors="[Classification] audit call broke",
+        )
+
+        create = next(cmd for cmd in calls if cmd[:3] == ["gh", "issue", "create"])
+        body = create[create.index("--body") + 1]
+        assert "### Combined audit feedback" in body
+        assert "test issue" in body
+        assert "### Audit errors" in body
+        assert "audit call broke" in body
+
+    def test_no_errors_means_no_audit_errors_section(self, monkeypatch) -> None:
+        from kb_pipeline.pipeline import _escalate_failure
+
+        calls: list[list[str]] = []
+        fake_run = self._make_fake_run(calls, listing_stdout="")
+        monkeypatch.setattr("kb_pipeline.pipeline.subprocess.run", fake_run)
+
+        _escalate_failure(SAMPLE_URL, SAMPLE_DRAFT, "test issue")
+
+        create = next(cmd for cmd in calls if cmd[:3] == ["gh", "issue", "create"])
+        body = create[create.index("--body") + 1]
+        assert "test issue" in body
+        assert "### Audit errors" not in body
 
     def test_gh_failure_degrades_to_creating_issue(self, monkeypatch, caplog) -> None:
         from kb_pipeline.pipeline import _escalate_failure

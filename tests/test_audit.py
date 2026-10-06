@@ -3,8 +3,19 @@ import json
 import pytest
 import requests
 
-from kb_pipeline.audit import _run_audit, classification_audit, content_audit
+from kb_pipeline.audit import (
+    AuditFailure,
+    AuditResult,
+    _run_audit,
+    classification_audit,
+    content_audit,
+)
 from kb_pipeline.config import LLM_API_KEY, LLM_API_URL
+
+
+def assert_audit_failure(result: AuditResult) -> None:
+    assert isinstance(result, AuditFailure)
+    assert result.reason
 
 
 class _StubPost:
@@ -61,11 +72,11 @@ class TestClassificationAudit:
 
     def test_malformed_json_is_not_a_pass(self):
         result = classification_audit(DATA, TEXT, audit_fn=stub_malformed)
-        assert result == {"pass": False}
+        assert_audit_failure(result)
 
     def test_exception_is_not_a_pass(self):
         result = classification_audit(DATA, TEXT, audit_fn=stub_exception)
-        assert result == {"pass": False}
+        assert_audit_failure(result)
 
     def test_prompt_contains_classification_fields(self):
         prompts = []
@@ -96,11 +107,11 @@ class TestContentAudit:
 
     def test_malformed_json_is_not_a_pass(self):
         result = content_audit(DATA, TEXT, audit_fn=stub_malformed)
-        assert result == {"pass": False}
+        assert_audit_failure(result)
 
     def test_exception_is_not_a_pass(self):
         result = content_audit(DATA, TEXT, audit_fn=stub_exception)
-        assert result == {"pass": False}
+        assert_audit_failure(result)
 
     def test_prompt_contains_summary(self):
         prompts = []
@@ -172,19 +183,19 @@ class TestRunAuditPostFn:
         def post(*args, **kwargs):
             return _StubPost(_body(""))
 
-        assert _run_audit("p", post_fn=post) == {"pass": False}
+        assert_audit_failure(_run_audit("p", post_fn=post))
 
     def test_post_fn_unparseable_content_is_not_a_pass(self):
         def post(*args, **kwargs):
             return _StubPost(_body("not json"))
 
-        assert _run_audit("p", post_fn=post) == {"pass": False}
+        assert_audit_failure(_run_audit("p", post_fn=post))
 
     def test_post_fn_exception_is_not_a_pass(self):
         def post(*args, **kwargs):
             raise requests.RequestException("boom")
 
-        assert _run_audit("p", post_fn=post) == {"pass": False}
+        assert_audit_failure(_run_audit("p", post_fn=post))
 
 
 class TestRunAuditFailureShape:
@@ -198,7 +209,7 @@ class TestRunAuditFailureShape:
             },
         )
         result = _run_audit("audit prompt", post_fn=lambda *a, **k: _StubPost(body))
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "finish_reason='length'" in caplog.text
         assert "len(content)=0" in caplog.text
         assert "reasoning_tokens" in caplog.text
@@ -208,7 +219,7 @@ class TestRunAuditFailureShape:
         content = '{"pass": true'
         body = _body(content, finish_reason="length")
         result = _run_audit("audit prompt", post_fn=lambda *a, **k: _StubPost(body))
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "finish_reason='length'" in caplog.text
         assert '"pass": true' in caplog.text
         assert "len(content)=0" not in caplog.text
@@ -217,14 +228,14 @@ class TestRunAuditFailureShape:
         content = '```json\n{"pass": true}\n```'
         body = _body(content)
         result = _run_audit("audit prompt", post_fn=lambda *a, **k: _StubPost(body))
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "```json" in caplog.text
 
     def test_prose_leading_content_surfaces_excerpt(self, caplog):
         content = 'Here is the audit result: {"pass": true}'
         body = _body(content)
         result = _run_audit("audit prompt", post_fn=lambda *a, **k: _StubPost(body))
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "Here is the audit result" in caplog.text
 
     def test_request_exception_logs_no_excerpt(self, caplog):
@@ -232,20 +243,20 @@ class TestRunAuditFailureShape:
             raise requests.RequestException("boom")
 
         result = _run_audit("audit prompt", post_fn=raising)
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "boom" in caplog.text
         assert "content_excerpt" not in caplog.text
 
     @pytest.mark.parametrize("body", [{"usage": {}}, {"choices": [{}]}])
     def test_malformed_body_is_not_a_pass(self, caplog, body):
         result = _run_audit("audit prompt", post_fn=lambda *a, **k: _StubPost(body))
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "audit failed" in caplog.text
 
     def test_non_string_content_is_not_a_pass(self, caplog):
         body = _body(None)
         result = _run_audit("audit prompt", post_fn=lambda *a, **k: _StubPost(body))
-        assert result == {"pass": False}
+        assert_audit_failure(result)
         assert "audit failed" in caplog.text
 
     def test_valid_body_returns_dict_no_warning(self, caplog):
