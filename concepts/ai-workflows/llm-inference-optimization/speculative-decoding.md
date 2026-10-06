@@ -2,20 +2,26 @@
 domain: ai-workflows
 subdomain: llm-inference-optimization
 concept: speculative-decoding
-title: How to Make LLMs 3X Faster
+title: Is Speculative Decoding Worth It? Profiling vLLM on NVIDIA Blackwell
 sources:
-  - title: "How to Make LLMs 3X Faster"
-    url: "https://blog.bytebytego.com/p/how-to-make-llms-3x-faster"
-    author: "ByteByteGo"
-    date: "2026-08-26"
+  - title: "Is Speculative Decoding Worth It? Profiling vLLM on NVIDIA Blackwell — Akamai"
+    url: "https://www.youtube.com/watch?v=XTpyNrEgJQ4"
+    author: "AI Engineer"
+    date: "2026-10-06T22:30:02+00:00"
 ---
 
-# How to Make LLMs 3X Faster
+# Is Speculative Decoding Worth It? Profiling vLLM on NVIDIA Blackwell
 
-Speculative decoding speeds up LLM token generation by exploiting the memory-bandwidth-bound nature of autoregressive decoding. A 70B model must stream ~140 GB of weights from VRAM for every single token, leaving GPU compute units idle most of the time (ByteByteGo, 2026). To use this spare capacity, a small draft model generates several candidate tokens in advance, and the large target model verifies them all in one parallel forward pass using causal masking. This converts one token per pass into several tokens per pass, delivering 2-3x speedups while producing statistically identical output.
+LLM inference has two main phases: prefill, where the model reads the query, processes incoming tokens, and creates a KV cache once, and decoding, where the model generates the response autoregressively one token at a time. For a large model such as a 70B Llama model, this can require many model transfers and introduce significant latency [1].
 
-- Autoregressive generation requires one forward pass per token, and each pass is dominated by weight transfer, not arithmetic.
-- Speculative decoding pairs a large target model with a much smaller draft model; the draft proposes K tokens, and the target verifies them simultaneously in a single pass.
-- Tokens are accepted or rejected against the target model's probabilities, with a rejection-replacement rule that preserves the exact output distribution, making it lossless.
-- Acceptance rates vary by workload: code, summarization, and structured output accept 80-90% of drafts, while open-ended creative writing accepts far fewer.
-- Gains shrink under high concurrency because spare compute disappears; a 70B model speedup drops from ~1.96x at batch size 1 to ~1.21x at batch size 128.
+Speculative decoding aims to reduce that cost by using a smaller draft model to speculate multiple tokens—typically three to five per cycle—in a faster, cheaper autoregressive process. The target model then validates the draft predictions in one pass, approving or rejecting them and recalculating rejected tokens. The output remains the same because the accurate target model still validates the tokens [1].
+
+It is not free: speculative decoding requires hosting two models, allocating memory for the second model, and reserving extra KV cache space for both. It is generally worth considering when there is spare GPU capacity; if the workload is highly parallel and the GPUs are already busy fulfilling requests, it may not make sense [1].
+
+Choosing a draft model involves balancing accuracy and speed. The draft model should usually be 10 to 50 times smaller than the target model, use the same tokenizer, and ideally come from the same model family. Structured workloads such as coding, JSON, or SQL queries are more likely to benefit, while creative tasks like writing poetry or brainstorming are less likely to benefit. In the demo, a single NVIDIA Blackwell GPU was used, splitting resources between a base model taking about 16 GB of weights and a draft model taking about 2.5 GB, leaving space for KV caching [1].
+
+- Speculative decoding uses a smaller draft model to propose multiple tokens per cycle, which the target model validates in one pass and recalculates when rejected.
+- The overhead includes hosting a second model and allocating KV cache for both models, so it is most attractive when spare GPU capacity is available.
+- Draft model selection should balance accuracy and speed; it is typically 10–50x smaller, shares the same tokenizer, and ideally belongs to the same model family.
+- Benefits are strongest for structured outputs like code, JSON, and SQL, and weaker for open-ended creative tasks such as poetry or brainstorming.
+- The demo split a single Blackwell GPU between a base model (~16 GB weights) and a draft model (~2.5 GB).
