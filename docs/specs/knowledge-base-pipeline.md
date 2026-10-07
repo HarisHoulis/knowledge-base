@@ -28,7 +28,7 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 - **Pipeline architecture**: Multi-module Python package `kb_pipeline`. No external orchestrator (n8n/Make.com). No database — filesystem tree is the store.
 - **Content retrieval**: RSS polling via `feedparser` for all blog/Substack sources. YouTube RSS for video channels (Ousterhout, Matt Pocock). Transcripts via `yt-dlp --write-auto-subs`.
 - **Text extraction**: `trafilatura` with markdown output. Falls back to raw summary text if no HTML content available.
-- **LLM classification + summarization**: Configurable LLM (model and endpoint supplied via `LLM_API_KEY`/`LLM_API_URL`/`LLM_MODEL` env vars) via OpenAI-compatible API. Single prompt requesting JSON output with `response_format: {"type": "json_object"}`. Temperature 0.3 for consistent classification. Max 2000 output tokens.
+- **LLM classification + summarization**: Configurable LLM (model and endpoint supplied via `LLM_API_KEY`/`LLM_API_URL`/`LLM_MODEL` env vars) via OpenAI-compatible API. Single prompt requesting JSON output with `response_format: {"type": "json_object"}`. Temperature 0.3 for consistent classification. Max 4000 output tokens, with model thinking disabled (`{"thinking": {"type": "disabled"}}`) so hidden reasoning does not consume the visible-JSON budget. The system prompt states the JSON-mode recipe — the literal word `json` plus a worked example object.
 - **State management**: `~/.kb-pipeline/state.json` — tracks `processed_hashes[]` (SHA-256[:16] of source URL). Prevents re-processing.
 - **Deduplication**: By source URL hash. No embedding-based fuzzy matching (overkill for this volume).
 - **Entry format**: YAML frontmatter (domain, subdomain, concept, title, sources[]) + summary body + key points list.
@@ -38,7 +38,7 @@ An automated pipeline (`kb_pipeline`) that polls RSS feeds from 9 trusted indivi
 - **No RAG / vector DB**: Filesystem tree is the canonical store. Search is via `grep` or file browser.
 - **Audit flow**: LLM output is written to `drafts/domain/subdomain/concept.md`. Classification Audit + Content Audit run concurrently on the draft. On pass, the file is moved to `domain/subdomain/concept.md` and `drafts/` is cleaned up. On fail, structured JSON feedback is fed into the LLM retry.
 - **Audit feedback format**: `{"pass": false, "issues": [{"field": "domain", "description": "should be android-kotlin, not system-design"}]}`. Minimum tokens, directly feedable into the retry prompt.
-- **Audit request config**: Audit calls disable model thinking (`{"thinking": {"type": "disabled"}}`) and cap output at `max_tokens: 1000`, so the verdict is not consumed by hidden reasoning. `response_format: {"type": "json_object"}` and temperature 0.1 are unchanged.
+- **Audit request config**: Audit calls disable model thinking (`{"thinking": {"type": "disabled"}}`) and cap output at `max_tokens: 2000`, so the verdict is not consumed by hidden reasoning and a multi-issue verdict fits without truncation. `response_format: {"type": "json_object"}` and temperature 0.1 are unchanged.
 - **Retry strategy**: Up to 2 iterations total. Only the failing audit re-runs per cycle (e.g., if Classification passes but Content fails, only Content re-runs on retry).
 - **Escalation**: After 2 failed retries, the pipeline halts and creates a GitHub issue via `gh issue create` with the entry path and combined audit feedback.
 

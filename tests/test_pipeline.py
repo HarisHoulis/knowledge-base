@@ -1828,6 +1828,12 @@ class TestTaxonomyDomains:
 
         assert "out-of-scope" in config.SYSTEM_PROMPT
 
+    def test_system_prompt_includes_json_recipe(self) -> None:
+        from kb_pipeline import config
+
+        assert "valid json object" in config.SYSTEM_PROMPT
+        assert '"concept": "structured-output"' in config.SYSTEM_PROMPT
+
 
 class TestEscalateFailureDedupe:
     def _make_fake_run(

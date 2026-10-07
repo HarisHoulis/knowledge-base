@@ -154,7 +154,7 @@ class TestRunAuditPostFn:
         _run_audit("audit prompt", post_fn=post)
         assert len(bodies) == 1
         assert bodies[0]["thinking"] == {"type": "disabled"}
-        assert bodies[0]["max_tokens"] == 1000
+        assert bodies[0]["max_tokens"] == 2000
         assert bodies[0]["response_format"] == {"type": "json_object"}
         assert bodies[0]["temperature"] == 0.1
 

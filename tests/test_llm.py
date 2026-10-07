@@ -104,3 +104,18 @@ def test_request_exception_keeps_message(caplog):
     assert result.kind is ClassifyFailureKind.REQUEST
     assert "LLM request failed" in caplog.text
     assert "content_excerpt" not in caplog.text
+
+
+def test_post_fn_body_disables_thinking_and_raises_max_tokens():
+    bodies = []
+
+    def post(*args, **kwargs):
+        bodies.append(kwargs["json"])
+        return _StubPost(_body(_valid_content()))
+
+    classify_summarize("some text", {"title": "t"}, post_fn=post)
+    assert len(bodies) == 1
+    assert bodies[0]["thinking"] == {"type": "disabled"}
+    assert bodies[0]["max_tokens"] == 4000
+    assert bodies[0]["response_format"] == {"type": "json_object"}
+    assert bodies[0]["temperature"] == 0.3
