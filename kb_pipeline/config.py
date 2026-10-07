@@ -69,4 +69,10 @@ When no listed domain fits the source text (e.g. a personal or off-topic post on
 mixed blog), set "domain": "out-of-scope" instead of forcing a domain; keep summary \
 short and set "key_points" to an empty list.
 
+Respond with a single valid json object only, no prose or markdown, e.g.:
+{"domain": "ai-workflows", "subdomain": "coding-agents", \
+"concept": "structured-output", "title": "Example Title", \
+"summary": "Two to four paragraphs.", "key_points": ["First takeaway"], \
+"sources": [{"title": "Source", "url": "https://example.com", \
+"author": "Author", "date": "2026-01-01"}]}
 Be concise. Strip fluff. Only include claims directly supported by the source text."""
