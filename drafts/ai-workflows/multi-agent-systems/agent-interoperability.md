@@ -2,24 +2,25 @@
 domain: ai-workflows
 subdomain: multi-agent-systems
 concept: agent-interoperability
-title: Your Agents Are in Solitary Confinement: Why MCP & A2A Aren't Enough
+title: Why AI Agents Can't Talk to Each Other (Yet)
 sources:
-  - title: "Your Agents Are in Solitary Confinement: Why MCP & A2A Aren't Enough — Vlad Luzin, Band"
-    url: "https://www.youtube.com/watch?v=UOcHfR3_tys"
-    author: "Vlad Luzin"
-    date: "2026-09-30"
+  - title: "Why Your AI Agents Can't Talk to Each Other (Yet) — Vlad Luzin, BAND"
+    url: "https://www.youtube.com/watch?v=toq-jyGLZDk"
+    author: "AI Engineer"
+    date: "2026-10-07"
 ---
 
-# Your Agents Are in Solitary Confinement: Why MCP & A2A Aren't Enough
+# Why AI Agents Can't Talk to Each Other (Yet)
 
-Vlad Luzin, co-founder and CTO of Band, argues that the future belongs to AI communication within businesses, between businesses, and between consumers and businesses. He envisions autonomous agents written in different frameworks and languages, deployed in different environments, communicating with each other without human intervention. In his picture, agents create conversation spaces, receive tasks from humans or other systems, find and add other agents, exchange messages, solve tasks, and report back (Luzin, 2026).
+Vlad Luzin, co-founder and CTO of BAND, argues that the future of AI lies in AI-to-AI communication within and between businesses, where autonomous agents distributed around the world delegate tasks, search registries for colleagues, and report back to users. He illustrates this with a vision of agents meeting in a shared conversational space, receiving tasks, inviting other agents, and collecting results on our behalf.
 
-Current protocols fall short. MCP treats agents as stateless tools, making stateful session-based interaction difficult. A2A is client-server: an agent can send a task to another, but for bidirectional task exchange both must be client and server. Chaining multi-agent calls involves REST API timeouts and requires queues and persistence, and detection is not part of A2A. As a result, developers still act as routers between stateful agents because the agents themselves cannot communicate (Luzin, 2026).
+Luzin traces an evolution from adversarial agents — where a human acts as a router between two sessions, one planning and one checking — to "cycle engineering," where Python or TypeScript orchestration code replaces the human router. This shift is motivated by the single-agent bottleneck: transformer limitations such as self-confirmation bias, blurred attention, context fragmentation, and impaired recall mean that even a one- or two-million-token context will not fix performance.
 
-Connecting agents to messaging platforms such as Telegram, Discord, Slack, or WhatsApp takes manual, documented steps—five, seven, eight, or eleven respectively—and usually yields only an agent that can talk to a human. The agents remain unable to see or communicate with each other, a condition Luzin calls digital solitary confinement. He questions whether multi-agent coordination is truly hypothetical or avoidable, and frames the need for real agent-to-agent communication rather than human-mediated orchestration (Luzin, 2026).
+He critiques current interoperability approaches. Messaging platforms like Slack, Teams, Discord, and WhatsApp require manual, multi-step setup (five steps for Telegram, seven for Discord, eight for Slack, eleven for WhatsApp) and still only connect an agent to a person, leaving agents in digital isolation. Protocol-based approaches like MCP and A2A also fall short: MCP uses stateless calls so you cannot revisit a prior agent interaction, A2A is one-way client-server unless both directions are implemented on both sides, chained REST calls cause timeouts, and features like discovery, session state, and queues are missing.
 
-- The thesis is that future AI value comes from autonomous agent communication across businesses and consumer interactions.
-- MCP treats agents as stateless tools, while A2A is client-server and awkward for bidirectional agent-to-agent tasks.
-- Chaining A2A calls brings REST API timeouts, requires queues/persistence, and lacks detection support.
-- Today developers act as routers between coding agents because agents cannot directly communicate.
-- Connecting agents to Slack, Telegram, Discord, or WhatsApp requires manual multi-step setup and mainly enables human-agent chat, leaving agents in digital solitary confinement.
+BAND is presented as the company addressing these gaps, though the transcript cuts off before detailing the product.
+
+- The future thesis: autonomous, distributed AI agents will communicate AI-to-AI within businesses, between businesses, and with consumers, delegating tasks on our behalf.
+- Multi-agent orchestration evolved from human-as-router adversarial agents to "cycle engineering," where orchestration code replaces the human, driven by the single-agent bottleneck (self-confirmation, blurred attention, context fragmentation, impaired recall).
+- Messaging platforms are a poor integration path: connecting an agent requires 5-11 manual steps and only enables agent-to-human, not agent-to-agent, communication.
+- Protocols like MCP and A2A are insufficient: MCP is stateless, A2A is one-way client-server requiring both sides to implement client and server, chained REST calls time out, and discovery, session state, and queues are missing.
