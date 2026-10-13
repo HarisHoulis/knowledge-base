@@ -2,17 +2,19 @@
 domain: engineering-culture
 subdomain: technical-writing
 concept: practitioner-voice
-title: Practitioner Voice: The Writing Category Nobody has Named Yet
+title: The Craft of Practitioner Voice
 sources:
-  - title: "Practitioner Voice: The Writing Category Nobody has Named Yet"
-    url: "https://martinfowler.com/articles/practitioner-voice.html"
+  - title: "The Craft of Practitioner Voice"
+    url: "https://martinfowler.com/articles/practitioner-voice.html#TheCraftOfPractitionerVoice"
     author: "Martin Fowler"
 ---
 
-# Practitioner Voice: The Writing Category Nobody has Named Yet
+# The Craft of Practitioner Voice
 
-The article introduces a writing category called "practitioner voice," a term coined by Jim Highsmith to describe effective writing from practitioners. This style is distinct from academic writing and thought-leadership content, offering a unique perspective rooted in practical experience. The author, Martin Fowler, advocates for this style and notes that his contributors mostly follow it, emphasizing its importance in technical communication.
+Jim Highsmith argues that practitioners writing for each other forms a distinct style of writing, and he expands on the craft of this style in a new section of his article. The piece covers how the writer shows up in the prose, its four principles, the role of story, how to sensibly use AI, three levels of editing, and clarity of the audience. Martin Fowler notes that Highsmith's addition provides more detail on how practitioners write in this style.
 
-- Practitioner voice is a distinct writing category recognized by Jim Highsmith.
-- It differs from academic writing and thought-leadership content.
-- The style is advocated by Martin Fowler and widely adopted by his contributors.
+- Practitioner writing for peers is a distinct style with its own craft.
+- The style involves how the writer shows up in the prose and four principles.
+- Story plays a role in practitioner writing.
+- AI should be used sensibly within this style.
+- Editing operates at three levels, and clarity of audience matters.
