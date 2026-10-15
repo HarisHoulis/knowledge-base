@@ -2,24 +2,25 @@
 domain: ai-workflows
 subdomain: coding-agents
 concept: software-factory
-title: The Software Factory: From Bug Report to Production Code
+title: Putting Your Codebase on Autopilot with Agent-Driven Software Factories
 sources:
-  - title: "The Software Factory: From Bug Report to Production Code — Davis Palmie, Factory"
-    url: "https://www.youtube.com/watch?v=exiwa9QbQXI"
-    author: "AI Engineer"
-    date: "2026-10-07"
+  - title: "How I Put My Codebase on Autopilot"
+    url: "https://www.youtube.com/watch?v=lDRjsHjkbjI"
+    author: "Kent C. Dodds"
+    date: "2026-10-13"
 ---
 
-# The Software Factory: From Bug Report to Production Code
+# Putting Your Codebase on Autopilot with Agent-Driven Software Factories
 
-Davis Palmie, a technical specialist at Factory, describes the evolution of AI engineering through three eras: tab-key autocomplete, whole-file generation, and agents that independently gather context, call tools, and debug their own code. Each step up the ladder of abstraction—from tokens to files to context to entire systems—makes engineers more valuable, not less, as their role shifts from writing code to managing agents and organizing them into a system he calls the software factory.
+Kent C. Dodds describes running a "software factory" where agents autonomously open and complete merge requests, citing 122 PRs issued in 24 hours straight from his software factory, with agents starting and completing valuable work even while he sleeps. He illustrates this with a real example: an agent detected a user experience issue in a table component (a phantom column appearing when the adaptive column is hidden), opened an issue under his account, and another agent fixed it in a merge request — all without his involvement.
 
-In this factory model, the system absorbs input signals such as bug reports or user feedback and produces ready-to-run code, while engineers maintain reliable fuses, identify code deviations, and set priorities and directions for work. Palmie argues that coding was never the bottleneck; the real friction lies in PR review time, reproducing user error reports, testing and debugging, documentation upkeep, and communication layers between testing, engineering, and product teams that are often on different continents.
+The core mechanism is turning agents into "complainers" rather than letting them silently accept workarounds. Agents often say they found an acceptable workaround and ignore problems, but these accumulate into explosive increases in difficulty. His PR release skill instructs agents, after merging and deploying code, to pay attention to their development experience and report minor glitches using a Kodi package, lubricating the mechanisms of the software factory and making agents more efficient at working with code.
 
-Palmie addresses four common concerns about AI-generated code. On budget overspending, he advocates model-agnosticism to access the full price-performance spectrum, quoting Factory's CEO: "if your child needs an algebra tutor, you'll definitely find someone cheaper than Albert Einstein." On model access, he rejects betting on one favorite model, favoring dynamic routing and open source options. On the future of engineers, he sees the line between product and engineering blurring, with engineers building and maintaining the factory system itself. On organizational change, he stresses that context must flow seamlessly across team boundaries, since information isolation is even more acute for agents than for humans.
+He points to Lauren, who produces 2,500 PRs per month, explaining that most of her agents work on polish and code quality — fixing bugs, improving performance, CI, and refactoring — to help the team move faster, while features are added carefully and kept at a high level. Dodds says he remains a "bottleneck" for product decisions and direction, and believes that is how it should be.
 
-- AI engineering has progressed through three eras: autocomplete, whole-file generation, and agents that gather context, call tools, and debug their own code.
-- The software factory is a system of agents that transforms input signals like bug reports into production-ready code, with engineers managing agents and setting strategic direction.
-- Coding was never the bottleneck; PR review, error reproduction, testing, debugging, and documentation are the real friction points.
-- Model-agnosticism and dynamic routing across providers and open source models avoid overspending and dependence on a single vendor.
-- Context must flow seamlessly across team boundaries because information isolation is especially acute for AI agents.
+To trust autonomous agent decisions, he outlines three requirements: agents must create quality PRs from the start; errors that creep into PRs must be caught before reaching production; and robust defense mechanisms must reduce the radius of damage if something slips into production. He also notes using Devon's cloud agent for a security audit across multiple repositories, and discusses model selection — some subtasks need expensive deep models while routine work can use cheaper ones.
+
+- Agents should be instructed to report problems ("complainers") instead of silently accepting workarounds, since accumulated workarounds cause explosive increases in difficulty.
+- Most agent work should target polish and code quality — bug fixes, performance, CI, refactoring — while product decisions remain a human bottleneck.
+- Trusting autonomous agents requires three safeguards: quality PRs from the start, catching errors before production, and defense mechanisms to limit damage in production.
+- Different subtasks warrant different models: expensive deep models for complex work, cheaper models for routine tasks.
