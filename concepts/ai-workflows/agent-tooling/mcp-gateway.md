@@ -2,26 +2,23 @@
 domain: ai-workflows
 subdomain: agent-tooling
 concept: mcp-gateway
-title: How Uber Built a Gateway for AI Agents to Access Tools
+title: Uber Builds MCP Gateway to Govern Access to 800+ Servers and 5,000+ AI Agent Tools
 sources:
-  - title: "How Uber Built A Gateway For AI Agents To Access Tools"
-    url: "https://blog.bytebytego.com/p/how-uber-built-a-gateway-for-ai-agents"
-    author: "ByteByteGo"
-    date: "2026-10-28"
+  - title: "Uber Builds MCP Gateway to Govern Access to 800+ Servers and 5,000+ AI Agent Tools"
+    url: "https://www.infoq.com/news/2026/11/uber-mcp-gateway-ai-agents/"
+    author: "Leela Kumili"
+    date: "2026-11-02"
 ---
 
-# How Uber Built a Gateway for AI Agents to Access Tools
+# Uber Builds MCP Gateway to Govern Access to 800+ Servers and 5,000+ AI Agent Tools
 
-Uber's engineering team built an MCP Gateway to solve the problem of many teams independently building MCP integrations for their services. An off-the-shelf LLM can't answer questions about internal systems, so tools (structured operations like log search or deployment status checks) are needed; MCP (Model Context Protocol) standardizes how AI applications discover and call these tools via MCP clients, servers, and tool definitions using JSON-RPC 2.0. As adoption grew, teams duplicated work on exposing tools, managing connections, and permissions, and Uber's mix of HTTP, gRPC, and TChannel services made direct forwarding of MCP requests impossible.
+Uber has built an MCP Gateway to standardize how AI agents discover and invoke internal services across more than 800 MCP servers and 5,000 tools (InfoQ, Leela Kumili). The gateway separates tool registration from runtime execution, decoupling how tools are catalogued from how they are actually called at runtime.
 
-The gateway splits into two components: the MCP Registry (control plane) holds the catalog of servers and tools and manages configuration, while the Proxy Gateway (data plane) handles live MCP requests, routing them to the right service and returning MCP-compatible results. Tool discovery is automated by AutoCrawler, a Cadence-powered distributed workflow that reads existing API IDL definitions to generate tool schemas (using an LLM to improve descriptions) and also detects native MCP servers via heartbeat metrics and listTools calls.
+The gateway includes automated API discovery, access controls, sensitive data redaction, incremental tool discovery through Omni MCP, and response filtering. These features let Uber govern which agents can reach which internal services and limit what data flows back to them.
 
-Newly discovered tools start disabled; the owning service team must review and enable them, with every change tracked as an approvable diff that can be rolled back. The data plane periodically refreshes in-memory configuration to create virtual MCP servers (e.g., logging/mcp), converting JSON tool arguments into the downstream format (Protobuf for gRPC, HTTP, or Thrift/TChannel) and translating responses back. Access control is enforced centrally via Uber's internal Access Control System at server or tool granularity, with PII redaction and token exchange for third-party services like Jira and Google.
+Incremental tool discovery via Omni MCP addresses the scale problem of exposing thousands of tools to agents, while response filtering and redaction add guardrails around sensitive data at the gateway layer rather than in each individual server.
 
-To handle a catalog of thousands of tools without exhausting the model's context window, Uber added Omni MCP, a single proxy server that lets agents discover capabilities gradually rather than loading all tool definitions upfront.
-
-- MCP Gateway separates a control plane (Registry for tool catalog and config) from a data plane (Proxy Gateway for live request routing).
-- AutoCrawler automates tool discovery from API IDL definitions and native MCP server heartbeats, using an LLM to generate better tool descriptions.
-- Discovered tools start disabled and require owner-team review and approval, with versioned diffs and rollback.
-- The gateway translates MCP JSON arguments into gRPC/Protobuf, HTTP, or TChannel formats and enforces tool-level access control with PII redaction.
-- Omni MCP addresses context-window limits by enabling gradual tool discovery instead of loading thousands of tool definitions upfront.
+- Uber's MCP Gateway fronts 800+ MCP servers and 5,000+ tools for AI agents
+- It separates tool registration from runtime execution
+- Features include automated API discovery, access controls, sensitive data redaction, and response filtering
+- Omni MCP provides incremental tool discovery to manage scale
