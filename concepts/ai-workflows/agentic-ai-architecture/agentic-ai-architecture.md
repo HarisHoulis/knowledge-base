@@ -2,21 +2,24 @@
 domain: ai-workflows
 subdomain: agentic-ai-architecture
 concept: agentic-ai-architecture
-title: Agentic AI Architecture: An Emerging Software Architecture Discipline
+title: Agentic AI Architecture: Current Challenges and Future Opportunities
 sources:
-  - title: "Article Series: Agentic AI Architecture"
-    url: "https://www.infoq.com/articles/agentic-ai-architecture-article-series/"
+  - title: "Agentic AI Architecture: Current Challenges and Future Opportunities"
+    url: "https://www.infoq.com/articles/agentic-ai-architecture-challenges-opportunities/"
     author: "Rafał Gancarz"
-    date: "2026-10-21"
+    date: "2026-11-09"
 ---
 
-# Agentic AI Architecture: An Emerging Software Architecture Discipline
+# Agentic AI Architecture: Current Challenges and Future Opportunities
 
-This InfoQ article series, introduced by Rafał Gancarz, proposes agentic AI architecture as a distinct new type of software architecture that is likely to dominate the industry for years to come. Rather than a single technique, the series frames it as a broad architectural category that industry experts explore from multiple angles.
+Gancarz frames agentic AI architecture as an extension of microservices and cloud-native architectures, in which AI agents operate with context, memory, and protocols such as MCP and A2A. Rather than replacing existing systems, agents are layered onto them, which raises questions about how they integrate with established bounded contexts.
 
-The contributing articles cover various elements and aspects of agentic AI architecture, aiming to capture the latest trends and developments as this architecture style enters the mainstream. The series is positioned as a survey of an emerging discipline rather than a single prescriptive design.
+The article emphasizes that coordination strategies should be task-dependent rather than uniform, and that agentic systems introduce new security risks and observability requirements beyond those of conventional services. Adoption is expected to be gradual, proceeding alongside existing architectures rather than as a wholesale replacement.
 
-- Agentic AI architecture is framed as a new type of software architecture, not just a tooling choice
-- The series argues this architecture will likely dominate the industry for years
-- Multiple industry experts contribute coverage of different elements and aspects
-- The focus is on current trends and developments as the approach enters the mainstream
+Over time, platforms are expected to absorb common agentic components, reducing the need for each team to build them independently.
+
+- Agentic AI architecture extends microservices and cloud-native patterns with agents that use context, memory, and protocols like MCP and A2A
+- Integration with bounded contexts is a central design concern
+- Coordination strategies should be chosen based on the task rather than applied uniformly
+- Agents bring new security risks and observability needs
+- Adoption will be gradual, with platforms absorbing common components over time
