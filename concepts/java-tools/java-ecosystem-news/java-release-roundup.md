@@ -2,20 +2,22 @@
 domain: java-tools
 subdomain: java-ecosystem-news
 concept: java-release-roundup
-title: Java News Roundup: TornadoVM, A2A Java, Open Liberty, Open J Proxy, Gradle, EclipseStore
+title: Java News Roundup: Lazy Constants, Spring for Apache Pulsar, GlassFish, Hibernate, TomEE, Seed4J
 sources:
-  - title: "Java News Roundup: TornadoVM, A2A Java, Open Liberty, Open J Proxy, Gradle, EclipseStore"
-    url: "https://www.infoq.com/news/2026/11/java-news-roundup-nov02-2026/"
+  - title: "Java News Roundup: Lazy Constants, Spring for Apache Pulsar, GlassFish, Hibernate, TomEE, Seed4J"
+    url: "https://www.infoq.com/news/2026/11/java-news-roundup-nov09-2026/"
     author: "Michael Redlich"
-    date: "2026-11-09"
+    date: "2026-11-16"
 ---
 
-# Java News Roundup: TornadoVM, A2A Java, Open Liberty, Open J Proxy, Gradle, EclipseStore
+# Java News Roundup: Lazy Constants, Spring for Apache Pulsar, GlassFish, Hibernate, TomEE, Seed4J
 
-This roundup covers Java ecosystem releases for the week of November 2nd, 2026. TornadoVM and TornadoInsight shipped point releases, alongside point releases of A2A for Java, Gradle, and EclipseStore (InfoQ). Open Liberty published its November 2026 edition, while Open J Proxy reached its third release candidate (InfoQ). Micrometer Metrics and Micrometer Tracing both issued second release candidates, and Quarkus 4.0 moved to its third beta release (InfoQ).
+This InfoQ roundup covers the Java ecosystem news for the week of November 9th, 2026. The headline item is a proposal to target Lazy Constants for JDK 28, alongside TornadoVM's jitLLM 3.0 release. The week also brought point releases of Seed4J and second release candidates for Spring AI and Spring Boot.
 
-- TornadoVM, TornadoInsight, A2A for Java, Gradle, and EclipseStore all issued point releases
-- Open Liberty released its November 2026 edition
-- Open J Proxy reached its third release candidate
-- Micrometer Metrics and Micrometer Tracing both hit second release candidates
-- Quarkus 4.0 entered its third beta release
+On the framework and server side, Hibernate ORM and Hibernate Reactive shipped their first release candidates, GlassFish reached its fourth milestone release, and Apache TomEE published its second milestone release. The roundup also references Spring for Apache Pulsar among the week's items.
+
+- Lazy Constants is proposed to target JDK 28
+- TornadoVM jitLLM 3.0 released
+- Spring AI and Spring Boot reached second release candidates
+- Hibernate ORM and Hibernate Reactive hit first release candidates
+- GlassFish and Apache TomEE published milestone releases
