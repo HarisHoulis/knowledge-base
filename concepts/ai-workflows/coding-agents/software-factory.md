@@ -2,25 +2,24 @@
 domain: ai-workflows
 subdomain: coding-agents
 concept: software-factory
-title: Putting Your Codebase on Autopilot with Agent-Driven Software Factories
+title: 40x More Merged PRs With 2.7x the Engineers: Cognition's Software Factory
 sources:
-  - title: "How I Put My Codebase on Autopilot"
-    url: "https://www.youtube.com/watch?v=lDRjsHjkbjI"
-    author: "Kent C. Dodds"
-    date: "2026-10-13"
+  - title: "40x More Merged PRs With 2.7x the Engineers — Walden Yan, CPO, Cognition"
+    url: "https://www.youtube.com/watch?v=U92J5mCDLMc"
+    author: "AI Engineer"
+    date: "2026-11-18"
 ---
 
-# Putting Your Codebase on Autopilot with Agent-Driven Software Factories
+# 40x More Merged PRs With 2.7x the Engineers: Cognition's Software Factory
 
-Kent C. Dodds describes running a "software factory" where agents autonomously open and complete merge requests, citing 122 PRs issued in 24 hours straight from his software factory, with agents starting and completing valuable work even while he sleeps. He illustrates this with a real example: an agent detected a user experience issue in a table component (a phantom column appearing when the adaptive column is hidden), opened an issue under his account, and another agent fixed it in a merge request — all without his involvement.
+Walden Yan, co-founder and CPO of Cognition, describes how his engineering team achieved a 40x increase in combined PRs over roughly a year while only growing the engineering headcount 2.7x, implying each engineer became more than 10x more productive, with PR quality claimed to be equal or better than a year prior. The core mechanism is a "software factory" in which everything is automated by default: PRs flow from initial bug report through merge, monitoring, and support without human intervention, with an escalation system reserved for cases that genuinely require human judgment.
 
-The core mechanism is turning agents into "complainers" rather than letting them silently accept workarounds. Agents often say they found an acceptable workaround and ignore problems, but these accumulate into explosive increases in difficulty. His PR release skill instructs agents, after merging and deploying code, to pay attention to their development experience and report minor glitches using a Kodi package, lubricating the mechanisms of the software factory and making agents more efficient at working with code.
+This shift required redefining the engineer's role. Yan told the team that simply pulling tickets off the Linear board and handing them to an agent would not succeed in the AI era, since anything describable and implementable can be sent to Devin. Instead, large teams were split into small groups of two or three engineers who own greater vertical responsibility—reviewing user bug reports, running QA, product management and governance—each managing their own Linear task board and dispatching work to agents.
 
-He points to Lauren, who produces 2,500 PRs per month, explaining that most of her agents work on polish and code quality — fixing bugs, improving performance, CI, and refactoring — to help the team move faster, while features are added carefully and kept at a high level. Dodds says he remains a "bottleneck" for product decisions and direction, and believes that is how it should be.
+Workflows are centered on Slack: a user bug report (often a video) is forwarded to an internal channel, Devin is tagged, and it creates a PR and replies with a video demonstrating the fix. This makes development evidence-based and video-driven, letting the team avoid opening an IDE or GitHub in most cases. Yan stresses that buying a coding agent is not enough—the underlying infrastructure must change. Cognition migrated from cloud-based testing environments to per-service local runs via Docker Compose, with mocked third-party services, all on a single VM accessible to every developer, rebuilt from scratch hourly so no coding agent needs access to live services to test changes.
 
-To trust autonomous agent decisions, he outlines three requirements: agents must create quality PRs from the start; errors that creep into PRs must be caught before reaching production; and robust defense mechanisms must reduce the radius of damage if something slips into production. He also notes using Devon's cloud agent for a security audit across multiple repositories, and discusses model selection — some subtasks need expensive deep models while routine work can use cheaper ones.
-
-- Agents should be instructed to report problems ("complainers") instead of silently accepting workarounds, since accumulated workarounds cause explosive increases in difficulty.
-- Most agent work should target polish and code quality — bug fixes, performance, CI, refactoring — while product decisions remain a human bottleneck.
-- Trusting autonomous agents requires three safeguards: quality PRs from the start, catching errors before production, and defense mechanisms to limit damage in production.
-- Different subtasks warrant different models: expensive deep models for complex work, cheaper models for routine tasks.
+- Cognition reports 40x more combined PRs with only 2.7x more engineers over about a year, implying >10x per-engineer productivity with equal or better quality.
+- The "software factory" model automates the full lifecycle from bug report to merge, monitoring, and support by default, with human escalation only when judgment is needed.
+- Engineers are organized into small 2-3 person groups with vertical ownership spanning bug triage, QA, product management, and agent dispatch via their own Linear boards.
+- Slack-centric, video-driven workflows let Devin create PRs and post proof-of-fix videos, so engineers rarely open an IDE or GitHub.
+- Infrastructure must change: services run locally via Docker Compose with mocked third-party dependencies on a shared hourly-rebuilt VM, so agents never need live services to test.
