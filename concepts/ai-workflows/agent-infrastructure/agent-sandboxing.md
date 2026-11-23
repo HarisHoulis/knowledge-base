@@ -2,23 +2,23 @@
 domain: ai-workflows
 subdomain: agent-infrastructure
 concept: agent-sandboxing
-title: Why AI Agents Should Have Their Own Sandbox
+title: Google Agent Compute Engine for Secure AI Agent Execution
 sources:
-  - title: "Why AI Agents Should Have Their Own Sandbox — Philipp Schmid, Google DeepMind"
-    url: "https://www.youtube.com/watch?v=oWTEiYpxl80"
-    author: "AI Engineer"
-    date: "2026-10-07"
+  - title: "Google Announces Agent Compute Engine for Secure AI Agent Execution"
+    url: "https://www.infoq.com/news/2026/11/google-agent-compute-engine/"
+    author: "Renato Losio"
+    date: "2026-11-22"
 ---
 
-# Why AI Agents Should Have Their Own Sandbox
+# Google Agent Compute Engine for Secure AI Agent Execution
 
-Philipp Schmid of Google DeepMind traces the evolution of LLM interaction from simple text continuation through instruction-following and chat dialogue to today's goal-driven agents that run autonomously for hours or days. In this agentic paradigm, users set a goal, explain how to test achievements, and how to deploy, then hope the model delivers expected results over extended runs.
+Google announced Agent Compute Engine, a managed service that executes AI agents inside isolated microVMs, providing a hardened boundary around agent workloads. The service also supports checkpointing, allowing execution environments to be suspended and resumed rather than rebuilt from scratch.
 
-Schmid introduces the Interactions API as Google's answer to OpenAI's Responses API, emphasizing that it is developer-oriented and treats models and agents through the same interface. The API supports server-side state management, long-running asynchronous operations (useful for slow tasks like video generation), and simplified tool creation combining built-in tools like Google Search with custom functions.
+A key security design choice is that sensitive material—credentials, API keys, and OAuth refresh tokens—is kept outside the agent sandbox. Instead, an external Agent Gateway authenticates requests and injects the required secrets, so agents never hold long-lived secrets directly.
 
-The central argument is that every model or agent should have its own sandbox. The Interactions API is named for the shift from merely getting a response to actively interacting with models and agents, where continuing a dialogue means passing an ID from the previous step and letting the server combine all prior inputs so the model sees everything that has been done before.
+Together these features address two practical problems of running agents in production: containing untrusted or unpredictable agent behavior, and managing secret exposure while preserving stateful, resumable execution.
 
-- LLM interaction evolved from text continuation to instruction-following to chat to goal-driven agents that run for hours or days
-- The Interactions API unifies model and agent invocation under one interface across all modalities
-- Server-side state management and long-running async operations simplify agent development
-- Every model or agent should have its own sandbox environment
+- Agents run in isolated microVMs managed by Google's Agent Compute Engine.
+- Checkpointing lets execution environments be suspended and resumed.
+- Credentials, API keys, and OAuth refresh tokens live outside the agent sandbox.
+- An external Agent Gateway authenticates requests and injects secrets.
